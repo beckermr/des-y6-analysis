@@ -78,7 +78,7 @@ for tile in tiles:
 
     break
 
-with joblib.Parallel(n_jobs=-1, backend='loky') as para:
+with joblib.Parallel(n_jobs=-1, backend='loky', verbose=100) as para:
     outputs = para(jobs)
 
 d = np.zeros(len(tiles) * len(BANDS), dtype=dtype)
