@@ -61,36 +61,18 @@ def _compute_hist_for_tile_band(tname, band):
         h_nepoch = np.histogram(nepoch, bins=BINS)[0]
         h_pizza = np.histogram(np.array(nepoch) + np.array(dnepoch), bins=BINS)[0]
 
-        return h_pizza, h_nepoch, h_dnepoch, tname, band
+    res = h_pizza, h_nepoch, h_dnepoch, tname, band
 
+    dtype = [
+        ("pizza", "f4", (BINS.shape[0]-1,)),
+        ("stamp", "f4", (BINS.shape[0]-1,)),
+        ("diff", "f4", (BINS.shape[0]-1,)),
+        ("bin", "f4", (BINS.shape[0]-1,)),
+        ("tilename", "U20"),
+        ("band", "U1"),
+    ]
 
-tiles = list(set([os.path.basename(f).split("_")[0] for f in glob.glob("./meds/*")]))
-assert len(tiles) == 100
-
-dtype = [
-    ("pizza", "f4", (BINS.shape[0]-1,)),
-    ("stamp", "f4", (BINS.shape[0]-1,)),
-    ("diff", "f4", (BINS.shape[0]-1,)),
-    ("bin", "f4", (BINS.shape[0]-1,)),
-    ("tilename", "U20"),
-    ("band", "U1"),
-]
-
-os.system("rm -rf test.fits")
-
-jobs = []
-totd = []
-for i, tile in enumerate(tiles):
-    for band in BANDS:
-        jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
-
-    with joblib.Parallel(n_jobs=5, backend='loky', verbose=100, timeout=240) as para:
-        outputs = para(jobs)
-    print("done with data processing", flush=True)
-
-    jobs = []
-
-    outputs = [o for o in outputs if o is not None]
+    outputs = [res]
 
     if len(outputs) > 0:
         d = np.zeros(len(outputs), dtype=dtype)
@@ -102,7 +84,20 @@ for i, tile in enumerate(tiles):
             d["stamp"][i] = res[1]
             d["diff"][i] = res[2]
 
-        totd.append(d)
-
         print("writing data", flush=True)
-        fitsio.write("test.fits", esutil.numpy_util.combine_arrlist(totd), clobber=True)
+        fitsio.write("./hdata/hdata_%s_%s.fits" % (tname, band), d, clobber=True)
+
+
+tiles = list(set([os.path.basename(f).split("_")[0] for f in glob.glob("./meds/*")]))
+assert len(tiles) == 100
+
+os.system("mkdir -p hdata")
+
+jobs = []
+totd = []
+for i, tile in enumerate(tiles):
+    for band in BANDS:
+        jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
+
+with joblib.Parallel(n_jobs=10, backend='loky', verbose=100) as para:
+    para(jobs)
