@@ -105,4 +105,4 @@ for i, tile in enumerate(tiles):
             totd.append(d)
 
             print("writing data", flush=True)
-            fitsio.write("test.fits", esutil.numpy_util.array_combine(totd), clobber=True)
+            fitsio.write("test.fits", esutil.numpy_util.combine_arrlist(totd), clobber=True)
