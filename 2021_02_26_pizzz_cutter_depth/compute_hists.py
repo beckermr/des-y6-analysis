@@ -30,7 +30,7 @@ def _compute_hist_for_tile_band(tname, band):
     )
     stamp_name = glob.glob("./meds/%s_*_%s_meds-Y6A1.fits.fz" % (tname, band))[0]
 
-    if (not os.path.exists(pizza_name) or (not os.path.exists(stamp_name)):
+    if (not os.path.exists(pizza_name)) or (not os.path.exists(stamp_name)):
         return None
 
     with meds.MEDS(pizza_name) as m, meds.MEDS(stamp_name) as mobj:
