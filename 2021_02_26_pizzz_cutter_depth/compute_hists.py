@@ -84,7 +84,7 @@ for i, tile in enumerate(tiles):
     for band in BANDS:
         jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
 
-        with joblib.Parallel(n_jobs=1, backend='serial', verbose=100, timeout=120) as para:
+        with joblib.Parallel(n_jobs=1, backend='sequential', verbose=100, timeout=120) as para:
             outputs = para(jobs)
         print("done with data processing", flush=True)
 
