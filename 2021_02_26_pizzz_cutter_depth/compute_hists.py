@@ -59,7 +59,7 @@ def _compute_hist_for_tile_band(tname, band):
         return h_pizza, h_nepoch, h_dnepoch
 
 
-tiles = set([os.path.basename(f) for f in glob.glob("./meds/*")])
+tiles = set([os.path.basename(f).split("_")[0] for f in glob.glob("./meds/*")])
 assert len(tiles) == 100
 
 dtype = [
