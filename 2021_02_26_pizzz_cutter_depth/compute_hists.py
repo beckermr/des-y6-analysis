@@ -56,7 +56,7 @@ def _compute_hist_for_tile_band(tname, band):
         h_nepoch = np.histogram(nepoch, bins=BINS)[0]
         h_pizza = np.histogram(np.array(nepoch) + np.array(dnepoch), bins=BINS)[0]
 
-        return h_pizza, h_nepoch, h_dnepoch
+        return h_pizza, h_nepoch, h_dnepoch, tname, band
 
 
 tiles = list(set([os.path.basename(f).split("_")[0] for f in glob.glob("./meds/*")]))
@@ -71,13 +71,24 @@ dtype = [
     ("band", "U1"),
 ]
 
-d = np.zeros(1, dtype=dtype)
-res = _compute_hist_for_tile_band(tiles[0], BANDS[0])
-d["band"][0] = BANDS[0]
-d["tilename"][0] = tiles[0]
-d["bin"][0] = (BINS+1)[:-1]
-d["pizza"][0] = res[0]
-d["stamp"][0] = res[1]
-d["diff"][0] = res[2]
+jobs = []
+for tile in tiles:
+    for band in BANDS:
+        jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
+
+    break
+
+with joblib.Parallel(n_jobs=-1, backend='loky') as para:
+    outputs = para(jobs)
+
+d = np.zeros(len(tiles) * len(BANDS), dtype=dtype)
+
+for i, res in enumerate(outputs):
+    d["band"][i] = res[4]
+    d["tilename"][i] = res[3]
+    d["bin"][i] = (BINS+1)[:-1]
+    d["pizza"][i] = res[0]
+    d["stamp"][i] = res[1]
+    d["diff"][i] = res[2]
 
 fitsio.write("test.fits", d, clobber=True)
