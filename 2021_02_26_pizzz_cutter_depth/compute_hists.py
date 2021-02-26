@@ -54,7 +54,7 @@ def _compute_hist_for_tile_band(tname, band):
 
         h_dnepoch = np.histogram(dnepoch, bins=BINS)[0]
         h_nepoch = np.histogram(nepoch, bins=BINS)[0]
-        h_pizza = np.histogram(m["nepoch"][pizza_ind], bins=BINS)[0]
+        h_pizza = np.histogram(np.array(nepoch) + np.array(dnepoch), bins=BINS)[0]
 
         return h_pizza, h_nepoch, h_dnepoch
 
