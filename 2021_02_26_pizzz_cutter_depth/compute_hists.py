@@ -52,9 +52,9 @@ def _compute_hist_for_tile_band(tname, band):
             dnepoch.append(m["nepoch"][pizza_ind] - nepoch_obj)
             nepoch.append(nepoch_obj)
 
-        h_dnepoch = np.histogram(dnepoch, bins=BINS)
-        h_nepoch = np.histogram(nepoch, bins=BINS)
-        h_pizza = np.histogram(m["nepoch"][pizza_ind], bins=BINS)
+        h_dnepoch = np.histogram(dnepoch, bins=BINS)[0]
+        h_nepoch = np.histogram(nepoch, bins=BINS)[0]
+        h_pizza = np.histogram(m["nepoch"][pizza_ind], bins=BINS)[0]
 
         return h_pizza, h_nepoch, h_dnepoch
 
