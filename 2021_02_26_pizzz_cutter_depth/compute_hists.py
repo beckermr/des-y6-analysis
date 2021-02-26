@@ -63,10 +63,10 @@ tiles = list(set([os.path.basename(f).split("_")[0] for f in glob.glob("./meds/*
 assert len(tiles) == 100
 
 dtype = [
-    ("pizza", "f4", (BINS.shape[0],)),
-    ("stamp", "f4", (BINS.shape[0],)),
-    ("diff", "f4", (BINS.shape[0],)),
-    ("bin", "f4", (BINS.shape[0],)),
+    ("pizza", "f4", (BINS.shape[0]-1,)),
+    ("stamp", "f4", (BINS.shape[0]-1,)),
+    ("diff", "f4", (BINS.shape[0]-1,)),
+    ("bin", "f4", (BINS.shape[0]-1,)),
     ("tilename", "U20"),
     ("band", "U1"),
 ]
