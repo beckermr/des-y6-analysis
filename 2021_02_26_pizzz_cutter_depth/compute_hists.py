@@ -75,7 +75,7 @@ d = np.zeros(1, dtype=dtype)
 res = _compute_hist_for_tile_band(tiles[0], BANDS[0])
 d["band"][0] = BANDS[0]
 d["tilename"][0] = tiles[0]
-d["bin"][0] = BINS
+d["bin"][0] = (BINS+1)[:-1]
 d["pizza"][0] = res[0]
 d["stamp"][0] = res[1]
 d["diff"][0] = res[2]
