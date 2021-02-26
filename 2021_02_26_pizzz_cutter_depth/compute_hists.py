@@ -27,7 +27,7 @@ def _compute_hist_for_tile_band(tname, band):
             band,
         )
     )
-    stamp_name = "./meds/%s_r4920p01_%s_meds-Y6A1.fits.fz" % (tname, band)
+    stamp_name = glob.glob("./meds/%s_*_%s_meds-Y6A1.fits.fz" % (tname, band))[0]
 
     with meds.MEDS(pizza_name) as m, meds.MEDS(stamp_name) as mobj:
         pizza_inds = _convert_to_index(mobj["orig_row"][:, 0], mobj["orig_col"][:, 0])
