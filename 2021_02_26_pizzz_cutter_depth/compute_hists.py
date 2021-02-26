@@ -77,7 +77,7 @@ for tile in tiles:
     for band in BANDS:
         jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
 
-with joblib.Parallel(n_jobs=-1, backend='loky', verbose=100) as para:
+with joblib.Parallel(n_jobs=-1, backend='threading', verbose=100) as para:
     outputs = para(jobs)
 
 d = np.zeros(len(tiles) * len(BANDS), dtype=dtype)
