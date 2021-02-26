@@ -85,22 +85,28 @@ for i, tile in enumerate(tiles):
         jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
 
     if i % 2 == 1:
-        with joblib.Parallel(n_jobs=10, backend='loky', verbose=100) as para:
-            outputs = para(jobs)
+        try:
+            with joblib.Parallel(n_jobs=10, backend='loky', verbose=100, timeout=120) as para:
+                outputs = para(jobs)
+            print("done with data processing", flush=True)
 
-        jobs = []
+            jobs = []
 
-        outputs = [o for o in outputs if o is not None]
+            outputs = [o for o in outputs if o is not None]
 
-        d = np.zeros(len(outputs), dtype=dtype)
-        for i, res in enumerate(outputs):
-            d["band"][i] = res[4]
-            d["tilename"][i] = res[3]
-            d["bin"][i] = BCEN
-            d["pizza"][i] = res[0]
-            d["stamp"][i] = res[1]
-            d["diff"][i] = res[2]
+            d = np.zeros(len(outputs), dtype=dtype)
+            for i, res in enumerate(outputs):
+                d["band"][i] = res[4]
+                d["tilename"][i] = res[3]
+                d["bin"][i] = BCEN
+                d["pizza"][i] = res[0]
+                d["stamp"][i] = res[1]
+                d["diff"][i] = res[2]
 
-        totd.append(d)
+            totd.append(d)
 
-        fitsio.write("test.fits", esutil.numpy_util.array_combine(totd), clobber=True)
+            print("writing data", flush=True)
+            fitsio.write("test.fits", esutil.numpy_util.array_combine(totd), clobber=True)
+        except Exception:
+            jobs = []
+            continue
