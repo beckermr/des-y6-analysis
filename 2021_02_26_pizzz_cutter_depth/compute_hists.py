@@ -10,6 +10,7 @@ from meds.defaults import BMASK_EDGE
 
 BINS = np.linspace(-20, 20, 41) + 0.5
 BANDS = ["g", "r", "i", "z", "Y"]
+BCEN = (BINS[:-1] + BINS[1:])/2
 
 
 def _convert_to_index(row, col, dbox=100, edge=50):
@@ -84,7 +85,7 @@ d = np.zeros(len(tiles) * len(BANDS), dtype=dtype)
 for i, res in enumerate(outputs):
     d["band"][i] = res[4]
     d["tilename"][i] = res[3]
-    d["bin"][i] = (BINS+1)[:-1]
+    d["bin"][i] = BCEN
     d["pizza"][i] = res[0]
     d["stamp"][i] = res[1]
     d["diff"][i] = res[2]
