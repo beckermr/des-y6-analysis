@@ -86,7 +86,7 @@ for i, tile in enumerate(tiles):
 
     if i % 2 == 1:
         try:
-            with joblib.Parallel(n_jobs=10, backend='loky', verbose=100, timeout=120) as para:
+            with joblib.Parallel(n_jobs=1, backend='serial', verbose=100, timeout=120) as para:
                 outputs = para(jobs)
             print("done with data processing", flush=True)
 
@@ -94,19 +94,20 @@ for i, tile in enumerate(tiles):
 
             outputs = [o for o in outputs if o is not None]
 
-            d = np.zeros(len(outputs), dtype=dtype)
-            for i, res in enumerate(outputs):
-                d["band"][i] = res[4]
-                d["tilename"][i] = res[3]
-                d["bin"][i] = BCEN
-                d["pizza"][i] = res[0]
-                d["stamp"][i] = res[1]
-                d["diff"][i] = res[2]
+            if len(outputs) > 0:
+                d = np.zeros(len(outputs), dtype=dtype)
+                for i, res in enumerate(outputs):
+                    d["band"][i] = res[4]
+                    d["tilename"][i] = res[3]
+                    d["bin"][i] = BCEN
+                    d["pizza"][i] = res[0]
+                    d["stamp"][i] = res[1]
+                    d["diff"][i] = res[2]
 
-            totd.append(d)
+                totd.append(d)
 
-            print("writing data", flush=True)
-            fitsio.write("test.fits", esutil.numpy_util.array_combine(totd), clobber=True)
+                print("writing data", flush=True)
+                fitsio.write("test.fits", esutil.numpy_util.array_combine(totd), clobber=True)
         except Exception:
             jobs = []
             continue
