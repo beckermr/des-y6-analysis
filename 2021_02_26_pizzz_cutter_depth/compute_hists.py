@@ -5,7 +5,6 @@ import os
 import numpy as np
 import meds
 import tqdm
-import esutil
 
 from meds.defaults import BMASK_EDGE
 
@@ -99,5 +98,5 @@ for i, tile in enumerate(tiles):
     for band in BANDS:
         jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
 
-with joblib.Parallel(n_jobs=10, backend='loky', verbose=100) as para:
+with joblib.Parallel(n_jobs=5, backend='loky', verbose=100) as para:
     para(jobs)
