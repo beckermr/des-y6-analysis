@@ -30,6 +30,9 @@ def _compute_hist_for_tile_band(tname, band):
     )
     stamp_name = glob.glob("./meds/%s_*_%s_meds-Y6A1.fits.fz" % (tname, band))[0]
 
+    if (not os.path.exists(pizza_name) or (not os.path.exists(stamp_name)):
+        return None
+
     with meds.MEDS(pizza_name) as m, meds.MEDS(stamp_name) as mobj:
         pizza_inds = _convert_to_index(mobj["orig_row"][:, 0], mobj["orig_col"][:, 0])
         assert np.array_equal(
@@ -73,14 +76,18 @@ dtype = [
 ]
 
 jobs = []
-for tile in tiles:
+for i, tile in enumerate(tiles):
     for band in BANDS:
         jobs.append(joblib.delayed(_compute_hist_for_tile_band)(tile, band))
+    if i >= 20:
+        break
 
-with joblib.Parallel(n_jobs=6, backend='loky', verbose=100) as para:
+with joblib.Parallel(n_jobs=8, backend='loky', verbose=100) as para:
     outputs = para(jobs)
 
-d = np.zeros(len(tiles) * len(BANDS), dtype=dtype)
+outputs = [o for o in outputs if o is not None]
+
+d = np.zeros(len(outputs), dtype=dtype)
 
 for i, res in enumerate(outputs):
     d["band"][i] = res[4]
