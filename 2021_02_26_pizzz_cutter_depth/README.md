@@ -8,4 +8,5 @@ To rerun, do the following
 1. Run `download.sh`
 2. Run `download_meds.sh`
 3. Run `compute_hists.py`
-4. Run `plot_hists.py`
+4. Run `combine_hists.py`
+5. Make the plot in the notebook.
