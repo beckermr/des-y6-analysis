@@ -50,13 +50,14 @@ command: |
   conda activate des-y6a2-test1
   cd ~/workarea/des-y6-analysis/2021_05_08_mdet_process_y6a2_test1/outputs
   mkdir -p /data/beckermr-mdet-y6a2-test1/{tname}/joblib
+  mkdir -p /data/beckermr-mdet-y6a2-test1/{tname}/temp
   export JOBLIB_TEMP_FOLDER=/data/beckermr-mdet-y6a2-test1/{tname}/joblib
   touch /data/beckermr-mdet-y6a2-test1/{tname}/log_{tname}.oe
   run-metadetect-on-slices \
     --config=../metadetect-v3.yaml \
     --output-path=. \
     --use-tmpdir \
-    --tmpdir=/data/beckermr-mdet-y6a2-test1/{tname} \
+    --tmpdir=/data/beckermr-mdet-y6a2-test1/{tname}/temp \
     --seed={seed} \
     --log-level=WARNING \
     --n-jobs=-1 \
