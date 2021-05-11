@@ -11,6 +11,8 @@ seeds = rng.randint(1, 2**30-1, size=len(tnames))
 
 bands = ["r", "i", "z"]
 os.makedirs("./jobs", exist_ok=True)
+os.makedirs("./logs", exist_ok=True)
+os.makedirs("./outputs", exist_ok=True)
 for seed, tname in zip(seeds, tnames):
     print("making job for tile %s" % tname, flush=True)
 
@@ -56,6 +58,6 @@ command: |
     --seed={seed} \
     --log-level=WARNING \
     --n-jobs=12 \
-    {mfiles[0]} {mfiles[1]} {mfiles[2]} || :
+    {mfiles[0]} {mfiles[1]} {mfiles[2]} &> ../logs/log_{tname}.oe || :
   rm -rf /data/beckermr-mdet-y6a2-test1/{tname}
 """)
