@@ -49,7 +49,9 @@ command: |
   source ~/.bashrc
   conda activate des-y6a2-test1
   cd ~/workarea/des-y6-analysis/2021_05_08_mdet_process_y6a2_test1/outputs
-  mkdir -p /data/beckermr-mdet-y6a2-test1/{tname}
+  mkdir -p /data/beckermr-mdet-y6a2-test1/{tname}/joblib
+  export JOBLIB_TEMP_FOLDER=/data/beckermr-mdet-y6a2-test1/{tname}/joblib
+  touch /data/beckermr-mdet-y6a2-test1/{tname}/log_{tname}.oe
   run-metadetect-on-slices \
     --config=../metadetect-v3.yaml \
     --output-path=. \
@@ -57,7 +59,8 @@ command: |
     --tmpdir=/data/beckermr-mdet-y6a2-test1/{tname} \
     --seed={seed} \
     --log-level=WARNING \
-    --n-jobs=12 \
-    {mfiles[0]} {mfiles[1]} {mfiles[2]} &> ../logs/log_{tname}.oe || :
+    --n-jobs=-1 \
+    {mfiles[0]} {mfiles[1]} {mfiles[2]} &> /data/beckermr-mdet-y6a2-test1/{tname}/log_{tname}.oe || :
+  mv /data/beckermr-mdet-y6a2-test1/{tname}/log_{tname}.oe ../logs/log_{tname}.oe
   rm -rf /data/beckermr-mdet-y6a2-test1/{tname}
-""")
+"""  # noqa )
