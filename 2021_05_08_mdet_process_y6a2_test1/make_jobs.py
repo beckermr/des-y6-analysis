@@ -63,4 +63,4 @@ command: |
     {mfiles[0]} {mfiles[1]} {mfiles[2]} &> /data/beckermr-mdet-y6a2-test1/{tname}/log_{tname}.oe || :
   mv /data/beckermr-mdet-y6a2-test1/{tname}/log_{tname}.oe ../logs/log_{tname}.oe
   rm -rf /data/beckermr-mdet-y6a2-test1/{tname}
-"""  # noqa )
+""")  # noqa
