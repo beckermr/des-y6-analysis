@@ -7,4 +7,5 @@ des-pizza-cutter \
   --log-level=debug \
   --seed=3232 \
   --use-tmpdir \
+  --tmpdir=/data/beckermr/tmp \
   --n-jobs=4
