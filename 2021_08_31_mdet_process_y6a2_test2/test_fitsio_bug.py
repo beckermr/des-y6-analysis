@@ -82,8 +82,23 @@ json_info = json.dumps(copy.deepcopy(info))
 assert len(_config) == len(_config.encode())
 assert len(json_info) == len(json_info.encode())
 
-md = _build_metadata(config=_config, json_info=json_info)
+try:
+    md = _build_metadata(config=_config, json_info=json_info)
+    with fitsio.FITS("test.fits", "rw", clobber=True) as fits:
+        fits.write(md, extname="metadata")
+except Exception as e:
+    print("all failed! %s" % e)
 
+try:
+    md = _build_metadata(config=_config, json_info="2342")
+    with fitsio.FITS("test.fits", "rw", clobber=True) as fits:
+        fits.write(md, extname="metadata")
+except Exception as e:
+    print("config failed! %s" % e)
 
-with fitsio.FITS("test.fits", "rw", clobber=True) as fits:
-    fits.write(md, extname="metadata")
+try:
+    md = _build_metadata(config="dssd", json_info=json_info)
+    with fitsio.FITS("test.fits", "rw", clobber=True) as fits:
+        fits.write(md, extname="metadata")
+except Exception as e:
+    print("info failed! %s" % e)
