@@ -7,4 +7,5 @@ python -m pdb `which des-pizza-cutter` \
   --seed=3232 \
   --use-tmpdir \
   --tmpdir=/data/beckermr/tmp \
+  --range="0:1" \
   --n-jobs=4
