@@ -30,7 +30,7 @@ def _build_metadata(*, config, json_info):
     dt = [
         ('magzp_ref', 'f8'),
         ('config', 'S%d' % len(config)),
-        ('tile_info', 'S%d' % len(json_info)),
+        ('tile_info', 'U%d' % len(json_info)),
         ('pizza_cutter_version', 'S%d' % len(__version__)),
         ('numpy_version', 'S%d' % len(numpy_version)),
         ('scipy_version', 'S%d' % len(scipy_version)),
