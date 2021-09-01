@@ -10,6 +10,9 @@ import pixmappy
 from meds.maker import MEDS_FMT_VERSION
 from pizza_cutter import __version__
 import os
+import yaml
+import json
+import copy
 
 MAGZP_REF = 30
 
@@ -63,7 +66,23 @@ def _build_metadata(*, config, json_info):
     return metadata
 
 
-md = _build_metadata(config="dsad", json_info="sdfd")
+with open("des-pizza-slices-y6-v9.yaml", 'r') as fp:
+    _config = fp.read()
+
+info = os.path.expandvars(
+    "${MEDS_DIR}/des-pizza-slices-y6-v9/pizza_cutter_info/"
+    "DES2132-5748_r_pizza_cutter_info.yaml"
+)
+with open(info, 'r') as fp:
+    info = yaml.load(fp, Loader=yaml.Loader)
+
+# this loads all of the data we need into the info dict
+json_info = json.dumps(copy.deepcopy(info))
+
+assert len(_config) == len(_config.encode())
+assert len(json_info) == len(json_info.encode())
+
+md = _build_metadata(config=_config, json_info=json_info)
 
 
 with fitsio.FITS("test.fits", "rw", clobber=True) as fits:
