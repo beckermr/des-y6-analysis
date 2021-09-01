@@ -1,7 +1,7 @@
 import fitsio
 import numpy as np
 
-d = np.ones(1, dtype=[("blah", "S3500")])
+d = np.ones(1, dtype=[("blah", "U35000")])
 
 fitsio.write("test.fits", d, clobber=True)
 
