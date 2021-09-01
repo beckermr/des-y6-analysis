@@ -63,7 +63,7 @@ def _build_metadata(*, config, json_info):
     return metadata
 
 
-md = _build_metadata(config="", json_info="")
+md = _build_metadata(config="dsad", json_info="sdfd")
 
 
 with fitsio.FITS("test.fits", clobber=True) as fits:
