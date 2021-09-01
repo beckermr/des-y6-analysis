@@ -1,3 +1,13 @@
+import fitsio
+import numpy as np
+
+d = np.ones(1, dtype=[("blah", "S35000")])
+
+fitsio.write("test.fits", d, clobber=True)
+
+
+
+
 import numpy as np
 import esutil as eu
 import scipy
