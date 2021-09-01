@@ -79,8 +79,8 @@ with open(info, 'r') as fp:
 # this loads all of the data we need into the info dict
 json_info = json.dumps(copy.deepcopy(info))
 
-assert len(_config) == len(_config.encode())
-assert len(json_info) == len(json_info.encode())
+assert len(_config) == len(_config.encode("ascii"))
+assert len(json_info) == len(json_info.encode("ascii"))
 
 try:
     md = _build_metadata(config=_config, json_info=json_info)
