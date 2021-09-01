@@ -8,4 +8,4 @@ des-pizza-cutter \
   --use-tmpdir \
   --tmpdir=/data/beckermr/tmp \
   --n-jobs=4 \
-  --range="0:8"
+  --range="0:0"
