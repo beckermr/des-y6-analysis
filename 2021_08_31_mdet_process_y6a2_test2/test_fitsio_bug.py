@@ -29,8 +29,8 @@ def _build_metadata(*, config, json_info):
     ngmix_version = ngmix.__version__
     dt = [
         ('magzp_ref', 'f8'),
-        ('config', 'S%d' % len(config)),
-        ('tile_info', 'U%d' % len(json_info)),
+        ('config', 'S%d' % len(config.encode("ascii"))),
+        ('tile_info', 'S%d' % len(json_info.encode("ascii"))),
         ('pizza_cutter_version', 'S%d' % len(__version__)),
         ('numpy_version', 'S%d' % len(numpy_version)),
         ('scipy_version', 'S%d' % len(scipy_version)),
@@ -47,7 +47,7 @@ def _build_metadata(*, config, json_info):
         ('desdata', 'S%d' % len(os.environ.get('DESDATA', ' ')))]
     metadata = np.zeros(1, dt)
     metadata['magzp_ref'] = MAGZP_REF
-    metadata['config'] = config
+    metadata['config'] = config.encode("ascii")
     metadata['numpy_version'] = numpy_version
     metadata['scipy_version'] = scipy_version
     metadata['esutil_version'] = esutil_version
@@ -62,7 +62,7 @@ def _build_metadata(*, config, json_info):
     metadata['meds_dir'] = os.environ['MEDS_DIR']
     metadata['piff_data_dir'] = os.environ.get('PIFF_DATA_DIR', '')
     metadata['desdata'] = os.environ.get('DESDATA', '')
-    metadata['tile_info'] = json_info
+    metadata['tile_info'] = json_info.encode("ascii")
     return metadata
 
 
