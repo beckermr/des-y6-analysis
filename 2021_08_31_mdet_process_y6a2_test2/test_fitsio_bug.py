@@ -45,6 +45,7 @@ def _build_metadata(*, config, json_info):
         ('meds_dir', 'S%d' % len(os.environ['MEDS_DIR'])),
         ('piff_data_dir', 'S%d' % len(os.environ.get('PIFF_DATA_DIR', ' '))),
         ('desdata', 'S%d' % len(os.environ.get('DESDATA', ' ')))]
+    print(dt)
     metadata = np.zeros(1, dt)
     metadata['magzp_ref'] = MAGZP_REF
     metadata['config'] = config.encode("ascii")
