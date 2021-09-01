@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-python -m pdb `which run-metadetect-on-slices` \
+run-metadetect-on-slices \
   --config=metadetect-v4.yaml \
   --output-path=. \
   --seed=23487956 \
