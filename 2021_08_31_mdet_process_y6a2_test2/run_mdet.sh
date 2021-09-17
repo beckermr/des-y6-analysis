@@ -7,4 +7,4 @@ run-metadetect-on-slices \
   --log-level=WARNING \
   --n-jobs=$1 \
   --range="0:$1" \
-  DES2132-5748_r_des-pizza-slices-y6-v9_meds-pizza-slices.fits.fz
+  DES2110-4748_z_des-pizza-slices-y6-v9_meds-pizza-slices.fits.fz
