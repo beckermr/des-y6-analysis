@@ -1,0 +1,11 @@
+select
+  qa.*
+from
+  PIFF_MODEL_QA qa,
+  proctag t,
+  miscfile m
+where
+  t.tag = 'Y6A2_PIFF_TEST_V2'
+  and t.pfw_attempt_id = m.pfw_attempt_id
+  and m.filetype = 'piff_model'
+  and m.filename = qa.filename; > qa_Y6A2_PIFF_TEST_V2.fits
