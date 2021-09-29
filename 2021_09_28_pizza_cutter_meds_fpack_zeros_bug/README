@@ -1,0 +1,8 @@
+# test weird values for mfrac and weight when fpacking
+
+We were seeing negative weight and mfrac values.
+
+It turns out when the weight or mfrac values are very small, but non-zero, you get
+negatives back out due to fpack compression dithering.
+
+We cannot do much about this, so moving on.
