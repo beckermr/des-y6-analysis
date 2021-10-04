@@ -131,3 +131,5 @@ dmypy.json
 *.fits
 *.fits.fz
 *.png
+*.hs
+*.zip

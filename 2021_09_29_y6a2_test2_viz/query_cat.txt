@@ -1,0 +1,10 @@
+select
+  *
+from
+  GRUENDL.METADETECT_OBJECT
+where
+  flags = 0
+  and mdet_s2n > 10
+  and mfrac < 0.1
+  and mdet_t_ratio > 1.2
+  and mask_flags = 0; > cat.fits
