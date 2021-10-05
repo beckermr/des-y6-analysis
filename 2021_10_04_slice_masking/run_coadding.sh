@@ -9,6 +9,6 @@ for band in r i z; do
     --seed=3232 \
     --use-tmpdir \
     --tmpdir=/data/beckermr/tmp/${band} \
-    --n-jobs=3 &
+    --n-jobs=2 &
 done
   # --range="706:710" \
