@@ -8,9 +8,7 @@ run-metadetect-on-slices \
   --seed=23487956 \
   --log-level=WARNING \
   --n-jobs=1 \
-  --range="$1:$2" \
+  --range="0:20" \
   --viz-dir=./mbobs_plots \
-  --band-names=riz \
-  ${tname}_r5366p01_r_pizza-cutter-slices.fits.fz \
-  ${tname}_r5366p01_i_pizza-cutter-slices.fits.fz \
-  ${tname}_r5366p01_z_pizza-cutter-slices.fits.fz
+  --band-names=r \
+  ${tname}_r_des-pizza-slices-y6-v9_meds-pizza-slices-range0000-0020.fits.fz
