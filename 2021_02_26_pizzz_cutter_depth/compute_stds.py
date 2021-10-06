@@ -67,6 +67,7 @@ def _compute_hist_for_tile_band(tname, band):
             flush=True,
         )
 
+
 tiles = list(set([os.path.basename(f).split("_")[0] for f in glob.glob("./meds/*")]))
 assert len(tiles) == 100
 
