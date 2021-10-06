@@ -9,6 +9,7 @@ for band in r; do
     --seed=3232 \
     --use-tmpdir \
     --tmpdir=/data/beckermr/tmp/${band} \
-    --n-jobs=6
+    --n-jobs=6 \
+    --n-chunks=12
 done
   # --range="706:710" \
