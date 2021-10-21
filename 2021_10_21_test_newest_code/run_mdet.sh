@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-tname="DES2229-3957"
+tname="DES2041-5248"
 
 run-metadetect-on-slices \
   --config=metadetect-v4.yaml \
