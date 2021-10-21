@@ -10,7 +10,7 @@ run-metadetect-on-slices \
   --n-jobs=8 \
   --range="0:200" \
   --band-names=griz \
-  ${tname}_g_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0020.fits.fz \
-  ${tname}_r_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0020.fits.fz \
-  ${tname}_i_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0020.fits.fz \
-  ${tname}_z_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0020.fits.fz
+  ${tname}_g_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200.fits.fz \
+  ${tname}_r_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200.fits.fz \
+  ${tname}_i_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200.fits.fz \
+  ${tname}_z_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200.fits.fz
