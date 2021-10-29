@@ -14,4 +14,4 @@ where
     and d1.id = fai.desfile_id
     and fai.archive_name = 'desar2home'
     and d1.filetype = 'coadd_pizza_cutter'
-    and m.tilename = 'DES0420-6039';
+    and m.tilename = 'DES0219-0541';
