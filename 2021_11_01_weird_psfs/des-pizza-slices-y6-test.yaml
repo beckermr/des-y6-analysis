@@ -40,7 +40,23 @@ single_epoch:
   # you need to set the piff_run above too
   psf_type: piff
   psf_kwargs:
-    GI_COLOR: 0.61
+    g:
+      GI_COLOR: 0.61
+    r:
+      GI_COLOR: 0.61
+    i:
+      GI_COLOR: 0.61
+    z:
+      IZ_COLOR: 0.34
+  piff_cuts:
+    max_fwhm_cen: 3.6
+    min_nstar: 25
+    max_exp_T_mean_fac: 4
+    max_ccd_T_std_fac: 0.3
+  mask_piff_failure:
+    grid_size: 128
+    any_bad_thresh: 5
+    flag_bad_thresh: 2
 
   # which SE WCS to use - one of piff, pixmappy or image
   wcs_type: pixmappy
