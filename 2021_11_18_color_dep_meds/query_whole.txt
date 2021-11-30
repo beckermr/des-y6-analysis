@@ -1,0 +1,18 @@
+select
+    det.object_number,
+    det.id,
+    gb.mag_auto - ib.mag_auto as gi_color,
+    ib.mag_auto - zb.mag_auto as iz_color
+from
+    -- coadd_object
+    -- prod.COADD_OBJECT_SAVE
+    (select * from prod.COADD_OBJECT where filename = 'DES0411-2332_r4939p01_r_cat.fits') det,
+    (select * from prod.COADD_OBJECT where filename = 'DES0411-2332_r4939p01_g_cat.fits') gb,
+    (select * from prod.COADD_OBJECT where filename = 'DES0411-2332_r4939p01_i_cat.fits') ib,
+    (select * from prod.COADD_OBJECT where filename = 'DES0411-2332_r4939p01_z_cat.fits') zb
+where
+    det.id = gb.id
+    and det.id = ib.id
+    and det.id = zb.id
+order by
+    det.object_number;
