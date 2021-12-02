@@ -7,6 +7,6 @@ for band in g r i z; do
     --output-path=`pwd` \
     --seed=3232 \
     --n-jobs=6 \
-    --n-chunks=12
-  # --range="706:710" \
+    --n-chunks=12 \
+    --tmpdir=/data/beckermr/tmp/${band}
 done
