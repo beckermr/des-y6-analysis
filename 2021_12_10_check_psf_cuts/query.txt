@@ -1,0 +1,23 @@
+select
+  distinct
+  qa.expnum,
+  qa.ccdnum,
+  t.tag,
+  qa.filename,
+  qa.flag,
+  qa.fwhm_cen,
+  qa.star_t_std,
+  qa.star_t_mean,
+  qa.nstar,
+  qa.exp_star_t_mean,
+  qa.exp_star_t_std
+from
+  PIFF_MODEL_QA qa,
+  proctag t,
+  miscfile m
+where
+  t.tag = 'Y6A2_PIFF'
+  and t.pfw_attempt_id = m.pfw_attempt_id
+  and m.filetype = 'piff_model'
+  and m.filename = qa.filename
+  and rownum < 100000; > psf_stats.fits
