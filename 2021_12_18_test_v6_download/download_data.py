@@ -9,7 +9,7 @@ fnames = [
     os.path.join(d["path"][i], d["filename"][i])
     for i in range(len(d))
 ]
-
+print(fnames)
 with open("fnames.txt", "w") as fp:
     for fname in fnames:
         fp.write("%s\n" % fname)
