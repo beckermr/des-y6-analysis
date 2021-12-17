@@ -1,0 +1,54 @@
+with
+  hsm_qas as (
+    select
+      distinct
+      expnum,
+      ccdnum,
+      filename,
+      substr(filename, 17, 8) as runproc,
+      avg(2*model_t*model_t) as star_t_mean,
+      stddev(2*model_t*model_t) as star_t_std
+    from PIFF_STAR_QA
+    group by
+      expnum,
+      ccdnum,
+      filename,
+      substr(filename, 17, 8)
+  ),
+  hsm_qae as (
+    select
+      distinct
+      count(*) as nccd,
+      expnum,
+      runproc,
+      avg(star_t_mean) as exp_star_t_mean,
+      stddev(star_t_mean) as exp_star_t_std
+    from hsm_qas
+    group by
+      expnum,
+      runproc
+  )
+select
+  distinct
+  hsm_qas.expnum,
+  hsm_qas.ccdnum,
+  hsm_qas.runproc,
+  hsm_qas.filename,
+  hsm_qas.star_t_mean,
+  hsm_qas.star_t_std,
+  qa.nstar,
+  qa.flag,
+  2.3548200450309493 * sqrt(hsm_qas.star_t_mean/2) as fwhm_cen,
+  hsm_qae.exp_star_t_std,
+  hsm_qae.exp_star_t_mean
+from
+  hsm_qae,
+  hsm_qas,
+  PIFF_MODEL_QA qa
+where
+  hsm_qae.expnum = hsm_qas.expnum
+  and hsm_qae.runproc = hsm_qas.runproc
+  and qa.expnum = hsm_qas.expnum
+  and qa.ccdnum = hsm_qas.ccdnum
+  and substr(qa.filename, 17, 8) = hsm_qas.runproc
+  and rownum < 100000;
