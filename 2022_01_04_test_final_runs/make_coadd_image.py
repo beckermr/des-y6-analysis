@@ -13,18 +13,48 @@ mfiles = glob.glob(
     )
 )
 mfiles = sorted(mfiles)
+mfiles = [
+    mfiles[0],
+    mfiles[2],
+    mfiles[1],
+    mfiles[3]
+]
 
-print(mfiles)
+subprocess.run("mkdir -p images", check=True, shell=True)
 
-# for band in g r i z; do
-#   make-coadd-image-from-slices \
-#     DES2041-5248_${band}_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200.fits.fz
-# done
-#
-# des-make-image-fromfiles \
-#     coadd-riz.jpg \
-#     DES2041-5248_g_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200-coadd-img.fits.fz \
-#     DES2041-5248_r_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200-coadd-img.fits.fz \
-#     DES2041-5248_i_des-pizza-slices-y6-test_meds-pizza-slices-range0000-0200-coadd-img.fits.fz
+
+def _render(fname, tname, band):
+    subprocess.run(
+        "make-coadd-image-from-slices %s --output-path=images/%s-%s.fits.fz" % (
+            fname, tname, band,
+        ),
+        check=True,
+        shell=True,
+    )
+    return band
+
+
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    futs = []
+    for band, fname in zip(["g", "r", "i", "z"], mfiles):
+        assert fname.endswith("%s_pizza-cutter-slices.fits.fz" % band)
+        futs.append(executor.submit(_render, fname, tname, band))
+
+    for fut in concurrent.futures.as_completed(futs):
+        print("done %s" % fut.result())
+
+
+subprocess.run(
+    """\
+des-make-image-fromfiles \
+    images/%s-coadd-gri.jpg \
+    images/%s-g.fits.fz \
+    images/%s-r.fits.fz \
+    images/%s-i.fits.fz \
+""" % (tname, tname, tname, tname),
+    check=True,
+    shell=True,
+)
+
 #     # --absscale 0.015 \
 #     # --scales 1.0,1.0,1.3
