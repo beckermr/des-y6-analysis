@@ -5,8 +5,6 @@ import concurrent.futures
 import os
 import tqdm
 
-tname = sys.argv[1]
-
 mfiles = glob.glob(
     "data/"
     "OPS/multiepoch/Y6A2_PIZZACUTTER/*/*/*/pizza-cutter/"
@@ -41,7 +39,7 @@ for tname in tqdm.tqdm(tnames):
         )
         subprocess.run(
             "make-coadd-image-from-slices %s "
-            "--use-tmpdir --tempdir=/data/beckermr/%s "
+            "--use-tmpdir --tmpdir=/data/beckermr/%s "
             "--output-path=images/%s-%s.fits.fz" % (
                 fname, tname, tname, band,
             ),
