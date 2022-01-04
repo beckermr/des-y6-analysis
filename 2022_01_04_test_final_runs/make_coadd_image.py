@@ -12,7 +12,7 @@ mfiles = glob.glob(
     "OPS/multiepoch/Y6A2_PIZZACUTTER/*/*/*/pizza-cutter/"
     "*_pizza-cutter-slices.fits.fz"
 )
-tnames = [os.path.basename(m).split("_")[0] for m in mfiles]
+tnames = set([os.path.basename(m).split("_")[0] for m in mfiles])
 
 for tname in tqdm.tqdm(tnames):
 
