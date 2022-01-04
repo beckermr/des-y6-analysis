@@ -64,5 +64,11 @@ for tname in tqdm.tqdm(tnames):
         shell=True,
     )
 
+    subprocess.run(
+        "rm -f images/%s-*.fits.fz" % tname,
+        shell=True,
+        check=True,
+    )
+
 #     # --absscale 0.015 \
 #     # --scales 1.0,1.0,1.3
