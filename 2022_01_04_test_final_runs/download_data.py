@@ -41,7 +41,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=n_threads) as executor:
 
         start = end
 
-        futs.append(executor.submit, _download(i))
+        futs.append(executor.submit, _download, i)
 
     for fut in concurrent.futures.as_completed(futs):
         fut.result()
