@@ -16,7 +16,7 @@ def _download(i):
     subprocess.run(cmd, shell=True)
 
 
-n_threads = 4
+n_threads = 10
 
 d = fitsio.read("fnames.fits", lower=True)
 
