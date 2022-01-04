@@ -33,15 +33,15 @@ for tname in tqdm.tqdm(tnames):
 
     def _render(fname, tname, band):
         subprocess.run(
-            "mkdir -p /data/beckermr/%s" % tname,
+            "mkdir -p /data/beckermr/%s-%s" % (tname, band),
             shell=True,
             check=True,
         )
         subprocess.run(
             "make-coadd-image-from-slices %s "
-            "--use-tmpdir --tmpdir=/data/beckermr/%s "
+            "--use-tmpdir --tmpdir=/data/beckermr/%s-%s "
             "--output-path=images/%s-%s.fits.fz" % (
-                fname, tname, tname, band,
+                fname, tname, band, tname, band,
             ),
             check=True,
             shell=True,
