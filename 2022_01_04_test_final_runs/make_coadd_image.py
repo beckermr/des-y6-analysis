@@ -51,7 +51,7 @@ mfiles = glob.glob(
 )
 tnames = set([os.path.basename(m).split("_")[0] for m in mfiles])
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
     futs = []
 
     for tname in tqdm.tqdm(tnames):
