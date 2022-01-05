@@ -1,37 +1,12 @@
-import sys
 import subprocess
 import glob
 import concurrent.futures
 import os
 import tqdm
 
-mfiles = glob.glob(
-    "data/"
-    "OPS/multiepoch/Y6A2_PIZZACUTTER/*/*/*/pizza-cutter/"
-    "*_pizza-cutter-slices.fits.fz"
-)
-tnames = set([os.path.basename(m).split("_")[0] for m in mfiles])
 
-for tname in tqdm.tqdm(tnames):
-
-    mfiles = glob.glob(
-        "data/"
-        "OPS/multiepoch/Y6A2_PIZZACUTTER/*/%s/*/pizza-cutter/"
-        "%s_r*_*_pizza-cutter-slices.fits.fz" % (
-            tname, tname,
-        )
-    )
-    mfiles = sorted(mfiles)
-    mfiles = [
-        mfiles[0],
-        mfiles[2],
-        mfiles[1],
-        mfiles[3]
-    ]
-
-    subprocess.run("mkdir -p images", check=True, shell=True)
-
-    def _render(fname, tname, band):
+def _make_image(fnames, tname):
+    for fname, band in zip(fnames, ["g", "r", "i"]):
         subprocess.run(
             "mkdir -p /data/beckermr/%s-%s" % (tname, band),
             shell=True,
@@ -47,15 +22,6 @@ for tname in tqdm.tqdm(tnames):
             shell=True,
         )
         return band
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        futs = []
-        for band, fname in zip(["g", "r", "i", "z"], mfiles):
-            assert fname.endswith("%s_pizza-cutter-slices.fits.fz" % band)
-            futs.append(executor.submit(_render, fname, tname, band))
-
-        for fut in concurrent.futures.as_completed(futs):
-            print("done %s" % fut.result())
 
     subprocess.run(
         """\
@@ -74,6 +40,40 @@ for tname in tqdm.tqdm(tnames):
         shell=True,
         check=True,
     )
+
+
+subprocess.run("mkdir -p images", check=True, shell=True)
+
+mfiles = glob.glob(
+    "data/"
+    "OPS/multiepoch/Y6A2_PIZZACUTTER/*/*/*/pizza-cutter/"
+    "*_pizza-cutter-slices.fits.fz"
+)
+tnames = set([os.path.basename(m).split("_")[0] for m in mfiles])
+
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    futs = []
+
+    for tname in tqdm.tqdm(tnames):
+
+        mfiles = glob.glob(
+            "data/"
+            "OPS/multiepoch/Y6A2_PIZZACUTTER/*/%s/*/pizza-cutter/"
+            "%s_r*_*_pizza-cutter-slices.fits.fz" % (
+                tname, tname,
+            )
+        )
+        mfiles = sorted(mfiles)
+        mfiles = [
+            mfiles[0],
+            mfiles[2],
+            mfiles[1],
+        ]
+
+    futs.append(executor.submit(_make_image, mfiles, tname))
+
+    for fut in concurrent.futures.as_completed(futs):
+        print("done %s" % fut.result())
 
 #     # --absscale 0.015 \
 #     # --scales 1.0,1.0,1.3
