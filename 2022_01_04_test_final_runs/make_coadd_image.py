@@ -21,7 +21,6 @@ def _make_image(fnames, tname):
             check=True,
             shell=True,
         )
-        return band
 
     subprocess.run(
         """\
@@ -54,7 +53,7 @@ tnames = set([os.path.basename(m).split("_")[0] for m in mfiles])
 with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
     futs = []
 
-    for tname in tqdm.tqdm(tnames):
+    for tname in tnames:
 
         mfiles = glob.glob(
             "data/"
@@ -70,9 +69,11 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
             mfiles[1],
         ]
 
-    futs.append(executor.submit(_make_image, mfiles, tname))
+        futs.append(executor.submit(_make_image, mfiles, tname))
 
-    for fut in concurrent.futures.as_completed(futs):
+    for fut in tqdm.tqdm(
+        concurrent.futures.as_completed(futs), total=len(tnames)
+    ):
         print("done %s" % fut.result())
 
 #     # --absscale 0.015 \
