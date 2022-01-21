@@ -31,7 +31,7 @@ for i, fname in enumerate(fnames):
                 d = d[msk]
 
                 msk = d["mdet_step"] == "no_shear"
-                e1o, e2o = d["mdet_g_1"][msk], d["mdet_g_2"][msk]
+                e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
                 g1, g2 = e1e2_to_g1g2(e1o, e2o)
                 eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
                 eta1 *= fac
@@ -41,8 +41,10 @@ for i, fname in enumerate(fnames):
                 d["mdet_g_1"][msk] = e1
                 d["mdet_g_2"][msk] = e2
 
+                print(np.max(np.abs(d["mdet_g_1"][msk] - e1o)))
                 assert not np.allclose(d["mdet_g_1"][msk], e1o)
                 assert not np.allclose(d["mdet_g_2"][msk], e2o)
+
                 out = os.path.join("data_final", os.path.basename(fname))
                 fitsio.write(out, d, clobber=True)
             except Exception:
