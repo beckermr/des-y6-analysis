@@ -4,6 +4,7 @@ import fitsio
 import io
 import contextlib
 import numpy as np
+import tqdm
 from ngmix.shape import (
     e1e2_to_g1g2, g1g2_to_e1e2, g1g2_to_eta1eta2, eta1eta2_to_g1g2
 )
@@ -19,7 +20,7 @@ fac = generate_shear_masking_factor(passphrase)
 
 fnames = glob.glob("data/**/*.fit*", recursive=True)
 
-for fname in fnames:
+for fname in tqdm.tqdm(fnames):
     buff = io.StringIO()
     with contextlib.redirect_stdout(buff):
         with contextlib.redirect_stderr(buff):
