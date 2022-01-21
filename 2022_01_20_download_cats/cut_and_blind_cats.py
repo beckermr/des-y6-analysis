@@ -23,30 +23,30 @@ fnames = glob.glob("data/**/*.fit*", recursive=True)
 for i, fname in enumerate(fnames):
     print("%d out of %d" % (i+1, len(fnames)), flush=True)
     buff = io.StringIO()
-    with contextlib.redirect_stdout(buff):
-        with contextlib.redirect_stderr(buff):
-            try:
-                d = fitsio.read(fname)
-                msk = d["flags"] == 0
-                d = d[msk]
+    # with contextlib.redirect_stdout(buff):
+    #     with contextlib.redirect_stderr(buff):
+    try:
+        d = fitsio.read(fname)
+        msk = d["flags"] == 0
+        d = d[msk]
 
-                msk = d["mdet_step"] == "no_shear"
-                e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
-                g1, g2 = e1e2_to_g1g2(e1o, e2o)
-                eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
-                eta1 *= fac
-                eta2 *= fac
-                g1, g2 = eta1eta2_to_g1g2(eta1, eta2)
-                e1, e2 = g1g2_to_e1e2(g1, g2)
-                d["mdet_g_1"][msk] = e1
-                d["mdet_g_2"][msk] = e2
+        msk = d["mdet_step"] == "no_shear"
+        e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
+        g1, g2 = e1e2_to_g1g2(e1o, e2o)
+        eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
+        eta1 *= fac
+        eta2 *= fac
+        g1, g2 = eta1eta2_to_g1g2(eta1, eta2)
+        e1, e2 = g1g2_to_e1e2(g1, g2)
+        d["mdet_g_1"][msk] = e1
+        d["mdet_g_2"][msk] = e2
 
-                assert not np.allclose(d["mdet_g_1"][msk], e1o)
-                assert not np.allclose(d["mdet_g_2"][msk], e2o)
+        assert not np.allclose(d["mdet_g_1"][msk], e1o)
+        assert not np.allclose(d["mdet_g_2"][msk], e2o)
 
-                out = os.path.join("data_final", os.path.basename(fname))
-                fitsio.write(out, d, clobber=True)
-            except Exception:
-                print(e1.shape, e1o.shape)
-                print(np.max(np.abs(d["mdet_g_1"][msk] - e1o)))
-                raise RuntimeError("failed!")
+        out = os.path.join("data_final", os.path.basename(fname))
+        fitsio.write(out, d, clobber=True)
+    except Exception:
+        print(e1.shape, e1o.shape)
+        print(np.max(np.abs(d["mdet_g_1"][msk] - e1o)))
+        raise RuntimeError("failed!")
