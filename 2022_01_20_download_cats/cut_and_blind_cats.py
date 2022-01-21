@@ -41,11 +41,12 @@ for i, fname in enumerate(fnames):
                 d["mdet_g_1"][msk] = e1
                 d["mdet_g_2"][msk] = e2
 
-                print(np.max(np.abs(d["mdet_g_1"][msk] - e1o)))
+
                 assert not np.allclose(d["mdet_g_1"][msk], e1o)
                 assert not np.allclose(d["mdet_g_2"][msk], e2o)
 
                 out = os.path.join("data_final", os.path.basename(fname))
                 fitsio.write(out, d, clobber=True)
             except Exception:
+                print(np.max(np.abs(d["mdet_g_1"][msk] - e1o)))
                 raise RuntimeError("failed!")
