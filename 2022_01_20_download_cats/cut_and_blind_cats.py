@@ -16,7 +16,7 @@ os.makedirs("data_final", exist_ok=True)
 with open(os.path.expanduser("~/.test_des_blinding_v1"), "r") as fp:
     passphrase = fp.read().strip()
 
-fac = generate_shear_masking_factor(passphrase)
+fac = 0.95 # generate_shear_masking_factor(passphrase)
 
 fnames = glob.glob("data/**/*.fit*", recursive=True)
 
