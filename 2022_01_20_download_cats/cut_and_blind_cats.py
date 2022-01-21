@@ -30,7 +30,7 @@ for i, fname in enumerate(fnames):
         msk = d["flags"] == 0
         d = d[msk]
 
-        msk = d["mdet_step"] == "no_shear"
+        msk = d["mdet_step"] == "noshear"
         e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
         g1, g2 = e1e2_to_g1g2(e1o, e2o)
         eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
