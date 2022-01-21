@@ -20,7 +20,8 @@ fac = generate_shear_masking_factor(passphrase)
 
 fnames = glob.glob("data/**/*.fit*", recursive=True)
 
-for fname in tqdm.tqdm(fnames):
+for i, fname in enumerate(fnames):
+    print("%d out of %d" % (i+1, len(fnames)), flush=True)
     buff = io.StringIO()
     with contextlib.redirect_stdout(buff):
         with contextlib.redirect_stderr(buff):
@@ -29,7 +30,7 @@ for fname in tqdm.tqdm(fnames):
                 msk = d["flags"] == 0
                 d = d[msk]
 
-                msk = d["shear_step"] == "no_shear"
+                msk = d["mdet_step"] == "no_shear"
                 e1o, e2o = d["mdet_g_1"][msk], d["mdet_g_2"][msk]
                 g1, g2 = e1e2_to_g1g2(e1o, e2o)
                 eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
