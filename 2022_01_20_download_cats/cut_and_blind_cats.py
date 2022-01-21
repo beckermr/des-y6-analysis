@@ -39,6 +39,8 @@ def _msk_shear(fname, passphrase):
                 assert not np.array_equal(d["mdet_g_2"][msk], e2o)
 
                 out = os.path.join("data_final", os.path.basename(fname))
+                if out.endswith(".fz"):
+                    out = out[:-3]
                 fitsio.write(out, d, clobber=True)
             except Exception:
                 raise RuntimeError("failed!")
