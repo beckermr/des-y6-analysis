@@ -3,6 +3,7 @@ import glob
 import fitsio
 import io
 import contextlib
+import numpy as np
 from ngmix.shape import (
     e1e2_to_g1g2, g1g2_to_e1e2, g1g2_to_eta1eta2, eta1eta2_to_g1g2
 )
@@ -28,8 +29,8 @@ for fname in fnames:
                 d = d[msk]
 
                 msk = d["shear_step"] == "no_shear"
-                e1, e2 = d["mdet_g_1"][msk], d["mdet_g_2"][msk]
-                g1, g2 = e1e2_to_g1g2(e1, e2)
+                e1o, e2o = d["mdet_g_1"][msk], d["mdet_g_2"][msk]
+                g1, g2 = e1e2_to_g1g2(e1o, e2o)
                 eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
                 eta1 *= fac
                 eta2 *= fac
@@ -37,6 +38,9 @@ for fname in fnames:
                 e1, e2 = g1g2_to_e1e2(g1, g2)
                 d["mdet_g_1"][msk] = e1
                 d["mdet_g_2"][msk] = e2
+
+                assert not np.allclose(d["mdet_g_1"][msk], e1o)
+                assert not np.allclose(d["mdet_g_2"][msk], e2o)
                 out = os.path.join("data_final", os.path.basename(fname))
                 fitsio.write(out, d, clobber=True)
             except Exception:
