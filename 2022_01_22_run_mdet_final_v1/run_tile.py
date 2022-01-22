@@ -86,6 +86,7 @@ if len(sys.argv) == 1:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])))
+    tnames = tnames[0:10]
     rng = np.random.RandomState(seed=seed)
     seeds = rng.randint(low=1, high=2**29, size=len(tnames))
     tmpdir = None
@@ -97,3 +98,11 @@ else:
 
 if len(tnames) == 1:
     _run_tile(tnames[0], seed, opth, tmpdir)
+else:
+    with CondorExecutor(conda_env=conda_env) as exec:
+        futs = [
+            exec.submit(_run_tile, tilename, seed, opth, tmpdir)
+            for tilename, seed in zip(tnames, seeds)
+        ]
+        for fut in PBar(as_completed(futs), total=len(futs), desc="running mdet"):
+            pass
