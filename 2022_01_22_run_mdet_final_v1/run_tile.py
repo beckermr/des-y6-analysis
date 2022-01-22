@@ -133,8 +133,13 @@ else:
             d["filename"][i].split("_")[0]
             for i in range(d.shape[0])
         ])))
+        import joblib
+
+        jobs = []
         for tilename in tnames:
-            _download_tile(tilename)
+            jobs.append(joblib.delayed(_download_tile)(tilename))
+        with joblib.Parallel(n_jobs=16, verbose=100) as par:
+            par(jobs)
     else:
         tnames = [sys.argv[1]]
         tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
