@@ -43,7 +43,8 @@ rsync \
 
     cmd = """\
 run-metadetect-on-slices \
-  --config=metadetect-v5.yaml \
+  --config=/astro/u/beckermr/workarea/des-y6-analysis/\
+2022_01_22_run_mdet_final_v1/metadetect-v5.yaml \
   --output-path=./mdet_data \
   --seed=%d \
   --use-tmpdir \
