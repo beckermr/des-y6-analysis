@@ -9,6 +9,36 @@ from esutil.pbar import PBar
 from condor_exec import CondorExecutor
 
 
+def _download_tile(tilename):
+    os.system("mkdir -p data")
+
+    d = fitsio.read(
+        "/astro/u/beckermr/workarea/des-y6-analysis/"
+        "2022_01_22_run_mdet_final_v1/fnames.fits",
+        lower=True,
+    )
+    tnames = np.array([
+        d["filename"][i].split("_")[0]
+        for i in range(d.shape[0])
+    ])
+    msk = tnames == tilename
+    d = d[msk]
+    mfiles = []
+    for band in ["g", "r", "i", "z"]:
+        msk = d["band"] == band
+        assert np.sum(msk) == 1
+        fname = os.path.join(d["path"][msk][0], d["filename"][msk][0])
+        cmd = """\
+rsync \
+        -av \
+        --password-file $DES_RSYNC_PASSFILE \
+        ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
+        ./data/%s
+""" % (fname, os.path.basename(fname))
+        subprocess.run(cmd, shell=True, check=True)
+        mfiles.append("./data/%s" % os.path.basename(fname))
+
+
 def _run_tile(tilename, seed, opth, tmpdir):
     os.system("mkdir -p data")
 
@@ -90,9 +120,22 @@ if len(sys.argv) == 1:
     tmpdir = None
 
 else:
-    tnames = [sys.argv[1]]
-    tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
-    os.system("mkdir -p " + tmpdir)
+    if sys.argv[1] == "download":
+        d = fitsio.read(
+            "/astro/u/beckermr/workarea/des-y6-analysis/"
+            "2022_01_22_run_mdet_final_v1/fnames.fits",
+            lower=True,
+        )
+        tnames = sorted(list(set([
+            d["filename"][i].split("_")[0]
+            for i in range(d.shape[0])
+        ])))
+        for tilename in tnames:
+            _download_tile(tilename)
+    else:
+        tnames = [sys.argv[1]]
+        tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
+        os.system("mkdir -p " + tmpdir)
 
 if len(tnames) == 1:
     _run_tile(tnames[0], seed, opth, tmpdir)
