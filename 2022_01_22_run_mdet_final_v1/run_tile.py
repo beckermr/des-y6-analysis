@@ -105,4 +105,7 @@ else:
             for tilename, seed in zip(tnames, seeds)
         ]
         for fut in PBar(as_completed(futs), total=len(futs), desc="running mdet"):
-            pass
+            try:
+                fut.result()
+            except Exception as e:
+                print(repr(e), flush=True)
