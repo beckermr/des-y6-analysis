@@ -99,7 +99,7 @@ else:
 if len(tnames) == 1:
     _run_tile(tnames[0], seed, opth, tmpdir)
 else:
-    with CondorExecutor(conda_env=conda_env) as exec:
+    with CondorExecutor(conda_env=conda_env, verbose=100) as exec:
         futs = [
             exec.submit(_run_tile, tilename, seed, opth, tmpdir)
             for tilename, seed in zip(tnames, seeds)

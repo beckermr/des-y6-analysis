@@ -66,15 +66,15 @@ def _kill_condor_jobs():
         cjobs.append(cjob)
         if len(cjobs) == chunksize:
             _cjobs = " ".join(cjobs)
-            subprocess.run("condor_rm " + _cjobs, shell=True, capture_output=True)
-            subprocess.run(
-                "condor_rm -forcex " + _cjobs, shell=True, capture_output=True)
+            # subprocess.run("condor_rm " + _cjobs, shell=True, capture_output=True)
+            # subprocess.run(
+            #     "condor_rm -forcex " + _cjobs, shell=True, capture_output=True)
             cjobs = []
 
     if cjobs:
         _cjobs = " ".join(cjobs)
-        subprocess.run("condor_rm " + _cjobs, shell=True, capture_output=True)
-        subprocess.run("condor_rm -forcex " + _cjobs, shell=True, capture_output=True)
+        # subprocess.run("condor_rm " + _cjobs, shell=True, capture_output=True)
+        # subprocess.run("condor_rm -forcex " + _cjobs, shell=True, capture_output=True)
         cjobs = []
 
 
@@ -230,11 +230,11 @@ def _attempt_result(exec, nanny_id, cjob, subids, status_code):
         infile = os.path.join(exec.execdir, subid, "input.pkl")
 
         del ALL_CONDOR_JOBS[cjob]
-        subprocess.run(
-            "condor_rm %s; condor_rm -forcex %s" % (cjob, cjob),
-            shell=True,
-            capture_output=True,
-        )
+        # subprocess.run(
+        #     "condor_rm %s; condor_rm -forcex %s" % (cjob, cjob),
+        #     shell=True,
+        #     capture_output=True,
+        # )
 
         if not os.path.exists(outfile):
             LOGGER.debug(
