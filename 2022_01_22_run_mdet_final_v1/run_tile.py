@@ -26,7 +26,7 @@ def _run_tile(tilename):
     for band in ["g", "r", "i", "z"]:
         msk = d["band"] == band
         assert np.sum(msk) == 1
-        fname = os.path.join(d["path"][msk], d["filename"][msk])
+        fname = os.path.join(d["path"][msk][0], d["filename"][msk][0])
         cmd = """\
 rsync \
         -av \
