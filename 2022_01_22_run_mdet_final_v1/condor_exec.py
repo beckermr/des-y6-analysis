@@ -41,7 +41,8 @@ export NUMEXPR_NUM_THREADS=1
 if [[ -n $_CONDOR_SCRATCH_DIR ]]; then
     # the condor system creates a scratch directory for us,
     # and cleans up afterward
-    tmpdir=$_CONDOR_SCRATCH_DIR
+    tmpdir=$_CONDOR_SCRATCH_DIR/tmp_me
+    mkdir -p $tmpdir
     export TMPDIR=$tmpdir
 else
     # otherwise use the TMPDIR
@@ -53,6 +54,7 @@ source activate %s
 
 mkdir -p $(dirname $2)
 mkdir -p $(dirname $3)
+touch $3
 
 /astro/u/beckermr/workarea/des-y6-analysis/2022_01_22_run_mdet_final_v1/run-pickled-task \
 $1 $2 $3 &> $3
