@@ -58,15 +58,18 @@ def _run_tile(tilename, seed, opth, tmpdir):
         msk = d["band"] == band
         assert np.sum(msk) == 1
         fname = os.path.join(d["path"][msk][0], d["filename"][msk][0])
-        cmd = """\
-rsync \
-        -av \
-        --password-file $DES_RSYNC_PASSFILE \
-        ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
-        ./data/%s
-""" % (fname, os.path.basename(fname))
-        subprocess.run(cmd, shell=True, check=True)
-        mfiles.append("./data/%s" % os.path.basename(fname))
+#         cmd = """\
+# rsync \
+#         -av \
+#         --password-file $DES_RSYNC_PASSFILE \
+#         ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
+#         ./data/%s
+# """ % (fname, os.path.basename(fname))
+#         subprocess.run(cmd, shell=True, check=True)
+        mfiles.append(
+            "/astro/u/beckermr/workarea/des-y6-analysis/"
+            "2022_01_22_run_mdet_final_v1/data/%s" % os.path.basename(fname)
+        )
 
     if tmpdir is None:
         tmpdir = os.environ["TMPDIR"]
