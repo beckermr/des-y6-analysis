@@ -54,7 +54,8 @@ source activate %s
 mkdir -p $(dirname $2)
 mkdir -p $(dirname $3)
 
-run-pickled-task $1 $2 $3 &> $3
+/astro/u/beckermr/workarea/des-y6-analysis/2022_01_22_run_mdet_final_v1/run-pickled-task \
+$1 $2 $3 &> $3
 """
 
 
