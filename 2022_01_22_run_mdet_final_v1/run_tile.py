@@ -59,11 +59,16 @@ run-metadetect-on-slices \
 
     fnames = glob.glob("./mdet_data/%s*" % tilename)
     for fname in fnames:
-        subprocess.run(
-            "mv %s %s" % (fname, os.path.join(opth, os.path.basename(fname))),
-            shell=True,
-            check=True,
+        pth1 = os.path.realpath(os.path.abspath(fname))
+        pth2 = os.path.realpath(os.path.abspath(
+            os.path.join(opth, os.path.basename(fname)))
         )
+        if pth1 != pth2:
+            subprocess.run(
+                "mv %s %s" % (pth1, pth2),
+                shell=True,
+                check=True,
+            )
 
 
 conda_env = "des-y6-final-v1"
