@@ -23,20 +23,20 @@ def _download_tile(tilename):
     ])
     msk = tnames == tilename
     d = d[msk]
-    mfiles = []
     for band in ["g", "r", "i", "z"]:
         msk = d["band"] == band
-        assert np.sum(msk) == 1
-        fname = os.path.join(d["path"][msk][0], d["filename"][msk][0])
-        cmd = """\
-rsync \
-        -av \
-        --password-file $DES_RSYNC_PASSFILE \
-        ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
-        ./data/%s
-""" % (fname, os.path.basename(fname))
-        subprocess.run(cmd, shell=True, check=True)
-        mfiles.append("./data/%s" % os.path.basename(fname))
+        if np.any(msk):
+            _d = d[msk]
+            for i in range(len(_d)):
+                fname = os.path.join(d["path"][msk][i], d["filename"][msk][i])
+                cmd = """\
+        rsync \
+                -av \
+                --password-file $DES_RSYNC_PASSFILE \
+                ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
+                ./data/%s
+        """ % (fname, os.path.basename(fname))
+                subprocess.run(cmd, shell=True, check=True)
 
 
 def _run_tile(tilename, seed, opth, tmpdir):
