@@ -41,7 +41,7 @@ def _download_tile(tilename):
                 ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
                 ./data/%s
         """ % (fname, os.path.basename(fname))
-                subprocess.run(cmd, shell=True, check=True, capture_output=True)
+                subprocess.run(cmd, shell=True, check=True)
             mfiles.append("./data/%s" % os.path.basename(fname))
 
     return mfiles
@@ -60,7 +60,7 @@ def _run_tile(tilename, seed, opth, tmpdir):
 
     if mfiles is None:
         raise RuntimeError("Could not download files for tile %s" % tilename)
-    elif isinstance(mfiles, int):
+    elif not isinstance(mfiles, list):
         raise RuntimeError("Only found %d files for tile %s" % (mfiles, tilename))
 
     if tmpdir is None:
