@@ -155,7 +155,10 @@ else:
         futs = []
         nsub = 0
         for tilename, seed in zip(tnames, seeds):
-            if np.sum(tnames == tilename):
+            if (
+                np.sum(tnames == tilename)
+                and len(glob.glob("%s/%s*" % (opth, tilename))) == 0
+            ):
                 nsub += 1
                 futs.append(
                     exec.submit(_run_tile, tilename, seed, opth, tmpdir)
