@@ -52,6 +52,7 @@ def _run_tile(tilename, seed, opth, tmpdir):
     for _ in range(10):
         try:
             mfiles = _download_tile(tilename)
+            break
         except Exception:
             time.sleep(120)
             mfiles = None
