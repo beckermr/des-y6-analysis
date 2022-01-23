@@ -36,7 +36,7 @@ def _download_tile(tilename):
                 ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
                 ./data/%s
         """ % (fname, os.path.basename(fname))
-                subprocess.run(cmd, shell=True, check=True)
+                subprocess.run(cmd, shell=True, check=True, capture_output=True)
 
 
 def _run_tile(tilename, seed, opth, tmpdir):
