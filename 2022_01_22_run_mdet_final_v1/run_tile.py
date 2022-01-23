@@ -24,7 +24,7 @@ def _download_tile(tilename):
     ])
     msk = tnames == tilename
     if np.sum(msk) != 4:
-        raise RuntimeError("not all files for tile %s" % tilename)
+        return np.sum(msk)
 
     d = d[msk]
     mfiles = []
@@ -54,12 +54,14 @@ def _run_tile(tilename, seed, opth, tmpdir):
             mfiles = _download_tile(tilename)
             break
         except Exception:
-            time.sleep(120)
+            time.sleep(600)
             mfiles = None
             pass
 
     if mfiles is None:
         raise RuntimeError("Could not download files for tile %s" % tilename)
+    elif isinstance(mfiles, int):
+        raise RuntimeError("Only found %d files for tile %s" % (mfiles, tilename))
 
     if tmpdir is None:
         tmpdir = os.environ["TMPDIR"]
@@ -140,11 +142,23 @@ else:
 if len(tnames) == 1:
     _run_tile(tnames[0], seed, opth, tmpdir)
 else:
+    d = fitsio.read(
+        "/astro/u/beckermr/workarea/des-y6-analysis/"
+        "2022_01_22_run_mdet_final_v1/fnames.fits",
+        lower=True,
+    )
+    tnames = np.array([
+        d["filename"][i].split("_")[0]
+        for i in range(d.shape[0])
+    ])
     with CondorExecutor(conda_env=conda_env, verbose=100) as exec:
-        futs = [
-            exec.submit(_run_tile, tilename, seed, opth, tmpdir)
-            for tilename, seed in zip(tnames, seeds)
-        ]
+        futs = []
+        for tilename, seed in zip(tnames, seeds):
+            if np.sum(tnames == tilename):
+                futs.append(
+                    exec.submit(_run_tile, tilename, seed, opth, tmpdir)
+                )
+
         for fut in PBar(as_completed(futs), total=len(futs), desc="running mdet"):
             try:
                 fut.result()
