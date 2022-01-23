@@ -4,6 +4,7 @@ import fitsio
 import subprocess
 import numpy as np
 import glob
+import time
 from concurrent.futures import as_completed
 from esutil.pbar import PBar
 from condor_exec import CondorExecutor
@@ -22,7 +23,11 @@ def _download_tile(tilename):
         for i in range(d.shape[0])
     ])
     msk = tnames == tilename
+    if np.sum(msk) != 4:
+        raise RuntimeError("not all files for tile %s" % tilename)
+
     d = d[msk]
+    mfiles = []
     for band in ["g", "r", "i", "z"]:
         msk = d["band"] == band
         if np.any(msk):
@@ -37,39 +42,23 @@ def _download_tile(tilename):
                 ./data/%s
         """ % (fname, os.path.basename(fname))
                 subprocess.run(cmd, shell=True, check=True, capture_output=True)
+            mfiles.append("./data/%s" % os.path.basename(fname))
+
+    return mfiles
 
 
 def _run_tile(tilename, seed, opth, tmpdir):
-    os.system("mkdir -p data")
+    os.system("mkdir -p ./data")
+    for _ in range(10):
+        try:
+            mfiles = _download_tile(tilename)
+        except Exception:
+            time.sleep(120)
+            mfiles = None
+            pass
 
-    d = fitsio.read(
-        "/astro/u/beckermr/workarea/des-y6-analysis/"
-        "2022_01_22_run_mdet_final_v1/fnames.fits",
-        lower=True,
-    )
-    tnames = np.array([
-        d["filename"][i].split("_")[0]
-        for i in range(d.shape[0])
-    ])
-    msk = tnames == tilename
-    d = d[msk]
-    mfiles = []
-    for band in ["g", "r", "i", "z"]:
-        msk = d["band"] == band
-        assert np.sum(msk) == 1
-        fname = os.path.join(d["path"][msk][0], d["filename"][msk][0])
-#         cmd = """\
-# rsync \
-#         -av \
-#         --password-file $DES_RSYNC_PASSFILE \
-#         ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
-#         ./data/%s
-# """ % (fname, os.path.basename(fname))
-#         subprocess.run(cmd, shell=True, check=True)
-        mfiles.append(
-            "/astro/u/beckermr/workarea/des-y6-analysis/"
-            "2022_01_22_run_mdet_final_v1/data/%s" % os.path.basename(fname)
-        )
+    if mfiles is None:
+        raise RuntimeError("Could not download files for tile %s" % tilename)
 
     if tmpdir is None:
         tmpdir = os.environ["TMPDIR"]
