@@ -130,6 +130,8 @@ else:
             jobs.append(joblib.delayed(_download_tile)(tilename))
         with joblib.Parallel(n_jobs=16, verbose=100) as par:
             par(jobs)
+
+        sys.exit(0)
     else:
         tnames = [sys.argv[1]]
         tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
