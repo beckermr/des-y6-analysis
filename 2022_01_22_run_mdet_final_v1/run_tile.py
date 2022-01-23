@@ -153,11 +153,16 @@ else:
     ])
     with CondorExecutor(conda_env=conda_env, verbose=100) as exec:
         futs = []
+        nsub = 0
         for tilename, seed in zip(tnames, seeds):
             if np.sum(tnames == tilename):
+                nsub += 1
                 futs.append(
                     exec.submit(_run_tile, tilename, seed, opth, tmpdir)
                 )
+            if nsub % 32 == 0:
+                time.sleep(600)
+                nsub = 0
 
         for fut in PBar(as_completed(futs), total=len(futs), desc="running mdet"):
             try:
