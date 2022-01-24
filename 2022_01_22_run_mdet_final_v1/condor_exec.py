@@ -86,7 +86,7 @@ atexit.register(_kill_condor_jobs)
 def _get_all_job_statuses_call(cjobs):
     status = {}
     res = subprocess.run(
-        "condor_q %s -af:jr JobStatus" % " ".join(cjobs),
+        "condor_q %s -af:jr JobStatus ExitBySignal" % " ".join(cjobs),
         shell=True,
         capture_output=True,
     )
@@ -94,7 +94,10 @@ def _get_all_job_statuses_call(cjobs):
         for line in res.stdout.decode("utf-8").splitlines():
             line = line.strip().split(" ")
             if line[0] in cjobs:
-                status[line[0]] = line[1]
+                if line[2].strip() == "true":
+                    status[line[0]] = "4"
+                else:
+                    status[line[0]] = line[1]
     return status
 
 
@@ -142,7 +145,7 @@ Universe       = vanilla
 Notification   = Never
 # this executable must have u+x bits
 Executable     = %s
-request_memory = 2G
+request_memory = 4G
 kill_sig       = SIGINT
 leave_in_queue = TRUE
 +Experiment    = "astro"
