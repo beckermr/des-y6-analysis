@@ -50,6 +50,17 @@ def _msk_shear(fname, passphrase):
                     if out.endswith(".fz"):
                         out = out[:-3]
                     fitsio.write(out, d, clobber=True)
+
+                    tname = os.path.basename(fname).split("_")[0]
+                    hs = glob.glob(
+                        os.path.join(os.path.dirname(fname), "%s*.hs" % tname)
+                    )
+                    assert len(hs) == 1
+                    os.system("mv %s %s" % (
+                        hs[0],
+                        os.path.join("./data_final", os.path.basename(hs[0]))
+                    ))
+
                 except Exception:
                     failed = True
                     pass
