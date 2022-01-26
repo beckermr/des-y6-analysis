@@ -17,35 +17,42 @@ def _msk_shear(fname, passphrase):
     fac = generate_shear_masking_factor(passphrase)
     failed = False
 
-    buff = io.StringIO()
-    with contextlib.redirect_stderr(sys.stdout):
-        with contextlib.redirect_stdout(buff):
-            try:
-                d = fitsio.read(fname)
-                msk = d["flags"] == 0
-                d = d[msk]
+    try:
+        d = fitsio.read(fname)
+    except Exception:
+        os.system("rm -f " + fname)
+        failed = True
 
-                msk = d["mdet_step"] == "noshear"
-                e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
-                g1, g2 = e1e2_to_g1g2(e1o, e2o)
-                eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
-                eta1 *= fac
-                eta2 *= fac
-                g1, g2 = eta1eta2_to_g1g2(eta1, eta2)
-                e1, e2 = g1g2_to_e1e2(g1, g2)
-                d["mdet_g_1"][msk] = e1
-                d["mdet_g_2"][msk] = e2
+    if not failed:
+        buff = io.StringIO()
+        with contextlib.redirect_stderr(sys.stdout):
+            with contextlib.redirect_stdout(buff):
+                try:
+                    d = fitsio.read(fname)
+                    msk = d["flags"] == 0
+                    d = d[msk]
 
-                assert not np.array_equal(d["mdet_g_1"][msk], e1o)
-                assert not np.array_equal(d["mdet_g_2"][msk], e2o)
+                    msk = d["mdet_step"] == "noshear"
+                    e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
+                    g1, g2 = e1e2_to_g1g2(e1o, e2o)
+                    eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
+                    eta1 *= fac
+                    eta2 *= fac
+                    g1, g2 = eta1eta2_to_g1g2(eta1, eta2)
+                    e1, e2 = g1g2_to_e1e2(g1, g2)
+                    d["mdet_g_1"][msk] = e1
+                    d["mdet_g_2"][msk] = e2
 
-                out = os.path.join("data_final", os.path.basename(fname))
-                if out.endswith(".fz"):
-                    out = out[:-3]
-                fitsio.write(out, d, clobber=True)
-            except Exception:
-                failed = True
-                pass
+                    assert not np.array_equal(d["mdet_g_1"][msk], e1o)
+                    assert not np.array_equal(d["mdet_g_2"][msk], e2o)
+
+                    out = os.path.join("data_final", os.path.basename(fname))
+                    if out.endswith(".fz"):
+                        out = out[:-3]
+                    fitsio.write(out, d, clobber=True)
+                except Exception:
+                    failed = True
+                    pass
 
     if failed:
         print("tile %s failed!" % fname, flush=True)

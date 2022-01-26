@@ -157,7 +157,7 @@ else:
         for tilename, seed in zip(tnames, seeds):
             if (
                 np.sum(tnames == tilename)
-                and len(glob.glob("%s/%s*" % (opth, tilename))) == 0
+                and len(glob.glob("%s/%s*.fits.fz" % (opth, tilename))) == 0
             ):
                 nsub += 1
                 futs.append(
