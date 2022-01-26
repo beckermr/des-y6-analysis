@@ -80,5 +80,5 @@ jobs = [
 ]
 
 print("found %d tiles to process" % len(jobs), flush=True)
-with joblib.Parallel(n_jobs=16, verbose=100) as exec:
-    exec(jobs)
+with joblib.Parallel(n_jobs=1, verbose=100) as exec:
+    exec(jobs[0:10])
