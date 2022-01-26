@@ -93,7 +93,7 @@ run-metadetect-on-slices \
             )
 
 
-cwd = os.path.abspath(os.path.realpath(os.cwd()))
+cwd = os.path.abspath(os.path.realpath(os.getcwd()))
 conda_env = "des-y6-final-v1"
 seed = 100
 os.system("mkdir -p ./mdet_data")
