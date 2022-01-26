@@ -15,6 +15,7 @@ from des_y6utils.shear_masking import generate_shear_masking_factor
 
 def _msk_shear(fname, passphrase):
     fac = generate_shear_masking_factor(passphrase)
+    failed = False
 
     buff = io.StringIO()
     with contextlib.redirect_stderr(sys.stdout):
@@ -43,7 +44,11 @@ def _msk_shear(fname, passphrase):
                     out = out[:-3]
                 fitsio.write(out, d, clobber=True)
             except Exception:
-                raise RuntimeError("failed!")
+                failed = True
+                pass
+
+    if failed:
+        print("tile %s failed!" % fname, flush=True)
 
 
 os.makedirs("data_final", exist_ok=True)
