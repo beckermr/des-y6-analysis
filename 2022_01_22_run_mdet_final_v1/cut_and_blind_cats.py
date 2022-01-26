@@ -56,11 +56,13 @@ def _msk_shear(fname, passphrase):
                         os.path.join(os.path.dirname(fname), "%s*.hs" % tname)
                     )
                     assert len(hs) == 1
-                    os.system("mv %s %s" % (
-                        hs[0],
-                        os.path.join("./data_final", os.path.basename(hs[0]))
-                    ))
-
+                    try:
+                        os.system("mv %s %s" % (
+                            hs[0],
+                            os.path.join("./data_final", os.path.basename(hs[0]))
+                        ))
+                    except Exception:
+                        pass
                 except Exception:
                     failed = True
                     pass
@@ -82,5 +84,5 @@ jobs = [
 ]
 
 print("found %d tiles to process" % len(jobs), flush=True)
-with joblib.Parallel(n_jobs=32, verbose=100) as exec:
+with joblib.Parallel(n_jobs=16, verbose=100) as exec:
     exec(jobs)
