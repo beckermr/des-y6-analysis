@@ -51,15 +51,11 @@ def _msk_shear(fname, passphrase):
                         out = out[:-3]
                     fitsio.write(out, d, clobber=True)
 
-                    tname = os.path.basename(fname).split("_")[0]
-                    hs = glob.glob(
-                        os.path.join(os.path.dirname(fname), "%s*.hs" % tname)
-                    )
-                    assert len(hs) == 1
+                    hs = fname[:-len(".fits.fz")] + "-healsparse-mask.hs"
                     try:
                         os.system("mv %s %s" % (
-                            hs[0],
-                            os.path.join("./data_final", os.path.basename(hs[0]))
+                            hs,
+                            os.path.join("./data_final", os.path.basename(hs))
                         ))
                     except Exception:
                         pass
