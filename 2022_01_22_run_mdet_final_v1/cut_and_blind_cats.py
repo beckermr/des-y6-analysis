@@ -78,9 +78,9 @@ fnames = glob.glob("mdet_data/*.fit*", recursive=True)
 jobs = [
     joblib.delayed(_msk_shear)(fname, passphrase)
     for fname in fnames
-    if not os.path.exists("./data_final/" + os.path.basename(fname)[:-3])
+    # if not os.path.exists("./data_final/" + os.path.basename(fname)[:-3])
 ]
 
 print("found %d tiles to process" % len(jobs), flush=True)
-with joblib.Parallel(n_jobs=8, verbose=100) as exec:
+with joblib.Parallel(n_jobs=32, verbose=100) as exec:
     exec(jobs)
