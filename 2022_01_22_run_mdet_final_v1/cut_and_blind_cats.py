@@ -20,7 +20,8 @@ def _msk_shear(fname, passphrase):
     try:
         d = fitsio.read(fname)
     except Exception:
-        os.system("rm -f " + fname)
+        # os.system("rm -f " + fname)
+        pass
         failed = True
 
     if not failed:
