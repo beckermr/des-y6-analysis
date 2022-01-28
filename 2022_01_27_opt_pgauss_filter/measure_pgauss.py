@@ -109,6 +109,7 @@ def _meas(gal, psf, nse, aps, seed):
     ts = []
     trs = []
     flags = []
+    g1errs = []
     for ap in aps:
         mom = PGaussMom(ap).go(obs)
         psf_mom = PGaussMom(ap).go(obs.psf, no_psf=True)
@@ -120,10 +121,11 @@ def _meas(gal, psf, nse, aps, seed):
         flags.append(mom["flags"] | psf_mom["flags"])
         s2ns.append(mom["s2n"])
         g1s.append(mom["e1"])
+        g1errs.append(mom["e_err"][0])
         ts.append(mom["T"])
         trs.append(mom["T"]/psf_mom_t)
 
-    return s2ns, g1s, flags, ts, trs
+    return s2ns, g1s, flags, ts, trs, g1errs
 
 
 def main():
@@ -202,6 +204,7 @@ def main():
                     ("T", "f4", (len(aps),)),
                     ("Tratio", "f4", (len(aps),)),
                     ("flags", "i4", (len(aps),))
+                    ("e1_err", "i4", (len(aps),))
                 ])
                 _o = np.array(outputs)
                 d["s2n"] = _o[:, 0]
@@ -209,6 +212,7 @@ def main():
                 d["flags"] = _o[:, 2]
                 d["T"] = _o[:, 3]
                 d["Tratio"] = _o[:, 4]
+                d["e1_err"] = _o[:, 5]
 
                 fitsio.write(
                     "./results/meas_seed%d.fits" % seed,
