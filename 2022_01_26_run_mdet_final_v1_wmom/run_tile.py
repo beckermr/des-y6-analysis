@@ -160,7 +160,7 @@ else:
                     exec.submit(_run_tile, tilename, seed, opth, tmpdir, cwd)
                 )
             if nsub % 32 == 0:
-                time.sleep(600)
+                time.sleep(300)
                 nsub = 0
 
         for fut in PBar(as_completed(futs), total=len(futs), desc="running mdet"):
