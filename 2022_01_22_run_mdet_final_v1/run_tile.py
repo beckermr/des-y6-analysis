@@ -150,9 +150,11 @@ else:
     with BNLCondorExecutor(conda_env, debug=True, mem=4) as exec:
         futs = []
         nsub = 0
-        for tilename, seed in zip(tnames, seeds):
+        for tilename, seed in PBar(
+            zip(tnames, seeds), total=len(tnames), desc="submitting"
+        ):
             if (
-                np.sum(tnames == tilename)
+                np.sum(tnames == tilename) == 4
                 and len(glob.glob("%s/%s*.fits.fz" % (opth, tilename))) == 0
             ):
                 nsub += 1
