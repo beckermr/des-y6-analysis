@@ -188,7 +188,7 @@ def main():
                         gal, psf, nse, aps, rng.randint(low=1, high=2**29))
                     )
 
-                    outputs.extend(par(jobs))
+                outputs.extend(par(jobs))
 
                 d = np.zeros(len(outputs), dtype=[
                     ("s2n", "f4", (len(aps),)),
