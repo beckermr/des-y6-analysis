@@ -155,7 +155,7 @@ def main():
         for i in range(d.shape[0])
     ])))
 
-    aps = np.linspace(1.25, 2.5, 15)
+    aps = np.linspace(1.25, 3, 20)
     outputs = []
     with joblib.Parallel(n_jobs=-1, verbose=10, batch_size=2) as par:
         for _ in tqdm.trange(n_tiles):
@@ -164,26 +164,26 @@ def main():
             mfiles = _download_tile(tilename, ".")
             ms = [meds.MEDS(mfile) for mfile in mfiles]
 
-            wgt_cache = {}
+            vars_cache = {}
 
             def _draw_noise(rng, ms):
                 rind = rng.randint(low=0, high=ms[0].size-1)
                 while any(m["ncutout"][rind] < 1 for m in ms):
                     rind = rng.randint(low=0, high=ms[0].size-1)
-                if rind not in wgt_cache:
-                    wgts = np.array([
+                if rind not in vars_cache:
+                    vars = np.array([
                         1.0/np.median(m.get_cutout(rind, 0, type="weight"))
                         for m in ms
                     ])
-                    wgt_cache[rind] = wgts
+                    vars_cache[rind] = vars
 
                 psf = np.sum([
-                    wgt * ms[i].get_cutout(rind, 0, type="psf")
-                    for i, wgt in enumerate(wgt_cache[rind])
+                    ms[i].get_cutout(rind, 0, type="psf")/wgt
+                    for i, wgt in enumerate(vars_cache[rind])
                 ], axis=0)
                 psf /= np.sum(psf)
 
-                return np.sqrt(2/np.sum(1/wgt_cache[rind])), psf
+                return np.sqrt(2/np.sum(1/vars_cache[rind])), psf
 
             for chunk in tqdm.trange(n_chunks):
                 jobs = []
