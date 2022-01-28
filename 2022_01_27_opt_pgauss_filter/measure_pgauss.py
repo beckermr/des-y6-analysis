@@ -66,7 +66,10 @@ def _get_object(rng, dcat):
     ).rotate(
         rng.uniform() * 360.0*galsim.degrees
     ).withFlux(
-        dcat["flux_i"][rind]
+        dcat["flux_g"][rind]
+        + dcat["flux_r"][rind]
+        + dcat["flux_i"][rind]
+        + dcat["flux_z"][rind]
     )
 
 
@@ -152,21 +155,23 @@ def main():
     ])))
 
     tilename = tnames[rng.randint(low=0, high=len(tnames)-1)]
-    mfile = _download_tile(tilename, ".")[2]
-    m = meds.MEDS(mfile)
+    mfiles = _download_tile(tilename, ".")
+    ms = [meds.MEDS(mfile) for mfile in mfiles]
 
     wgt_cache = {}
 
-    def _draw_noise(rng, m):
-        rind = rng.randint(low=0, high=m.size-1)
-        while m["ncutout"][rind] < 1:
-            rind = rng.randint(low=0, high=m.size-1)
+    def _draw_noise(rng, ms):
+        rind = rng.randint(low=0, high=ms[0].size-1)
+        while all(m["ncutout"][rind] < 1 for m in ms):
+            rind = rng.randint(low=0, high=ms[0].size-1)
         if rind not in wgt_cache:
-            wgt_cache[rind] = 1.0/np.sqrt(
-                np.median(m.get_cutout(rind, 0, type="weight"))
-            )
+            tot_var = sum(
+                1.0/np.median(m.get_cutout(rind, 0, type="weight"))
+                for m in ms
+            )/4
+            wgt_cache[rind] = np.sqrt(tot_var)
 
-        return wgt_cache[rind], m.get_cutout(rind, 0, type="psf")
+        return wgt_cache[rind], ms[2].get_cutout(rind, 0, type="psf")
 
     aps = np.linspace(1.25, 2.5, 15)
     outputs = []
@@ -174,7 +179,7 @@ def main():
         jobs = []
         for i in range(n_per_chunk):
             gal = _get_object(rng, dcat)
-            nse, psf = _draw_noise(rng, m)
+            nse, psf = _draw_noise(rng, ms)
             jobs.append(joblib.delayed(_meas)(
                 gal, psf, nse, aps, rng.randint(low=1, high=2**29))
             )
