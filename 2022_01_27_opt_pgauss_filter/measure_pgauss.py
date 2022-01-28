@@ -171,13 +171,19 @@ def main():
                 while any(m["ncutout"][rind] < 1 for m in ms):
                     rind = rng.randint(low=0, high=ms[0].size-1)
                 if rind not in wgt_cache:
-                    tot_var = sum(
+                    wgts = np.array([
                         1.0/np.median(m.get_cutout(rind, 0, type="weight"))
                         for m in ms
-                    )/4
-                    wgt_cache[rind] = np.sqrt(tot_var*2)
+                    ])
+                    wgt_cache[rind] = wgts
 
-                return wgt_cache[rind], ms[2].get_cutout(rind, 0, type="psf")
+                psf = np.sum([
+                    wgt * ms[i].get_cutout(rind, 0, type="psf")
+                    for i, wgt in enumerate(wgt_cache[rind])
+                ], axis=0)
+                psf /= np.sum(psf)
+
+                return np.sqrt(2/np.sum(1/wgt_cache[rind])), psf
 
             for chunk in tqdm.trange(n_chunks):
                 jobs = []

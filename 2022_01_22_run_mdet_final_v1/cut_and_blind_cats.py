@@ -83,3 +83,5 @@ jobs = [
 print("found %d tiles to process" % len(jobs), flush=True)
 with joblib.Parallel(n_jobs=8, verbose=100) as exec:
     exec(jobs)
+
+os.system("cd data_final && ls -1 *.fits > mdet_files.txt")
