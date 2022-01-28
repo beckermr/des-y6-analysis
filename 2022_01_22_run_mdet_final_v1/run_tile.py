@@ -143,7 +143,7 @@ else:
         os.path.join(cwd, "fnames.fits"),
         lower=True,
     )
-    tnames = np.array([
+    all_tnames = np.array([
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
@@ -154,14 +154,15 @@ else:
             zip(tnames, seeds), total=len(tnames), desc="submitting"
         ):
             if (
-                np.sum(tnames == tilename) == 4
+                np.sum(all_tnames == tilename) == 4
                 and len(glob.glob("%s/%s*.fits.fz" % (opth, tilename))) == 0
             ):
                 nsub += 1
                 futs.append(
                     exec.submit(_run_tile, tilename, seed, opth, tmpdir, cwd)
                 )
-            if nsub % 32 == 0:
+            if nsub % 32 == 0 and nsub > 0:
+                print("sleeping for jobs to finish downloads", flush=True)
                 time.sleep(300)
                 nsub = 0
 
