@@ -218,6 +218,9 @@ def main():
             for m in ms:
                 m.close()
 
+            for mfile in mfiles:
+                os.system("rm -rf %s" % mfile)
+
 
 if __name__ == "__main__":
     main()
