@@ -10,6 +10,7 @@ import galsim
 import joblib
 import tqdm
 from ngmix.prepsfmom import PGaussMom
+from ngmix.admom import run_admom
 
 
 def _download_tile(tilename, cwd):
@@ -100,16 +101,26 @@ def _meas(gal, psf, nse, aps, seed):
         nse,
         rng,
     )
+    psf_mom = run_admom(obs.psf, 1.0, rng=rng)
+    if psf_mom["flags"] == 0:
+        psf_mom_t = psf_mom["T"]
+    else:
+        psf_mom_t = np.nan
+
     s2ns = []
     g1s = []
+    ts = []
+    trs = []
     flags = []
     for ap in aps:
         mom = PGaussMom(ap).go(obs)
-        flags.append(mom["flags"])
+        flags.append(mom["flags"] & psf_mom["flags"])
         s2ns.append(mom["s2n"])
         g1s.append(mom["e1"])
+        ts.append(mom["T"])
+        trs.append(mom["T"]/psf_mom_t)
 
-    return s2ns, g1s, flags
+    return s2ns, g1s, flags, ts, trs
 
 
 def main():
@@ -165,12 +176,16 @@ def main():
         d = np.zeros(len(outputs), dtype=[
             ("s2n", "f4", (len(aps),)),
             ("e1", "f4", (len(aps),)),
+            ("T", "f4", (len(aps),)),
+            ("Tratio", "f4", (len(aps),)),
             ("flags", "i4", (len(aps),))
         ])
         _o = np.array(outputs)
         d["s2n"] = _o[:, 0]
         d["e1"] = _o[:, 1]
         d["flags"] = _o[:, 2]
+        d["T"] = _o[:, 3]
+        d["Tratio"] = _o[:, 4]
 
         fitsio.write(
             "./results/meas_seed%d.fits" % seed, d, extname="data", clobber=True)
