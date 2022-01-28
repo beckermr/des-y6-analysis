@@ -142,7 +142,16 @@ def main():
     )
     dcat = dcat[msk]
 
-    tilename = "DES0001-0624"
+    d = fitsio.read(
+        "fnames.fits",
+        lower=True,
+    )
+    tnames = sorted(list(set([
+        d["filename"][i].split("_")[0]
+        for i in range(d.shape[0])
+    ])))
+
+    tilename = tnames[rng.randint(low=0, high=len(tnames)-1)]
     mfile = _download_tile(tilename, ".")[2]
     m = meds.MEDS(mfile)
 
