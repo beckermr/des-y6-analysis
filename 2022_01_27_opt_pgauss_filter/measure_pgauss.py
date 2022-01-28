@@ -10,7 +10,6 @@ import galsim
 import joblib
 import tqdm
 from ngmix.prepsfmom import PGaussMom
-from ngmix.admom import run_admom
 
 
 def _download_tile(tilename, cwd):
@@ -104,11 +103,6 @@ def _meas(gal, psf, nse, aps, seed):
         nse,
         rng,
     )
-    psf_mom = run_admom(obs.psf, 1.0, rng=rng)
-    if psf_mom["flags"] == 0:
-        psf_mom_t = psf_mom["T"]
-    else:
-        psf_mom_t = np.nan
 
     s2ns = []
     g1s = []
@@ -117,6 +111,12 @@ def _meas(gal, psf, nse, aps, seed):
     flags = []
     for ap in aps:
         mom = PGaussMom(ap).go(obs)
+        psf_mom = PGaussMom(ap).go(obs.psf, no_psf=True)
+        if psf_mom["flags"] == 0:
+            psf_mom_t = psf_mom["T"]
+        else:
+            psf_mom_t = np.nan
+
         flags.append(mom["flags"] | psf_mom["flags"])
         s2ns.append(mom["s2n"])
         g1s.append(mom["e1"])
