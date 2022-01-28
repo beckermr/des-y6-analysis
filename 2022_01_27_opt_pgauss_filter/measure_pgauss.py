@@ -113,7 +113,7 @@ def _meas(gal, psf, nse, aps, seed):
 
 
 def main():
-    n_per_chunk = 100
+    n_per_chunk = 1000
     n_chunks = int(sys.argv[1])
     seed = np.random.randint(low=1, high=2**29)
     rng = np.random.RandomState(seed=seed)
@@ -172,7 +172,9 @@ def main():
         d["e1"] = _o[:, 1]
         d["flags"] = _o[:, 2]
 
-        fitsio.write("meas.fits", d, clobber=True)
+        fitsio.write(
+            "./results/meas_seed%d.fits" % seed, d, extname="data", clobber=True)
+        fitsio.write("./results/meas_seed%d.fits" % seed, aps, extname="aps")
 
 
 if __name__ == "__main__":
