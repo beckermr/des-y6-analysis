@@ -155,10 +155,12 @@ def main():
         for i in range(d.shape[0])
     ])))
 
+    aps = np.linspace(1.25, 2.5, 15)
     outputs = []
     with joblib.Parallel(n_jobs=-1, verbose=10, batch_size=2) as par:
-        for _ in range(n_tiles):
+        for _ in tqdm.trange(n_tiles):
             tilename = tnames[rng.randint(low=0, high=len(tnames)-1)]
+            print("tile:", tilename, flush=True)
             mfiles = _download_tile(tilename, ".")
             ms = [meds.MEDS(mfile) for mfile in mfiles]
 
@@ -177,7 +179,6 @@ def main():
 
                 return wgt_cache[rind], ms[2].get_cutout(rind, 0, type="psf")
 
-            aps = np.linspace(1.25, 2.5, 15)
             for chunk in tqdm.trange(n_chunks):
                 jobs = []
                 for i in range(n_per_chunk):
@@ -207,6 +208,9 @@ def main():
                     "./results/meas_seed%d.fits" % seed,
                     d, extname="data", clobber=True)
                 fitsio.write("./results/meas_seed%d.fits" % seed, aps, extname="aps")
+
+            for m in ms:
+                m.close()
 
 
 if __name__ == "__main__":
