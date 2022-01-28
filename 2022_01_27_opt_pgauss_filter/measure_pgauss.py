@@ -35,7 +35,7 @@ def _download_tile(tilename, cwd):
             _d = d[msk]
             for i in range(len(_d)):
                 fname = os.path.join(d["path"][msk][i], d["filename"][msk][i])
-                if not os.path.exists(os.path.join("./data", fname)):
+                if not os.path.exists(os.path.join("./data", os.path.basename(fname))):
                     cmd = """\
             rsync \
                     -av \
