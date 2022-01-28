@@ -118,8 +118,8 @@ def main():
     seed = np.random.randint(low=1, high=2**29)
     rng = np.random.RandomState(seed=seed)
 
-    os.makedirs("./results", exixt_ok=True)
-    os.makedirs("./data", exixt_ok=True)
+    os.makedirs("./results", exist_ok=True)
+    os.makedirs("./data", exist_ok=True)
 
     dcat = fitsio.read(os.path.expandvars("$MEDS_DIR/input_cosmos_v4.fits"))
     msk = (
