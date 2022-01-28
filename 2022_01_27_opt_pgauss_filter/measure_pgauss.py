@@ -182,7 +182,6 @@ def main():
                     for i, wgt in enumerate(wgt_cache[rind])
                 ], axis=0)
                 psf /= np.sum(psf)
-                print(psf.shape)
 
                 return np.sqrt(2/np.sum(1/wgt_cache[rind])), psf
 
