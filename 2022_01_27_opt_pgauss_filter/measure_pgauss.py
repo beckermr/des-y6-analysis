@@ -128,7 +128,8 @@ def _meas(gal, psf, nse, aps, seed):
 
 def main():
     n_per_chunk = 1000
-    n_chunks = int(sys.argv[1])
+    n_chunks = 1
+    n_tiles = int(sys.argv[1])
     seed = np.random.randint(low=1, high=2**29)
     rng = np.random.RandomState(seed=seed)
 
@@ -154,56 +155,58 @@ def main():
         for i in range(d.shape[0])
     ])))
 
-    tilename = tnames[rng.randint(low=0, high=len(tnames)-1)]
-    mfiles = _download_tile(tilename, ".")
-    ms = [meds.MEDS(mfile) for mfile in mfiles]
-
-    wgt_cache = {}
-
-    def _draw_noise(rng, ms):
-        rind = rng.randint(low=0, high=ms[0].size-1)
-        while any(m["ncutout"][rind] < 1 for m in ms):
-            rind = rng.randint(low=0, high=ms[0].size-1)
-        if rind not in wgt_cache:
-            tot_var = sum(
-                1.0/np.median(m.get_cutout(rind, 0, type="weight"))
-                for m in ms
-            )/4
-            wgt_cache[rind] = np.sqrt(tot_var)
-
-        return wgt_cache[rind], ms[2].get_cutout(rind, 0, type="psf")
-
-    aps = np.linspace(1.25, 2.5, 15)
     outputs = []
-    for chunk in tqdm.trange(n_chunks):
-        jobs = []
-        for i in range(n_per_chunk):
-            gal = _get_object(rng, dcat)
-            nse, psf = _draw_noise(rng, ms)
-            jobs.append(joblib.delayed(_meas)(
-                gal, psf, nse, aps, rng.randint(low=1, high=2**29))
-            )
+    with joblib.Parallel(n_jobs=-1, verbose=10, batch_size=2) as par:
+        for _ in range(n_tiles):
+            tilename = tnames[rng.randint(low=0, high=len(tnames)-1)]
+            mfiles = _download_tile(tilename, ".")
+            ms = [meds.MEDS(mfile) for mfile in mfiles]
 
-        with joblib.Parallel(n_jobs=-1, verbose=10, batch_size=2) as par:
-            outputs.extend(par(jobs))
+            wgt_cache = {}
 
-        d = np.zeros(len(outputs), dtype=[
-            ("s2n", "f4", (len(aps),)),
-            ("e1", "f4", (len(aps),)),
-            ("T", "f4", (len(aps),)),
-            ("Tratio", "f4", (len(aps),)),
-            ("flags", "i4", (len(aps),))
-        ])
-        _o = np.array(outputs)
-        d["s2n"] = _o[:, 0]
-        d["e1"] = _o[:, 1]
-        d["flags"] = _o[:, 2]
-        d["T"] = _o[:, 3]
-        d["Tratio"] = _o[:, 4]
+            def _draw_noise(rng, ms):
+                rind = rng.randint(low=0, high=ms[0].size-1)
+                while any(m["ncutout"][rind] < 1 for m in ms):
+                    rind = rng.randint(low=0, high=ms[0].size-1)
+                if rind not in wgt_cache:
+                    tot_var = sum(
+                        1.0/np.median(m.get_cutout(rind, 0, type="weight"))
+                        for m in ms
+                    )/4
+                    wgt_cache[rind] = np.sqrt(tot_var*2)
 
-        fitsio.write(
-            "./results/meas_seed%d.fits" % seed, d, extname="data", clobber=True)
-        fitsio.write("./results/meas_seed%d.fits" % seed, aps, extname="aps")
+                return wgt_cache[rind], ms[2].get_cutout(rind, 0, type="psf")
+
+            aps = np.linspace(1.25, 2.5, 15)
+            for chunk in tqdm.trange(n_chunks):
+                jobs = []
+                for i in range(n_per_chunk):
+                    gal = _get_object(rng, dcat)
+                    nse, psf = _draw_noise(rng, ms)
+                    jobs.append(joblib.delayed(_meas)(
+                        gal, psf, nse, aps, rng.randint(low=1, high=2**29))
+                    )
+
+                    outputs.extend(par(jobs))
+
+                d = np.zeros(len(outputs), dtype=[
+                    ("s2n", "f4", (len(aps),)),
+                    ("e1", "f4", (len(aps),)),
+                    ("T", "f4", (len(aps),)),
+                    ("Tratio", "f4", (len(aps),)),
+                    ("flags", "i4", (len(aps),))
+                ])
+                _o = np.array(outputs)
+                d["s2n"] = _o[:, 0]
+                d["e1"] = _o[:, 1]
+                d["flags"] = _o[:, 2]
+                d["T"] = _o[:, 3]
+                d["Tratio"] = _o[:, 4]
+
+                fitsio.write(
+                    "./results/meas_seed%d.fits" % seed,
+                    d, extname="data", clobber=True)
+                fitsio.write("./results/meas_seed%d.fits" % seed, aps, extname="aps")
 
 
 if __name__ == "__main__":
