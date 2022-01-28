@@ -155,7 +155,7 @@ def main():
         for i in range(d.shape[0])
     ])))
 
-    aps = np.linspace(0.5, 3, 25)
+    aps = np.linspace(1, 3, 25)
     outputs = []
     with joblib.Parallel(n_jobs=-1, verbose=10, batch_size=2) as par:
         for _ in tqdm.trange(n_tiles):
