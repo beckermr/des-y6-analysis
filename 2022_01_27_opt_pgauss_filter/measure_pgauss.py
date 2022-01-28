@@ -114,7 +114,7 @@ def _meas(gal, psf, nse, aps, seed):
     flags = []
     for ap in aps:
         mom = PGaussMom(ap).go(obs)
-        flags.append(mom["flags"] & psf_mom["flags"])
+        flags.append(mom["flags"] | psf_mom["flags"])
         s2ns.append(mom["s2n"])
         g1s.append(mom["e1"])
         ts.append(mom["T"])
