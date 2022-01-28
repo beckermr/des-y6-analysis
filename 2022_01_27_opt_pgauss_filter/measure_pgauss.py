@@ -113,7 +113,7 @@ def _meas(gal, psf, nse, aps, seed):
 
 
 def main():
-    n_per_chunk = 1000
+    n_per_chunk = 10000
     n_chunks = int(sys.argv[1])
     seed = np.random.randint(low=1, high=2**29)
     rng = np.random.RandomState(seed=seed)
@@ -148,7 +148,7 @@ def main():
 
         return wgt_cache[rind], m.get_cutout(rind, 0, type="psf")
 
-    aps = np.linspace(1.5, 2.5, 10)
+    aps = np.linspace(1.25, 2.5, 15)
     outputs = []
     for chunk in tqdm.trange(n_chunks):
         jobs = []
