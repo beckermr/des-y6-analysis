@@ -184,7 +184,7 @@ def main():
                 gal, psf, nse, aps, rng.randint(low=1, high=2**29))
             )
 
-        with joblib.Parallel(n_jobs=-1, verbose=10) as par:
+        with joblib.Parallel(n_jobs=-1, verbose=10, batch_size=2) as par:
             outputs.extend(par(jobs))
 
         d = np.zeros(len(outputs), dtype=[
