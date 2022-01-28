@@ -162,7 +162,7 @@ def main():
 
     def _draw_noise(rng, ms):
         rind = rng.randint(low=0, high=ms[0].size-1)
-        while all(m["ncutout"][rind] < 1 for m in ms):
+        while any(m["ncutout"][rind] < 1 for m in ms):
             rind = rng.randint(low=0, high=ms[0].size-1)
         if rind not in wgt_cache:
             tot_var = sum(
