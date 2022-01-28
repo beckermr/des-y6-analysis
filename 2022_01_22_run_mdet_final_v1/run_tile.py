@@ -7,15 +7,14 @@ import glob
 import time
 from concurrent.futures import as_completed
 from esutil.pbar import PBar
-from condor_exec import CondorExecutor
+from mattspy import BNLCondorExecutor
 
 
-def _download_tile(tilename):
+def _download_tile(tilename, cwd):
     os.system("mkdir -p data")
 
     d = fitsio.read(
-        "/astro/u/beckermr/workarea/des-y6-analysis/"
-        "2022_01_22_run_mdet_final_v1/fnames.fits",
+        os.path.join(cwd, "fnames.fits"),
         lower=True,
     )
     tnames = np.array([
@@ -47,11 +46,11 @@ def _download_tile(tilename):
     return mfiles
 
 
-def _run_tile(tilename, seed, opth, tmpdir):
+def _run_tile(tilename, seed, opth, tmpdir, cwd):
     os.system("mkdir -p ./data")
     for _ in range(10):
         try:
-            mfiles = _download_tile(tilename)
+            mfiles = _download_tile(tilename, cwd)
             break
         except Exception:
             time.sleep(600)
@@ -68,8 +67,7 @@ def _run_tile(tilename, seed, opth, tmpdir):
 
     cmd = """\
 run-metadetect-on-slices \
-  --config=/astro/u/beckermr/workarea/des-y6-analysis/\
-2022_01_22_run_mdet_final_v1/metadetect-v5.yaml \
+  --config=%s/metadetect-v5.yaml \
   --output-path=./mdet_data \
   --seed=%d \
   --use-tmpdir \
@@ -77,7 +75,7 @@ run-metadetect-on-slices \
   --log-level=INFO \
   --n-jobs=1 \
   --band-names=griz %s %s %s %s""" % (
-        seed, tmpdir, mfiles[0], mfiles[1], mfiles[2], mfiles[3]
+        cwd, seed, tmpdir, mfiles[0], mfiles[1], mfiles[2], mfiles[3]
     )
     subprocess.run(cmd, shell=True, check=True)
 
@@ -95,6 +93,7 @@ run-metadetect-on-slices \
             )
 
 
+cwd = os.path.abspath(os.path.realpath(os.getcwd()))
 conda_env = "des-y6-final-v1"
 seed = 100
 os.system("mkdir -p ./mdet_data")
@@ -102,8 +101,7 @@ opth = os.path.abspath("./mdet_data")
 
 if len(sys.argv) == 1:
     d = fitsio.read(
-        "/astro/u/beckermr/workarea/des-y6-analysis/"
-        "2022_01_22_run_mdet_final_v1/fnames.fits",
+        os.path.join(cwd, "fnames.fits"),
         lower=True,
     )
     tnames = sorted(list(set([
@@ -117,8 +115,7 @@ if len(sys.argv) == 1:
 else:
     if sys.argv[1] == "download":
         d = fitsio.read(
-            "/astro/u/beckermr/workarea/des-y6-analysis/"
-            "2022_01_22_run_mdet_final_v1/fnames.fits",
+            os.path.join(cwd, "fnames.fits"),
             lower=True,
         )
         tnames = sorted(list(set([
@@ -140,18 +137,17 @@ else:
         os.system("mkdir -p " + tmpdir)
 
 if len(tnames) == 1:
-    _run_tile(tnames[0], seed, opth, tmpdir)
+    _run_tile(tnames[0], seed, opth, tmpdir, cwd)
 else:
     d = fitsio.read(
-        "/astro/u/beckermr/workarea/des-y6-analysis/"
-        "2022_01_22_run_mdet_final_v1/fnames.fits",
+        os.path.join(cwd, "fnames.fits"),
         lower=True,
     )
     tnames = np.array([
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    with CondorExecutor(conda_env=conda_env, verbose=100) as exec:
+    with BNLCondorExecutor(conda_env, debug=True, mem=4) as exec:
         futs = []
         nsub = 0
         for tilename, seed in zip(tnames, seeds):
@@ -161,10 +157,10 @@ else:
             ):
                 nsub += 1
                 futs.append(
-                    exec.submit(_run_tile, tilename, seed, opth, tmpdir)
+                    exec.submit(_run_tile, tilename, seed, opth, tmpdir, cwd)
                 )
             if nsub % 32 == 0:
-                time.sleep(600)
+                time.sleep(300)
                 nsub = 0
 
         for fut in PBar(as_completed(futs), total=len(futs), desc="running mdet"):
