@@ -203,7 +203,7 @@ def main():
                     ("e1", "f4", (len(aps),)),
                     ("T", "f4", (len(aps),)),
                     ("Tratio", "f4", (len(aps),)),
-                    ("flags", "i4", (len(aps),))
+                    ("flags", "i4", (len(aps),)),
                     ("e1_err", "i4", (len(aps),))
                 ])
                 _o = np.array(outputs)
