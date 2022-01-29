@@ -72,7 +72,7 @@ def _get_object(rng, dcat, wgts):
     )
 
 
-def _make_obs(gal, psf_im, nse, rng, n=101):
+def _make_obs(gal, psf_im, nse, rng, n=49):
     psf = galsim.InterpolatedImage(galsim.ImageD(psf_im), scale=0.263)
     im = galsim.Convolve([gal, psf]).drawImage(
         nx=n, ny=n, scale=0.263, method="no_pixel"
