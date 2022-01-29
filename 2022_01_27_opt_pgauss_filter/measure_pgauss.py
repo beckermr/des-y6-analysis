@@ -185,7 +185,7 @@ def main():
                 ], axis=0)
                 psf /= np.sum(psf)
 
-                return np.sqrt(2/np.sum(wgts_cache[rind])), psf, wgts
+                return np.sqrt(2/np.sum(wgts_cache[rind])), psf, wgts_cache[rind].copy()
 
             for chunk in tqdm.trange(n_chunks):
                 jobs = []
