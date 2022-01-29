@@ -71,6 +71,8 @@ def _msk_shear(fname, passphrase):
 
     if failed:
         print("tile %s failed!" % fname, flush=True)
+    else:
+        print("copied tile %s!" % fname, flush=True)
 
 
 def _is_ok(fname):
