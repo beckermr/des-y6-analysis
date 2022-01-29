@@ -49,7 +49,7 @@ def _download_tile(tilename, cwd):
     return mfiles
 
 
-def _get_object(rng, dcat):
+def _get_object(rng, dcat, wgts):
     rind = rng.randint(low=0, high=dcat.shape[0]-1)
     return (
         (
@@ -65,10 +65,10 @@ def _get_object(rng, dcat):
     ).rotate(
         rng.uniform() * 360.0*galsim.degrees
     ).withFlux(
-        dcat["flux_g"][rind]
-        + dcat["flux_r"][rind]
-        + dcat["flux_i"][rind]
-        + dcat["flux_z"][rind]
+        dcat["flux_g"][rind] * wgts[0]
+        + dcat["flux_r"][rind] * wgts[1]
+        + dcat["flux_i"][rind] * wgts[2]
+        + dcat["flux_z"][rind] * wgts[3]
     )
 
 
@@ -166,32 +166,32 @@ def main():
             mfiles = _download_tile(tilename, ".")
             ms = [meds.MEDS(mfile) for mfile in mfiles]
 
-            vars_cache = {}
+            wgts_cache = {}
 
             def _draw_noise(rng, ms):
                 rind = rng.randint(low=0, high=ms[0].size-1)
                 while any(m["ncutout"][rind] < 1 for m in ms):
                     rind = rng.randint(low=0, high=ms[0].size-1)
-                if rind not in vars_cache:
-                    vars = np.array([
-                        1.0/np.median(m.get_cutout(rind, 0, type="weight"))
+                if rind not in wgts_cache:
+                    wgts = np.array([
+                        np.median(m.get_cutout(rind, 0, type="weight"))
                         for m in ms
                     ])
-                    vars_cache[rind] = vars
+                    wgts_cache[rind] = wgts / np.sum(wgts)
 
                 psf = np.sum([
-                    ms[i].get_cutout(rind, 0, type="psf")/wgt
-                    for i, wgt in enumerate(vars_cache[rind])
+                    ms[i].get_cutout(rind, 0, type="psf") * wgt
+                    for i, wgt in enumerate(wgts_cache[rind])
                 ], axis=0)
                 psf /= np.sum(psf)
 
-                return np.sqrt(2/np.sum(1/vars_cache[rind])), psf
+                return np.sqrt(2/np.sum(wgts_cache[rind])), psf, wgts
 
             for chunk in tqdm.trange(n_chunks):
                 jobs = []
                 for i in range(n_per_chunk):
-                    gal = _get_object(rng, dcat)
-                    nse, psf = _draw_noise(rng, ms)
+                    nse, psf, wgts = _draw_noise(rng, ms)
+                    gal = _get_object(rng, dcat, wgts)
                     jobs.append(joblib.delayed(_meas)(
                         gal, psf, nse, aps, rng.randint(low=1, high=2**29))
                     )
