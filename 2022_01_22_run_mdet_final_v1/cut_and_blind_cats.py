@@ -68,6 +68,17 @@ def _msk_shear(fname, passphrase):
         print("tile %s failed!" % fname, flush=True)
 
 
+def _is_ok(fname):
+    if os.path.exists(fname):
+        try:
+            fitsio.read(fname)
+            return True
+        except Exception:
+            return False
+    else:
+        return False
+
+
 os.makedirs("data_final", exist_ok=True)
 
 with open(os.path.expanduser("~/.test_des_blinding_v1"), "r") as fp:
@@ -77,7 +88,7 @@ fnames = glob.glob("mdet_data/*.fit*", recursive=True)
 jobs = [
     joblib.delayed(_msk_shear)(fname, passphrase)
     for fname in fnames
-    if not os.path.exists("./data_final/" + os.path.basename(fname)[:-3])
+    if not _is_ok("./data_final/" + os.path.basename(fname)[:-3])
 ]
 
 print("found %d tiles to process" % len(jobs), flush=True)
