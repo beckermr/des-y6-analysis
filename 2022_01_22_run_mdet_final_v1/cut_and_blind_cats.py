@@ -6,6 +6,8 @@ import sys
 import contextlib
 import numpy as np
 import joblib
+import tqdm
+
 from ngmix.shape import (
     e1e2_to_g1g2, g1g2_to_e1e2, g1g2_to_eta1eta2, eta1eta2_to_g1g2
 )
@@ -14,6 +16,9 @@ from des_y6utils.shear_masking import generate_shear_masking_factor
 
 
 def _msk_shear(fname, passphrase):
+    if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
+        return None
+
     fac = generate_shear_masking_factor(passphrase)
     failed = False
 
@@ -87,8 +92,7 @@ with open(os.path.expanduser("~/.test_des_blinding_v1"), "r") as fp:
 fnames = glob.glob("mdet_data/*.fit*", recursive=True)
 jobs = [
     joblib.delayed(_msk_shear)(fname, passphrase)
-    for fname in fnames
-    if not _is_ok("./data_final/" + os.path.basename(fname)[:-3])
+    for fname in tqdm.tqdm(fnames, desc="making jobs")
 ]
 
 print("found %d tiles to process" % len(jobs), flush=True)
