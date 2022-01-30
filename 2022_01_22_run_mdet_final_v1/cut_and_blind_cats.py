@@ -86,7 +86,8 @@ def _is_ok(fname):
         return False
 
 
-os.makedirs("data_final", exist_ok=True)
+if not os.path.exists("data_final"):
+    os.makedirs("data_final", exist_ok=True)
 
 with open(os.path.expanduser("~/.test_des_blinding_v1"), "r") as fp:
     passphrase = fp.read().strip()
