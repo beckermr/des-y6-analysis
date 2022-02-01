@@ -11,7 +11,7 @@ def _is_ok(fname):
             fitsio.read(fname)
             return True
         except Exception:
-            print(fname, flush=True)
+            print("\n\n" + fname + "\n", flush=True)
             return False
     else:
         return False
