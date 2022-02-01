@@ -18,7 +18,7 @@ def _is_ok(fname):
 
 
 if __name__ == "__main__":
-    fnames = glob.glob("mdet_data/*.fit*", recursive=True)
+    fnames = sorted(glob.glob("mdet_data/*.fit*", recursive=True))
     print("found %d tiles to process" % len(fnames), flush=True)
     with ProcessPoolExecutor(max_workers=8) as exec:
         futs = [
