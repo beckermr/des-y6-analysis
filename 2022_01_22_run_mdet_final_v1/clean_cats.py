@@ -28,4 +28,4 @@ if __name__ == "__main__":
             try:
                 fut.result()
             except Exception:
-                print("\n\n\n" + futs[fut] + "\n\n\n", flush=True)
+                print(futs[fut], flush=True)
