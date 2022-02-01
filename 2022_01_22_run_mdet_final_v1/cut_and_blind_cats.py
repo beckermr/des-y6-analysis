@@ -5,8 +5,8 @@ import io
 import sys
 import contextlib
 import numpy as np
-import joblib
 import tqdm
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from ngmix.shape import (
     e1e2_to_g1g2, g1g2_to_e1e2, g1g2_to_eta1eta2, eta1eta2_to_g1g2
@@ -86,20 +86,24 @@ def _is_ok(fname):
         return False
 
 
-if not os.path.exists("data_final"):
-    os.makedirs("data_final", exist_ok=True)
+if __name__ == "__main__":
+    if not os.path.exists("data_final"):
+        os.makedirs("data_final", exist_ok=True)
 
-with open(os.path.expanduser("~/.test_des_blinding_v1"), "r") as fp:
-    passphrase = fp.read().strip()
+    with open(os.path.expanduser("~/.test_des_blinding_v1"), "r") as fp:
+        passphrase = fp.read().strip()
 
-fnames = glob.glob("mdet_data/*.fit*", recursive=True)
-jobs = [
-    joblib.delayed(_msk_shear)(fname, passphrase)
-    for fname in tqdm.tqdm(fnames, desc="making jobs")
-]
+    fnames = glob.glob("mdet_data/*.fit*", recursive=True)
+    print("found %d tiles to process" % len(fnames), flush=True)
+    with ProcessPoolExecutor(max_workers=8) as exec:
+        futs = [
+            exec.submit(_msk_shear, fname, passphrase)
+            for fname in tqdm.tqdm(fnames, desc="making jobs")
+        ]
+        for fut in tqdm.tqdm(as_completed(futs), total=len(futs)):
+            try:
+                fut.result()
+            except Exception as e:
+                print(e)
 
-print("found %d tiles to process" % len(jobs), flush=True)
-with joblib.Parallel(n_jobs=8, verbose=100) as exec:
-    exec(jobs)
-
-os.system("cd data_final && ls -1 *.fits > mdet_files.txt")
+    os.system("cd data_final && ls -1 *.fits > mdet_files.txt")
