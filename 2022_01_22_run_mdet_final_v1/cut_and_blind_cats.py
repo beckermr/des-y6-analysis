@@ -16,8 +16,8 @@ from des_y6utils.shear_masking import generate_shear_masking_factor
 
 
 def _msk_shear(fname, passphrase):
-    if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
-        return None
+    # if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
+    #     return None
 
     fac = generate_shear_masking_factor(passphrase)
     failed = False
@@ -35,10 +35,23 @@ def _msk_shear(fname, passphrase):
             with contextlib.redirect_stdout(buff):
                 try:
                     d = fitsio.read(fname)
-                    msk = d["flags"] == 0
-                    d = d[msk]
 
-                    msk = d["mdet_step"] == "noshear"
+                    # make all non-zero flags nan in shear
+                    msk = d["flags"] != 0
+                    for col in [
+                        'mdet_g_1',
+                        'mdet_g_2',
+                        'mdet_g_cov_1_1',
+                        'mdet_g_cov_1_2',
+                        'mdet_g_cov_2_2',
+                    ]:
+                        d[col][msk] = np.nan
+
+                    # apply blinding to the good ones
+                    msk = (
+                        (d["mdet_step"] == "noshear")
+                        & (d["flags"] == 0)
+                    )
                     e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
                     g1, g2 = e1e2_to_g1g2(e1o, e2o)
                     eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
@@ -58,13 +71,14 @@ def _msk_shear(fname, passphrase):
                     fitsio.write(out, d, clobber=True)
 
                     hs = fname[:-len(".fits.fz")] + "-healsparse-mask.hs"
-                    try:
-                        os.system("mv %s %s" % (
-                            hs,
-                            os.path.join("./data_final", os.path.basename(hs))
-                        ))
-                    except Exception:
-                        pass
+                    if os.path.exists(hs):
+                        try:
+                            os.system("mv %s %s" % (
+                                hs,
+                                os.path.join("./data_final", os.path.basename(hs))
+                            ))
+                        except Exception:
+                            pass
                 except Exception:
                     failed = True
                     pass
