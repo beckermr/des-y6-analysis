@@ -1,19 +1,15 @@
-import os
 import glob
-import fitsio
 import tqdm
+import subprocess
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 def _is_ok(fname):
-    if os.path.exists(fname):
-        try:
-            fitsio.read(fname)
-            return True
-        except Exception:
-            return False
-    else:
-        return False
+    subprocess.run(
+        "python -c 'import fitsio; fitsio.read(\"%s\")'" % fname,
+        shell=True,
+        check=True
+    )
 
 
 if __name__ == "__main__":
