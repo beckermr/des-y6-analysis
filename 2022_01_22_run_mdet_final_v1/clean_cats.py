@@ -24,4 +24,4 @@ if __name__ == "__main__":
             try:
                 fut.result()
             except Exception:
-                print(futs[fut], flush=True)
+                print("\n" + futs[fut], flush=True)
