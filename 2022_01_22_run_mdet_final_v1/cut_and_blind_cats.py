@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     fnames = glob.glob("mdet_data/*.fit*", recursive=True)
     print("found %d tiles to process" % len(fnames), flush=True)
-    with ProcessPoolExecutor(max_workers=8) as exec:
+    with ProcessPoolExecutor(max_workers=12) as exec:
         futs = [
             exec.submit(_msk_shear, fname, passphrase)
             for fname in tqdm.tqdm(fnames, desc="making jobs")
