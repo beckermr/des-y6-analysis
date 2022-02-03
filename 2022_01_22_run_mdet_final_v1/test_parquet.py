@@ -39,7 +39,7 @@ def write_numparquet(filename, recarray, clobber=False):
     schema = pa.schema(type_list, metadata=metadata)
 
     with parquet.ParquetWriter(filename, schema) as writer:
-        arrays = [pa.array(np.byteswap(recarray[name]))
+        arrays = [pa.array(recarray[name].byteswap())
                   for name in recarray.dtype.names]
         pa_table = pa.Table.from_arrays(arrays, schema=schema)
 
