@@ -130,7 +130,7 @@ output:
     type: DESTile
     nproc: 16
     # The number of exposures to build
-    tilename: DES0003-3832
+    tilename: DES2359-6539
     bands: [i]
     desrun: y3v02
     imsim_data: /global/project/projectdirs/des/y3-image-sims
