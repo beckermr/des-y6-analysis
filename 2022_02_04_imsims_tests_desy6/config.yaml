@@ -31,7 +31,7 @@ single_band_swarp:
     update:
         NTHREADS: 8
         PIXEL_SCALE : 0.263
-        IMAGE_SIZE : 10000,10000
+        IMAGE_SIZE : 10000,1000
 
 # swarp:
 #     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
