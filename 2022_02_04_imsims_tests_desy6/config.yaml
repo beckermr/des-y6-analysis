@@ -1,0 +1,156 @@
+modules:
+    - galsim.des
+    - galsim_extra
+    - montara
+    - numpy
+
+pipeline:
+    steps: [galsim_montara]
+
+galsim_montara: {}
+
+# delete_images:
+#     delete_coadd: True
+#     delete_se: True
+#     save_tilenames:
+#     - DES0003-3832
+#
+# delete_meds:
+#     save_tilenames: [DES0003-3832]
+#
+# meds:
+#     cutout_types: ['image','weight','seg','bmask']
+#     meds_dir: meds
+#     meds_run: y3v02
+#     sub_bkg: False
+#     add_psf_data: True
+#     use_joblib: True
+#
+# single_band_swarp:
+#     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
+#     swarp_cmd: swarp
+#     ref_mag_zp: 30.
+#     update:
+#         NTHREADS: 8
+#         PIXEL_SCALE : 0.263
+#         IMAGE_SIZE : 10000,10000
+#
+# swarp:
+#     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
+#     swarp_cmd: swarp
+#     center_from_header: True
+#     coadd_bands: ['r','i','z']
+#     mask_hdu : 1
+#     update:
+#         RESAMPLE : N
+#         COPY_KEYWORDS : BUNIT,TILENAME,TILEID
+#         PIXEL_SCALE : 0.263
+#         IMAGE_SIZE : 10000,10000
+#         COMBINE_TYPE : CHI-MEAN
+#         NTHREADS : 32
+#         BLANK_BADPIXELS : Y
+#
+# #Options for SExtractor - can just provide a sextractor config file as below
+# #Fields can be updated using the update section e.g. here we update the detection
+# #threshold DETECT_THRESH.
+# sextractor:
+#     sex_cmd: sex
+#     #single_band_det: r
+#     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_sex.config
+#     params_file : ${IMSIM_DIR}/astromatic_config/deblend.param
+#     filter_file : ${IMSIM_DIR}/astromatic_config/Y3A1_v1_gauss_3.0_7x7.conv
+#     star_nnw_file : ${IMSIM_DIR}/astromatic_config/Y3A1_v1_sex.nnw
+#     update:
+#         CHECKIMAGE_TYPE : SEGMENTATION,BACKGROUND,BACKGROUND_RMS
+#         DEBLEND_MINCONT : 0.001
+#         DETECT_THRESH : 1.1
+#         ANALYSIS_THRESH : 1.1
+
+
+image:
+    type: WideScattered
+    border: 15
+    random_seed: 1234
+
+    # The number of objects across the full focal plane.
+    nobjects:
+        type: MixedNObjects
+        ngalaxies:
+            type: RandomPoisson
+            mean: 200
+        use_all_stars: True
+
+    #could read this from the image headers, but let's set them explicitly for now
+    xsize: 2048
+    ysize: 4096
+
+    world_pos:
+        type: RADec
+        type: RADec
+        ra:
+            type: Degrees
+            theta: { type: Random, min: "$ra_min_deg", max: "$ra_max_deg" }
+        dec:
+            type: Radians
+            theta:
+                type: RandomDistribution
+                function: "math.cos(x)"  # Uniform on the sky means P(delta) ~ cos(delta)
+                x_min: "$numpy.radians(dec_min_deg)"
+                x_max: "$numpy.radians(dec_max_deg)"
+
+
+psf:
+    type: Gaussian
+    sigma : 1
+
+gal:
+  type: Exponential
+  half_light_radius: 0.5
+  flux: 64000.0
+
+star:
+    type: Gaussian
+    sigma: 1.e-6
+    flux: 0
+
+stamp:
+    type: MixedScene
+    objects:
+        star: 0
+        gal: 1
+    draw_method: auto
+    shear:
+        type: G1G2
+        g1: 0.02
+        g2: 0.00
+    gsparams:
+        maximum_fft_size: 16384
+
+output:
+    type: DESTile
+    nproc: 16
+    # The number of exposures to build
+    tilename: DES0003-3832
+    bands: [i]
+    desrun: y3v02
+    imsim_data: /global/project/projectdirs/des/y3-image-sims
+    noise_mode: from_weight
+    add_bkg: False
+
+    #Save weight and badpix extensions too
+    badpixfromfits:
+        hdu: 1
+        mask_hdu: 2
+        mask_file: "$orig_image_path"
+    weight:
+        hdu: 2
+
+    truth:
+        columns:
+            num: obj_num
+            g1: "$(@stamp.shear).g1"
+            g2: "$(@stamp.shear).g2"
+            g: "$truth_g"
+            beta: "$truth_beta"
+            band: "band"
+            mag_zp: "$mag_zp"
