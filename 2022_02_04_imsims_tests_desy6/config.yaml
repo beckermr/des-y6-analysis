@@ -133,7 +133,7 @@ output:
     tilename: DES2359-6539
     bands: [i]
     desrun: y3v02
-    imsim_data: /global/project/projectdirs/des/y3-image-sims
+    imsim_data: ${IMSIM_DATA}
     noise_mode: from_weight
     add_bkg: False
 
