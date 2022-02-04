@@ -4,6 +4,6 @@ export IMSIM_DATA=${MEDS_DIR}
 
 mkdir -p ./sim_outputs
 run-eastlake-sim \
-  -v 2 \
+  -v 1 \
   config.yaml \
   ./sim_outputs
