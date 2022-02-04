@@ -73,12 +73,7 @@ image:
     random_seed: 1234
 
     # The number of objects across the full focal plane.
-    nobjects:
-        type: MixedNObjects
-        ngalaxies:
-            type: RandomPoisson
-            mean: 200
-        use_all_stars: True
+    nobjects: 100
 
     #could read this from the image headers, but let's set them explicitly for now
     xsize: 2048
@@ -132,7 +127,7 @@ output:
     # The number of exposures to build
     tilename: DES2359-6539
     bands: [i]
-    desrun: des-pizza-slices-y6-v12
+    desrun: "des-pizza-slices-y6-v12"
     imsim_data: "$os.environ['IMSIM_DATA']"
     noise_mode: from_weight
     add_bkg: False
