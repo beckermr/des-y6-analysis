@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara]
+    steps: [galsim_montara, single_band_swarp]
 
 galsim_montara: {}
 
@@ -26,15 +26,13 @@ galsim_montara: {}
 #     add_psf_data: True
 #     use_joblib: True
 #
-# single_band_swarp:
-#     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
-#     swarp_cmd: swarp
-#     ref_mag_zp: 30.
-#     update:
-#         NTHREADS: 8
-#         PIXEL_SCALE : 0.263
-#         IMAGE_SIZE : 10000,10000
-#
+
+single_band_swarp:
+    update:
+        NTHREADS: 8
+        PIXEL_SCALE : 0.263
+        IMAGE_SIZE : 10000,10000
+
 # swarp:
 #     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
 #     swarp_cmd: swarp
