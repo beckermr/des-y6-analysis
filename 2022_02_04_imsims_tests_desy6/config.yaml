@@ -145,7 +145,5 @@ output:
             num: obj_num
             g1: "$(@stamp.shear).g1"
             g2: "$(@stamp.shear).g2"
-            g: "$truth_g"
-            beta: "$truth_beta"
             band: "band"
             mag_zp: "$mag_zp"
