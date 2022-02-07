@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara, single_band_swarp]
+    steps: [galsim_montara, single_band_swarp, swarp, ]
 
 galsim_montara: {}
 
@@ -30,7 +30,7 @@ galsim_montara: {}
 single_band_swarp: {}
 swarp:
     coadd_bands: ['r', 'i', 'z']
-sextractor: {}
+src_extractor: {}
 
 image:
     type: WideScattered
