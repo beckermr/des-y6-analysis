@@ -29,24 +29,8 @@ galsim_montara: {}
 
 single_band_swarp: {}
 swarp:
-    coadd_bands: ['i']
-#
-# #Options for SExtractor - can just provide a sextractor config file as below
-# #Fields can be updated using the update section e.g. here we update the detection
-# #threshold DETECT_THRESH.
-# sextractor:
-#     sex_cmd: sex
-#     #single_band_det: r
-#     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_sex.config
-#     params_file : ${IMSIM_DIR}/astromatic_config/deblend.param
-#     filter_file : ${IMSIM_DIR}/astromatic_config/Y3A1_v1_gauss_3.0_7x7.conv
-#     star_nnw_file : ${IMSIM_DIR}/astromatic_config/Y3A1_v1_sex.nnw
-#     update:
-#         CHECKIMAGE_TYPE : SEGMENTATION,BACKGROUND,BACKGROUND_RMS
-#         DEBLEND_MINCONT : 0.001
-#         DETECT_THRESH : 1.1
-#         ANALYSIS_THRESH : 1.1
-
+    coadd_bands: ['r', 'i', 'z']
+sextractor: {}
 
 image:
     type: WideScattered
@@ -107,7 +91,7 @@ output:
     nproc: 16
     # The number of exposures to build
     tilename: DES2359-6539
-    bands: [i]
+    bands: ['r', 'i', 'z']
     desrun: "des-pizza-slices-y6-v12"
     imsim_data: "$os.environ['IMSIM_DATA']"
     noise_mode: from_weight
