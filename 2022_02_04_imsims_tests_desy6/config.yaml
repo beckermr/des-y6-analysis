@@ -27,24 +27,9 @@ galsim_montara: {}
 #     use_joblib: True
 #
 
-single_band_swarp:
-    update:
-        NTHREADS: 8
-
-# swarp:
-#     config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
-#     swarp_cmd: swarp
-#     center_from_header: True
-#     coadd_bands: ['r','i','z']
-#     mask_hdu : 1
-#     update:
-#         RESAMPLE : N
-#         COPY_KEYWORDS : BUNIT,TILENAME,TILEID
-#         PIXEL_SCALE : 0.263
-#         IMAGE_SIZE : 10000,10000
-#         COMBINE_TYPE : CHI-MEAN
-#         NTHREADS : 32
-#         BLANK_BADPIXELS : Y
+single_band_swarp: {}
+swarp:
+    coadd_bands: ['i']
 #
 # #Options for SExtractor - can just provide a sextractor config file as below
 # #Fields can be updated using the update section e.g. here we update the detection
