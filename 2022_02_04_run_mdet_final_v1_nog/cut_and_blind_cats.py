@@ -16,8 +16,8 @@ from des_y6utils.shear_masking import generate_shear_masking_factor
 
 
 def _msk_shear(fname, passphrase):
-    # if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
-    #     return None
+    if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
+        return None
 
     fac = generate_shear_masking_factor(passphrase)
     failed = False
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     fnames = glob.glob("mdet_data/*.fit*", recursive=True)
     print("found %d tiles to process" % len(fnames), flush=True)
-    with ProcessPoolExecutor(max_workers=12) as exec:
+    with ProcessPoolExecutor(max_workers=4) as exec:
         futs = [
             exec.submit(_msk_shear, fname, passphrase)
             for fname in tqdm.tqdm(fnames, desc="making jobs")
