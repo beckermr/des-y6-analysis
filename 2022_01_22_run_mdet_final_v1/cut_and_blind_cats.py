@@ -10,9 +10,11 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from des_y6utils.shear_masking import generate_shear_masking_factor
 
+OUTDIR = "data_final_nogcut"
+
 
 def _msk_shear(fname, passphrase):
-    if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
+    if _is_ok(os.path.join(".", OUTDIR, os.path.basename(fname)[:-3])):
         return None
 
     fac = generate_shear_masking_factor(passphrase)
@@ -61,7 +63,7 @@ def _msk_shear(fname, passphrase):
                     assert not np.array_equal(d["mdet_g_1"][msk], e1o)
                     assert not np.array_equal(d["mdet_g_2"][msk], e2o)
 
-                    out = os.path.join("data_final", os.path.basename(fname))
+                    out = os.path.join(".", OUTDIR, os.path.basename(fname))
                     if out.endswith(".fz"):
                         out = out[:-3]
                     fitsio.write(out, d, clobber=True)
@@ -71,7 +73,7 @@ def _msk_shear(fname, passphrase):
                         try:
                             os.system("mv %s %s" % (
                                 hs,
-                                os.path.join("./data_final", os.path.basename(hs))
+                                os.path.join(".", OUTDIR, os.path.basename(hs))
                             ))
                         except Exception:
                             pass
@@ -98,8 +100,8 @@ def _is_ok(fname):
 
 
 if __name__ == "__main__":
-    if not os.path.exists("data_final"):
-        os.makedirs("data_final", exist_ok=True)
+    if not os.path.exists(OUTDIR):
+        os.makedirs(OUTDIR, exist_ok=True)
 
     with open(os.path.expanduser("~/.test_des_blinding_v2"), "r") as fp:
         passphrase = fp.read().strip()
@@ -117,4 +119,4 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e)
 
-    os.system("cd data_final && ls -1 *.fits > mdet_files.txt")
+    os.system(f"cd {OUTDIR} && ls -1 *.fits > mdet_files.txt")
