@@ -8,16 +8,12 @@ import numpy as np
 import tqdm
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from ngmix.shape import (
-    e1e2_to_g1g2, g1g2_to_e1e2, g1g2_to_eta1eta2, eta1eta2_to_g1g2
-)
-
 from des_y6utils.shear_masking import generate_shear_masking_factor
 
 
 def _msk_shear(fname, passphrase):
-    # if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
-    #     return None
+    if _is_ok("./data_final/" + os.path.basename(fname)[:-3]):
+        return None
 
     fac = generate_shear_masking_factor(passphrase)
     failed = False
@@ -36,6 +32,10 @@ def _msk_shear(fname, passphrase):
                 try:
                     d = fitsio.read(fname)
 
+                    # unset the shear range bits
+                    d["flags"] = d["flags"] & (~2**19)
+                    d["mdet_flags"] = d["mdet_flags"] & (~2**19)
+
                     # make all non-zero flags nan in shear
                     msk = d["flags"] != 0
                     for col in [
@@ -53,12 +53,8 @@ def _msk_shear(fname, passphrase):
                         & (d["flags"] == 0)
                     )
                     e1o, e2o = d["mdet_g_1"][msk].copy(), d["mdet_g_2"][msk].copy()
-                    g1, g2 = e1e2_to_g1g2(e1o, e2o)
-                    eta1, eta2 = g1g2_to_eta1eta2(g1, g2)
-                    eta1 *= fac
-                    eta2 *= fac
-                    g1, g2 = eta1eta2_to_g1g2(eta1, eta2)
-                    e1, e2 = g1g2_to_e1e2(g1, g2)
+                    e1 = e1o * fac
+                    e2 = e2o * fac
                     d["mdet_g_1"][msk] = e1
                     d["mdet_g_2"][msk] = e2
 
@@ -105,12 +101,12 @@ if __name__ == "__main__":
     if not os.path.exists("data_final"):
         os.makedirs("data_final", exist_ok=True)
 
-    with open(os.path.expanduser("~/.test_des_blinding_v1"), "r") as fp:
+    with open(os.path.expanduser("~/.test_des_blinding_v2"), "r") as fp:
         passphrase = fp.read().strip()
 
     fnames = glob.glob("mdet_data/*.fit*", recursive=True)
     print("found %d tiles to process" % len(fnames), flush=True)
-    with ProcessPoolExecutor(max_workers=12) as exec:
+    with ProcessPoolExecutor(max_workers=6) as exec:
         futs = [
             exec.submit(_msk_shear, fname, passphrase)
             for fname in tqdm.tqdm(fnames, desc="making jobs")
