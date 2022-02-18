@@ -119,7 +119,6 @@ def _run_tile(tilename, band, seed, cwd):
                             assert bin >= 0
                             assert bin < 32
                             dind = (ccdnum-1)*32 + bin
-                            print("\n", bin, dind, flush=True)
                             assert data["ccdnum"][dind] == ccdnum
                             assert data["bin"][dind] == bin
                             data["e1"][dind] += res["e"][0]
