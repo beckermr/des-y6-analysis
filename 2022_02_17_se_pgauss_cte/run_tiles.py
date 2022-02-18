@@ -150,6 +150,7 @@ def main():
         jobs = [
             joblib.delayed(_run_tile)(d["tilename"][i], d["band"][i], seeds[i], cwd)
             for i in range(d.shape[0])
+            if d["band"][i] in ["r", "i", "z"]
         ]
         all_data = []
 
