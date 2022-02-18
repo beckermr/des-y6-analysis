@@ -125,7 +125,7 @@ def _run_tile(tilename, band, seed, cwd):
                             data["row"][dind] += rr
                             data["n"][dind] += 1
 
-            if np.sum(data["n"]) > 10000:
+            if np.sum(data["n"]) > 100:
                 break
 
     return data
