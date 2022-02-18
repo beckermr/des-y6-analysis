@@ -77,7 +77,7 @@ def _run_tile(tilename, band, seed, cwd):
         ("bin", "i4"),
         ("ccdnum", "i4"),
         ("band", "U1"),
-        ("tilename", "U!2"),
+        ("tilename", "U12"),
     ])
     for i in range(62):
         for j in range(32):
