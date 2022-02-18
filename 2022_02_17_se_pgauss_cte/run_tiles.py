@@ -142,6 +142,7 @@ def main():
         )
         rng = np.random.RandomState(seed=seed)
         seeds = rng.randint(low=1, high=2**29, size=d.shape[0])
+        tnames = d["tilename"]
     else:
         tnames = [sys.argv[1]]
         seeds = [10]
