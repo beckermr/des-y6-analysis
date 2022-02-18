@@ -72,6 +72,7 @@ def _run_tile(tilename, band, seed, cwd):
 
     data = np.zeros(62*32, dtype=[
         ("e1", "f8"),
+        ("e2", "f8"),
         ("row", "f8"),
         ("n", "f8"),
         ("bin", "i4"),
@@ -122,6 +123,7 @@ def _run_tile(tilename, band, seed, cwd):
                             assert data["ccdnum"][dind] == ccdnum
                             assert data["bin"][dind] == bin
                             data["e1"][dind] += res["e"][0]
+                            data["e2"][dind] += res["e"][1]
                             data["row"][dind] += rr
                             data["n"][dind] += 1
 
