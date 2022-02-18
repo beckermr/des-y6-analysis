@@ -102,9 +102,14 @@ def _run_tile(tilename, band, seed, cwd):
                         o = None
 
                     if o is not None and np.all(o.weight > 0) and np.all(o.bmask == 0):
-                        res = fitter.go(o)
+                        try:
+                            res = fitter.go(o)
+                        except Exception:
+                            res = None
+
                         if (
-                            res["flags"] == 0
+                            res is not None
+                            and res["flags"] == 0
                             and res["s2n"] > 7
                             and res["s2n"] < 100
                             and res["T"] > 0.2
