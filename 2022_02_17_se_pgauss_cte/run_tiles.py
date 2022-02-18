@@ -26,7 +26,10 @@ def _download_tile(tilename, cwd, bands):
         os.path.join(cwd, "meds_files.fits"),
         lower=True,
     )
-    msk = d["tilename"] == tilename
+    msk = (
+        (d["tilename"] == tilename)
+        & np.isin(d["band"], bands)
+    )
     if np.sum(msk) != len(bands):
         return np.sum(msk)
 
