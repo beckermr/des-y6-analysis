@@ -115,7 +115,9 @@ def _run_tile(tilename, band, seed, cwd):
                             else:
                                 rr = m["orig_row"][i, j]
 
-                            bin = max(min(rr-1, 4095), 0) // 128
+                            bin = int(max(min(rr-1, 4095), 0) / 128)
+                            assert bin >= 0
+                            assert bin < 32
                             dind = (ccdnum-1)*32 + bin
                             print("\n", bin, dind, flush=True)
                             assert data["ccdnum"][dind] == ccdnum
