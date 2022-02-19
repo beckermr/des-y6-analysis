@@ -165,8 +165,9 @@ def main():
             for i in range(d.shape[0])
             if d["band"][i] in ["r", "i", "z"]
         ]
-        all_data = []
 
+        all_data = []
+        last_io = time.time()
         with BNLCondorParallel(verbose=0, n_jobs=10000) as exc:
             for pr in PBar(exc(jobs), total=len(jobs), desc="running jobs"):
                 try:
@@ -176,11 +177,19 @@ def main():
                 else:
                     all_data.append(res)
 
-                    fitsio.write(
-                        "cte_data.fits",
-                        np.concatenate(all_data, axis=0),
-                        clobber=True,
-                    )
+                    if time.time() - last_io > 300:
+                        last_io = time.time()
+                        fitsio.write(
+                            "cte_data.fits",
+                            np.concatenate(all_data, axis=0),
+                            clobber=True,
+                        )
+
+        fitsio.write(
+            "cte_data.fits",
+            np.concatenate(all_data, axis=0),
+            clobber=True,
+        )
 
 
 if __name__ == "__main__":
