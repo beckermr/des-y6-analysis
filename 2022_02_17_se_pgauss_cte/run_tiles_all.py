@@ -18,6 +18,25 @@ from ngmix.prepsfmom import PGaussMom
 TESTING = False
 
 
+def _query_gold(tilename):
+    q = """\
+SELECT
+    coadd_object_id
+FROM
+    y6_gold_2_0
+WHERE
+    flags_footprint > 0
+    AND flags_gold = 0
+    AND flags_foreground = 0
+    AND ext_mash = 4
+    AND tilename = '%s'; > gold_ids.fits
+""" % tilename
+    with open("query.txt", "w") as fp:
+        fp.write(q)
+    subprocess.run("easyaccess --db dessci -l query.txt", shell=True, check=True)
+    return fitsio.read("gold_ids.fits")["COADD_OBJECT_ID"]
+
+
 def get_ccdnum(fname):
     return int(os.path.basename(fname).split("_")[2][1:])
 
@@ -73,6 +92,8 @@ def _run_tile(tilename, band, seed, cwd):
     elif not isinstance(mfiles, list):
         raise RuntimeError("Only found %d files for tile %s" % (mfiles, tilename))
 
+    gids = _query_gold(tilename)
+
     data = np.zeros((62, 32, 16), dtype=[
         ("e1", "f8"),
         ("e2", "f8"),
@@ -100,6 +121,8 @@ def _run_tile(tilename, band, seed, cwd):
         ii = m.get_image_info()
 
         for i in PBar(range(m.size)):
+            if m["id"][i] not in gids:
+                continue
             for j in range(m["ncutout"][i]):
                 if j > 0:
                     try:

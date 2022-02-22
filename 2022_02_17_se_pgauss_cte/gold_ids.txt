@@ -6,4 +6,5 @@ WHERE
     flags_footprint > 0
     AND flags_gold = 0
     AND flags_foreground = 0
-    AND ext_mash = 4; > gold_ids.fits
+    AND ext_mash = 4
+    AND tilename = '%s'; > gold_ids.fits
