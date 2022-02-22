@@ -118,18 +118,16 @@ def _reduce_per_ccd_all(fnames):
     fitsio.write("cte_data_all_ccd.fits", e2_err, extname="e2_err")
 
 
-def _online_update_one(e, e_err, n, n2, _e, _n, ind):
-    e_old = e[ind].copy()
-    e[ind] = e_old + (_n / n[ind]) * (_e - e_old)
-    e_err[ind] = e_err[ind] + _n * (_e - e_old) * (_e - e[ind])
+def _online_update_one(e, e_err, n, _e, _err, _n, ind):
+    delta = e[ind] - _e
+    e[ind] = (_e*_n + e[ind]*(n[ind] - _n)) / n[ind]
+    e_err[ind] = e_err[ind] + _err + delta**2 * (n[ind] - _n) * _n / n[ind]
     return e, e_err
 
 
 def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
 
-    ns = np.zeros(shape)
     n = np.zeros(shape)
-    n2 = np.zeros(shape)
     e1 = np.zeros(shape)
     e1_err = np.zeros(shape)
     e2 = np.zeros(shape)
@@ -147,19 +145,18 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
             if np.any(msk):
                 _n = np.sum(d["n"][msk])
                 n[b] += _n
-                n2[b] += _n**2
 
                 _e = np.mean(d["e1"][msk])
-                e1, e1_err = _online_update_one(e1, e1_err, n, n2, _e, _n, b)
+                _err = np.sum((d["e1"][msk] - _e)**2)
+                e1, e1_err = _online_update_one(e1, e1_err, n, _e, _err, _n, b)
 
                 _e = np.mean(d["e2"][msk])
-                e2, e2_err = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
+                _err = np.sum((d["e2"][msk] - _e)**2)
+                e2, e2_err = _online_update_one(e2, e2_err, n, _e, _err, _n, b)
 
                 loc[b] += np.sum(d[loc_col][msk])
 
-                ns[b] += np.sum(msk)
-
-        print(n, ns)
+        print(n)
         print(e1, e2)
         print(e1_err, e2_err)
 
