@@ -164,6 +164,8 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
     e1_err = np.sqrt(e1_err / (n - 1))
     e2_err = np.sqrt(e2_err / (n - 1))
 
+    print(e1_err, e2_err)
+
     loc = loc / n
 
     fitsio.write(oname, e1, extname="e1", clobber=True)
@@ -187,10 +189,10 @@ def main():
             "cte_data_all_col.fits"
         ),
         # joblib.delayed(_reduce_per_ccd)(fnames),
-        # joblib.delayed(_reduce_rows_cols)(
-        #     fnames, 32, "row_bin", "reducing rows", "row",
-        #     "cte_data_all_row.fits"
-        # ),
+        joblib.delayed(_reduce_rows_cols)(
+            fnames, 32, "row_bin", "reducing rows", "row",
+            "cte_data_all_row.fits"
+        ),
         # joblib.delayed(_reduce_per_ccd_all)(fnames),
     ]
 
