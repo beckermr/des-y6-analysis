@@ -158,7 +158,7 @@ def _run_tile(tilename, band, seed, cwd):
                         ):
                             ccdnum = get_ccdnum(ii["image_path"][m["file_id"][i, j]])
                             if ccdnum >= 32:
-                                rr = 4096 - m["orig_col"][i, j]
+                                rr = 4096 - m["orig_row"][i, j]
                             else:
                                 rr = m["orig_row"][i, j]
 
