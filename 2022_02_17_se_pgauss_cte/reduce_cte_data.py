@@ -164,7 +164,7 @@ def main():
     for i in range(62):
         jobs.append(joblib.delayed(_reduce_per_ccd)(fnames, i+1))
 
-    with joblib.Parallel(n_jobs=4, verbose=100) as par:
+    with joblib.Parallel(n_jobs=2, verbose=100) as par:
         par(jobs)
 
 
