@@ -157,11 +157,11 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
 
                 loc[b] += np.sum(d[loc_col][msk])
 
-                ns[b] = np.sum(msk)
+                ns[b] += np.sum(msk)
 
-    print(n, ns)
-    print(e1, e2)
-    print(e1_err, e2_err)
+        print(n, ns)
+        print(e1, e2)
+        print(e1_err, e2_err)
 
     e1_err = np.sqrt(e1_err / (n - 1))
     e2_err = np.sqrt(e2_err / (n - 1))
