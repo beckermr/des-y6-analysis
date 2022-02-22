@@ -59,7 +59,7 @@ def _online_update_one(e, e_err, n, n2, _e, _n, ind):
     return e, e_err, n, n2
 
 
-def _reduce_rows_cols(fnames, shape, col, desc):
+def _reduce_rows_cols(fnames, shape, col, desc, loc_col):
 
     ns = np.zeros(shape)
     n = np.zeros(shape)
@@ -68,6 +68,7 @@ def _reduce_rows_cols(fnames, shape, col, desc):
     e1_err = np.zeros(shape)
     e2 = np.zeros(shape)
     e2_err = np.zeros(shape)
+    loc = np.zeros(shape)
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc=desc):
         d = fitsio.read(fname)
@@ -85,22 +86,28 @@ def _reduce_rows_cols(fnames, shape, col, desc):
             _e = np.sum(d["e2"][msk])
             e1, e1_err, n, n2 = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
 
+            loc[b] += np.sum(d[loc_col][msk])
+
             ns[b] = np.sum(msk)
 
     e1_err = np.sqrt(e1_err / (n - 1)) / np.sqrt(ns)
     e2_err = np.sqrt(e2_err / (n - 1)) / np.sqrt(ns)
+    loc /= n
 
-    return e1, e1_err, e2, e2_err
+    return e1, e1_err, e2, e2_err, loc
 
 
 def main():
     fnames = glob.glob("cte_data_all_*.fits")
 
-    e1, e1_err, e2, e2_err = _reduce_rows_cols(fnames, 16, "col_bin", "reducing cols")
-    fitsio.write("cte_data_all_rows.fits", e1, extname="e1", clobber=True)
-    fitsio.write("cte_data_all_rows.fits", e1_err, extname="e1_err")
-    fitsio.write("cte_data_all_rows.fits", e2, extname="e2")
-    fitsio.write("cte_data_all_rows.fits", e2_err, extname="e2_err")
+    e1, e1_err, e2, e2_err, row = _reduce_rows_cols(
+        fnames, 16, "col_bin", "reducing cols", "col"
+    )
+    fitsio.write("cte_data_all_col.fits", e1, extname="e1", clobber=True)
+    fitsio.write("cte_data_all_col.fits", e1_err, extname="e1_err")
+    fitsio.write("cte_data_all_col.fits", e2, extname="e2")
+    fitsio.write("cte_data_all_col.fits", e2_err, extname="e2_err")
+    fitsio.write("cte_data_all_col.fits", row, extname="col")
 
 
 if __name__ == "__main__":
