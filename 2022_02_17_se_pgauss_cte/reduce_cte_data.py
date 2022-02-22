@@ -30,10 +30,11 @@ def _reduce_per_ccd(fnames):
     for fname in tqdm.tqdm(fnames, ncols=79, desc="per ccd"):
         print("\n", end="", flush=True)
         d = fitsio.read(fname)
+        d = d[d["n"] > 0]
 
-        for i in tqdm.trange(62, ncols=79, desc="on ccd %d" % ccd):
+        for i in tqdm.trange(62, ncols=79, desc="reducing ccds"):
             ccd = i + 1
-            ccd_msk = (d["n"] > 0) & (d["ccdnum"] == ccd)
+            ccd_msk = d["ccdnum"] == ccd
             _d = d[ccd_msk]
             for row in range(32):
                 for col in range(16):
