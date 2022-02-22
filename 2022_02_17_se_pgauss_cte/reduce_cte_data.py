@@ -91,10 +91,8 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col):
 
     e1_err = np.sqrt(e1_err / (n - 1)) * np.sqrt(ns)
     e2_err = np.sqrt(e2_err / (n - 1)) * np.sqrt(ns)
-    print(loc, n)
-    loc /= n
 
-    return e1, e1_err, e2, e2_err, loc
+    return e1, e1_err, e2, e2_err, loc/n
 
 
 def main():
@@ -105,14 +103,14 @@ def main():
         if f.split(".")[0].split("_")[-1].isdigit()
     ]
 
-    e1, e1_err, e2, e2_err, row = _reduce_rows_cols(
+    e1, e1_err, e2, e2_err, col = _reduce_rows_cols(
         fnames, 16, "col_bin", "reducing cols", "col"
     )
     fitsio.write("cte_data_all_col.fits", e1, extname="e1", clobber=True)
     fitsio.write("cte_data_all_col.fits", e1_err, extname="e1_err")
     fitsio.write("cte_data_all_col.fits", e2, extname="e2")
     fitsio.write("cte_data_all_col.fits", e2_err, extname="e2_err")
-    fitsio.write("cte_data_all_col.fits", row, extname="col")
+    fitsio.write("cte_data_all_col.fits", col, extname="col")
 
 
 if __name__ == "__main__":
