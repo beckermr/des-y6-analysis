@@ -59,31 +59,31 @@ def _online_update_one(e, e_err, n, n2, _e, _n, ind):
     return e, e_err, n, n2
 
 
-def _reduce_rows(fnames):
+def _reduce_rows_cols(fnames, shape, col, desc):
 
-    ns = np.zeros(16)
-    n = np.zeros(16)
-    n2 = np.zeros(16)
-    e1 = np.zeros(16)
-    e1_err = np.zeros(16)
-    e2 = np.zeros(16)
-    e2_err = np.zeros(16)
+    ns = np.zeros(shape)
+    n = np.zeros(shape)
+    n2 = np.zeros(shape)
+    e1 = np.zeros(shape)
+    e1_err = np.zeros(shape)
+    e2 = np.zeros(shape)
+    e2_err = np.zeros(shape)
 
-    for fname in tqdm.tqdm(fnames, ncols=79):
+    for fname in tqdm.tqdm(fnames, ncols=79, desc=desc):
         d = fitsio.read(fname)
 
         msk = (d["n"] > 0)
         d = d[msk]
         for b in tqdm.trange(16, ncols=79):
-            msk = (d["col_bin"] == b)
+            msk = (d[col] == b)
 
             _n = np.sum(d["n"][msk])
 
             _e = np.sum(d["e1"][msk])
-            e1, e1_err, n, n2 = _online_update(e1, e1_err, n, n2, _e, _n, b)
+            e1, e1_err, n, n2 = _online_update_one(e1, e1_err, n, n2, _e, _n, b)
 
             _e = np.sum(d["e2"][msk])
-            e1, e1_err, n, n2 = _online_update(e2, e2_err, n, n2, _e, _n, b)
+            e1, e1_err, n, n2 = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
 
             ns[b] = np.sum(msk)
 
@@ -96,8 +96,7 @@ def _reduce_rows(fnames):
 def main():
     fnames = glob.glob("cte_data_all_*.fits")
 
-    print("reducing rows", flush=True)
-    e1, e1_err, e2, e2_err = _reduce_rows(fnames)
+    e1, e1_err, e2, e2_err = _reduce_rows_cols(fnames, 16, "col_bin", "reducing cols")
     fitsio.write("cte_data_all_rows.fits", e1, extname="e1", clobber=True)
     fitsio.write("cte_data_all_rows.fits", e1_err, extname="e1_err")
     fitsio.write("cte_data_all_rows.fits", e2, extname="e2")
