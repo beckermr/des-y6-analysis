@@ -16,25 +16,35 @@ from ngmix.prepsfmom import PGaussMom
 
 
 TESTING = False
+WORKDIR = "/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_02_17_se_pgauss_cte"
 
 
-def _query_gold(tilename):
-    q = """\
-SELECT
-    coadd_object_id
-FROM
-    y6_gold_2_0
-WHERE
-    flags_footprint > 0
-    AND flags_gold = 0
-    AND flags_foreground = 0
-    AND ext_mash = 4
-    AND tilename = '%s'; > gold_ids.fits
-""" % tilename
-    with open("query.txt", "w") as fp:
-        fp.write(q)
-    subprocess.run("easyaccess --db dessci -l query.txt", shell=True, check=True)
-    return fitsio.read("gold_ids.fits")["COADD_OBJECT_ID"]
+def _query_gold(tilename, band):
+    gf = WORKDIR + "/gold_ids/%s.fits" % tilename
+
+    if not os.path.exists(gf):
+        q = """\
+    SELECT
+        coadd_object_id
+    FROM
+        y6_gold_2_0
+    WHERE
+        flags_footprint > 0
+        AND flags_gold = 0
+        AND flags_foreground = 0
+        AND ext_mash = 4
+        AND tilename = '%s'; > gold_ids.fits
+    """ % tilename
+        with open("query.txt", "w") as fp:
+            fp.write(q)
+        subprocess.run("easyaccess --db dessci -l query.txt", shell=True, check=True)
+        d = fitsio.read("gold_ids.fits")
+        if band == "r":
+            fitsio.write(gf, d, clobber=True)
+    else:
+        d = fitsio.read(gf)
+
+    return d["COADD_OBJECT_ID"]
 
 
 def get_ccdnum(fname):
@@ -81,18 +91,18 @@ def _run_tile(tilename, band, seed, cwd):
     for _ in range(10):
         try:
             mfiles = _download_tile(tilename, cwd, [band])
+            gids = _query_gold(tilename, band)
             break
         except Exception:
             time.sleep(600 + random.randint(-100, 100))
             mfiles = None
+            gids = None
             pass
 
-    if mfiles is None:
+    if mfiles is None or gids is None:
         raise RuntimeError("Could not download files for tile %s" % tilename)
     elif not isinstance(mfiles, list):
         raise RuntimeError("Only found %d files for tile %s" % (mfiles, tilename))
-
-    gids = _query_gold(tilename)
 
     data = np.zeros((62, 32, 16), dtype=[
         ("e1", "f8"),
@@ -121,7 +131,6 @@ def _run_tile(tilename, band, seed, cwd):
         ii = m.get_image_info()
 
         for i in PBar(range(m.size)):
-            print(m["id"][i])
             if m["id"][i] not in gids:
                 continue
             for j in range(m["ncutout"][i]):
