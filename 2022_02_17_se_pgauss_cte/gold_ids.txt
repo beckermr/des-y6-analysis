@@ -6,5 +6,4 @@ WHERE
     flags_footprint > 0
     AND flags_gold = 0
     AND flags_foreground = 0
-    AND ext_mash = 4
-    AND rownum < 10; > gold_ids.fits
+    AND ext_mash = 4; > gold_ids.fits
