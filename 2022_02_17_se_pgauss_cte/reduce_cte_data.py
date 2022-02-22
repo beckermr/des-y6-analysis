@@ -31,7 +31,7 @@ def _reduce_per_ccd(fnames):
         print("\n", end="", flush=True)
         d = fitsio.read(fname)
 
-        for i in range(62):
+        for i in tqdm.trange(62, ncols=79, desc="on ccd %d" % ccd):
             ccd = i + 1
             ccd_msk = (d["n"] > 0) & (d["ccdnum"] == ccd)
             _d = d[ccd_msk]
