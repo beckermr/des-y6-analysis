@@ -12,7 +12,7 @@ def _online_update(e, e_err, n, n2, _e, _n, row, col):
     n2[row, col] += _n**2
 
     e_old = e[row, col].copy()
-    e[row, col] = e_old[row, col] + (_n / n[row, col]) * (_e - e_old)
+    e[row, col] = e_old + (_n / n[row, col]) * (_e - e_old)
     e_err[row, col] = e_err[row, col] + _n * (_e - e_old) * (_e - e[row, col])
     return e, e_err, n, n2
 
@@ -74,7 +74,7 @@ def _reduce_rows_cols(fnames, shape, col, desc):
 
         msk = (d["n"] > 0)
         d = d[msk]
-        for b in tqdm.trange(16, ncols=79):
+        for b in range(shape):
             msk = (d[col] == b)
 
             _n = np.sum(d["n"][msk])
