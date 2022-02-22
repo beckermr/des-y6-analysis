@@ -198,7 +198,10 @@ def main():
                     all_data.append(res)
                     loc += 1
 
-                if loc % delta_io_loc == 0 or time.time() - last_io > 300:
+                if (
+                    (loc % delta_io_loc == 0 or time.time() - last_io > 300)
+                    and len(all_data) > 0
+                ):
                     all_data = [np.concatenate(all_data, axis=0)]
                     fitsio.write(
                         "cte_data_all_%03d.fits" % io_loc,
@@ -211,11 +214,12 @@ def main():
                         io_loc += 1
                         all_data = []
 
-        fitsio.write(
-            "cte_data_all_%03d.fits" % io_loc,
-            np.concatenate(all_data, axis=0),
-            clobber=True,
-        )
+        if len(all_data) > 0:
+            fitsio.write(
+                "cte_data_all_%03d.fits" % io_loc,
+                np.concatenate(all_data, axis=0),
+                clobber=True,
+            )
 
 
 if __name__ == "__main__":
