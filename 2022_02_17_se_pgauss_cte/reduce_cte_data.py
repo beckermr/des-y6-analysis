@@ -33,6 +33,7 @@ def _reduce_per_ccd(fnames):
         d = d[d["n"] > 0]
 
         for i in tqdm.trange(62, ncols=79, desc="reducing ccds"):
+            print("\n", end="", flush=True)
             ccd = i + 1
             ccd_msk = d["ccdnum"] == ccd
             _d = d[ccd_msk]
