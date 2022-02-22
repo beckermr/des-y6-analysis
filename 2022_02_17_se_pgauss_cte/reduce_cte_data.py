@@ -99,6 +99,11 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col):
 
 def main():
     fnames = glob.glob("cte_data_all_*.fits")
+    fnames = [
+        f
+        for f in fnames
+        if f.split(".")[0].split("_")[-1].idigit()
+    ]
 
     e1, e1_err, e2, e2_err, row = _reduce_rows_cols(
         fnames, 16, "col_bin", "reducing cols", "col"
