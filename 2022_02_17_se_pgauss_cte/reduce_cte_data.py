@@ -37,10 +37,10 @@ def _reduce_per_ccd(fnames, ccd):
                 msk = (d["row_bin"] == row) & (d["col_bin"] == col)
                 _n = np.sum(d["n"][msk])
 
-                _e = np.sum(d["e1"][msk])
+                _e = np.mean(d["e1"][msk])
                 e1, e1_err, n, n2 = _online_update(e1, e1_err, n, n2, _e, _n, row, col)
 
-                _e = np.sum(d["e2"][msk])
+                _e = np.mean(d["e2"][msk])
                 e1, e1_err, n, n2 = _online_update(e2, e2_err, n, n2, _e, _n, row, col)
 
                 ns[row, col] = np.sum(msk)
@@ -80,10 +80,10 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col):
 
             _n = np.sum(d["n"][msk])
 
-            _e = np.sum(d["e1"][msk])
+            _e = np.mean(d["e1"][msk])
             e1, e1_err, n, n2 = _online_update_one(e1, e1_err, n, n2, _e, _n, b)
 
-            _e = np.sum(d["e2"][msk])
+            _e = np.mean(d["e2"][msk])
             e1, e1_err, n, n2 = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
 
             loc[b] += np.sum(d[loc_col][msk])
