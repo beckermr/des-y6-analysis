@@ -180,16 +180,16 @@ def main():
     ]
 
     jobs = [
-        # joblib.delayed(_reduce_rows_cols)(
-        #     fnames, 16, "col_bin", "reducing cols", "col",
-        #     "cte_data_all_col.fits"
-        # ),
-        # joblib.delayed(_reduce_rows_cols)(
-        #     fnames, 32, "row_bin", "reducing rows", "row",
-        #     "cte_data_all_row.fits"
-        # ),
-        # joblib.delayed(_reduce_per_ccd_all)(fnames),
+        joblib.delayed(_reduce_rows_cols)(
+            fnames, 16, "col_bin", "reducing cols", "col",
+            "cte_data_all_col.fits"
+        ),
         joblib.delayed(_reduce_per_ccd)(fnames),
+        joblib.delayed(_reduce_rows_cols)(
+            fnames, 32, "row_bin", "reducing rows", "row",
+            "cte_data_all_row.fits"
+        ),
+        joblib.delayed(_reduce_per_ccd_all)(fnames),
     ]
 
     with joblib.Parallel(n_jobs=2, verbose=100) as par:
