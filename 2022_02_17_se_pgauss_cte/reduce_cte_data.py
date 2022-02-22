@@ -3,6 +3,7 @@ import numpy as np
 import tqdm
 import glob
 import joblib
+import sys
 
 
 # see here https://en.wikipedia.org/wiki/
@@ -161,8 +162,11 @@ def main():
         ),
         joblib.delayed(_reduce_per_ccd_all)(fnames),
     ]
-    for i in range(62):
-        jobs.append(joblib.delayed(_reduce_per_ccd)(fnames, i+1))
+    if len(sys.argv) > 1 and sys.argv[1] == "fast":
+        pass
+    else:
+        for i in range(62):
+            jobs.append(joblib.delayed(_reduce_per_ccd)(fnames, i+1))
 
     with joblib.Parallel(n_jobs=2, verbose=100) as par:
         par(jobs)
