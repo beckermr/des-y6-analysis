@@ -54,7 +54,7 @@ def _online_update_one(e, e_err, n, n2, _e, _n, ind):
     n2[ind] += _n**2
 
     e_old = e[ind].copy()
-    e[ind] = e_old[ind] + (_n / n[ind]) * (_e - e_old)
+    e[ind] = e_old + (_n / n[ind]) * (_e - e_old)
     e_err[ind] = e_err[ind] + _n * (_e - e_old) * (_e - e[ind])
     return e, e_err, n, n2
 
