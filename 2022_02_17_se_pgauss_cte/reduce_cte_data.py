@@ -3,7 +3,6 @@ import numpy as np
 import tqdm
 import glob
 import joblib
-import sys
 
 
 # see here https://en.wikipedia.org/wiki/
@@ -15,41 +14,68 @@ def _online_update(e, e_err, n, n2, _e, _n, row, col):
     return e, e_err
 
 
-def _reduce_per_ccd(fnames, ccd):
-    n = np.zeros((32, 16))
-    n2 = np.zeros((32, 16))
-    e1 = np.zeros((32, 16))
-    e1_err = np.zeros((32, 16))
-    e2 = np.zeros((32, 16))
-    e2_err = np.zeros((32, 16))
+def _reduce_per_ccd(fnames):
+    data = {}
+    for i in range(62):
+        ccd = i + 1
+        data[ccd] = dict(
+            n=np.zeros((32, 16)),
+            n2=np.zeros((32, 16)),
+            e1=np.zeros((32, 16)),
+            e1_err=np.zeros((32, 16)),
+            e2=np.zeros((32, 16)),
+            e2_err=np.zeros((32, 16)),
+        )
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc="ccd %d" % ccd):
         print("\n", end="", flush=True)
         d = fitsio.read(fname)
 
-        ccd_msk = (d["n"] > 0) & (d["ccdnum"] == ccd)
-        d = d[ccd_msk]
-        for row in range(32):
-            for col in range(16):
-                msk = (d["row_bin"] == row) & (d["col_bin"] == col)
-                if np.any(msk):
-                    _n = np.sum(d["n"][msk])
-                    n[row, col] += _n
-                    n2[row, col] += _n**2
+        for i in range(62):
+            ccd = i + 1
+            ccd_msk = (d["n"] > 0) & (d["ccdnum"] == ccd)
+            _d = d[ccd_msk]
+            for row in range(32):
+                for col in range(16):
+                    msk = (_d["row_bin"] == row) & (_d["col_bin"] == col)
+                    if np.any(msk):
+                        _n = np.sum(_d["n"][msk])
+                        data[ccd]["n"][row, col] += _n
+                        data[ccd]["n2"][row, col] += _n**2
 
-                    _e = np.mean(d["e1"][msk])
-                    e1, e1_err = _online_update(e1, e1_err, n, n2, _e, _n, row, col)
+                        _e = np.mean(_d["e1"][msk])
+                        e1, e1_err = _online_update(
+                            data[ccd]["e1"], data[ccd]["e1_err"],
+                            data[ccd]["n"], data[ccd]["n2"],
+                            _e, _n, row, col,
+                        )
+                        data[ccd]["e1"] = e1
+                        data[ccd]["e1_err"] = e1_err
 
-                    _e = np.mean(d["e2"][msk])
-                    e2, e2_err = _online_update(e2, e2_err, n, n2, _e, _n, row, col)
+                        _e = np.mean(_d["e2"][msk])
+                        e2, e2_err = _online_update(
+                            data[ccd]["e2"], data[ccd]["e2_err"],
+                            data[ccd]["n"], data[ccd]["n2"],
+                            _e, _n, row, col,
+                        )
+                        data[ccd]["e2"] = e2
+                        data[ccd]["e2_err"] = e2_err
 
-    e1_err = np.sqrt(e1_err / (n - 1))
-    e2_err = np.sqrt(e2_err / (n - 1))
+    for i in range(62):
+        ccd = i + 1
+        data[ccd]["e1_err"] = np.sqrt(data[ccd]["e1_err"] / (data[ccd]["n"] - 1))
+        data[ccd]["e2_err"] = np.sqrt(data[ccd]["e2_err"] / (data[ccd]["n"] - 1))
 
-    fitsio.write("cte_data_all_ccd%02d.fits" % ccd, e1, extname="e1", clobber=True)
-    fitsio.write("cte_data_all_ccd%02d.fits" % ccd, e1_err, extname="e1_err")
-    fitsio.write("cte_data_all_ccd%02d.fits" % ccd, e2, extname="e2")
-    fitsio.write("cte_data_all_ccd%02d.fits" % ccd, e2_err, extname="e2_err")
+        fitsio.write(
+            "cte_data_all_ccd%02d.fits" % ccd, data[ccd]["e1"], extname="e1",
+            clobber=True,
+        )
+        fitsio.write(
+            "cte_data_all_ccd%02d.fits" % ccd, data[ccd]["e1_err"], extname="e1_err")
+        fitsio.write(
+            "cte_data_all_ccd%02d.fits" % ccd, data[ccd]["e2"], extname="e2")
+        fitsio.write(
+            "cte_data_all_ccd%02d.fits" % ccd, data[ccd]["e2_err"], extname="e2_err")
 
 
 def _reduce_per_ccd_all(fnames):
@@ -161,12 +187,8 @@ def main():
             "cte_data_all_row.fits"
         ),
         joblib.delayed(_reduce_per_ccd_all)(fnames),
+        joblib.delayed(_reduce_per_ccd)(fnames),
     ]
-    if len(sys.argv) > 1 and sys.argv[1] == "fast":
-        pass
-    else:
-        for i in range(62):
-            jobs.append(joblib.delayed(_reduce_per_ccd)(fnames, i+1))
 
     with joblib.Parallel(n_jobs=2, verbose=100) as par:
         par(jobs)
