@@ -3,6 +3,7 @@ import numpy as np
 import tqdm
 import glob
 import joblib
+import subprocess
 
 
 # see here https://en.wikipedia.org/wiki/
@@ -64,6 +65,10 @@ def _reduce_per_ccd(fnames, ccds):
                         data[ccd]["e2_err"] = e2_err
 
     for ccd in ccds:
+        if np.all(data[ccd]["n"] == 0):
+            subprocess.run("rm -f cte_data_all_ccd%02d.fits" % ccd, shell=True)
+            continue
+
         data[ccd]["e1_err"] = np.sqrt(
             data[ccd]["e1_err"] / (data[ccd]["n"] - 1)
         ) / np.sqrt(data[ccd]["n"])
