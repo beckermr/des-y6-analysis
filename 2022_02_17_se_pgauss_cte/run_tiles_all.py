@@ -130,18 +130,18 @@ def _run_tile(tilename, band, seed, cwd):
                             cc = m["orig_col"][i, j]
 
                             rr_bin = int(max(min(rr-1, 4095), 0) / 128)
-                            assert rr_bin >= 0
-                            assert rr_bin < 32
+                            assert rr_bin >= 0, f"{rr_bin} is too low"
+                            assert rr_bin < 32, f"{rr_bin} is too high"
                             cc_bin = int(max(min(cc-1, 2047), 0) / 128)
-                            assert cc_bin >= 0
-                            assert cc_bin < 16
+                            assert cc_bin >= 0, f"{cc_bin} is too low"
+                            assert cc_bin < 16, f"{cc_bin} is too low"
                             data["e1"][ccdnum-1, rr_bin, cc_bin] += res["e"][0]
                             data["e2"][ccdnum-1, rr_bin, cc_bin] += res["e"][1]
                             data["row"][ccdnum-1, rr_bin, cc_bin] += rr
                             data["col"][ccdnum-1, rr_bin, cc_bin] += cc
                             data["n"][ccdnum-1, rr_bin, cc_bin] += 1
                             assert data["row_bin"][ccdnum-1, rr_bin, cc_bin] == rr_bin
-                            assert data["row_bin"][ccdnum-1, rr_bin, cc_bin] == cc_bin
+                            assert data["col_bin"][ccdnum-1, rr_bin, cc_bin] == cc_bin
 
             if TESTING:
                 break
@@ -193,10 +193,10 @@ def main():
                 try:
                     res = pr.result()
                 except Exception as e:
-                    print(f"failure: {repr(e)}", flush=True)
+                    print(f"\nfailure: {repr(e)}", flush=True)
                 else:
                     all_data.append(res)
-                loc += 1
+                    loc += 1
 
                 if loc % delta_io_loc == 0 or time.time() - last_io > 300:
                     all_data = [np.concatenate(all_data, axis=0)]
