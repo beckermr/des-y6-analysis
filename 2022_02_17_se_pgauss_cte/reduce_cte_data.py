@@ -15,7 +15,6 @@ def _online_update(e, e_err, n, n2, _e, _n, row, col):
 
 
 def _reduce_per_ccd(fnames, ccd):
-
     n = np.zeros((32, 16))
     n2 = np.zeros((32, 16))
     e1 = np.zeros((32, 16))
@@ -24,6 +23,7 @@ def _reduce_per_ccd(fnames, ccd):
     e2_err = np.zeros((32, 16))
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc="ccd %d" % ccd):
+        print("\n")
         d = fitsio.read(fname)
 
         ccd_msk = (d["n"] > 0) & (d["ccdnum"] == ccd)
@@ -60,6 +60,7 @@ def _reduce_per_ccd_all(fnames):
     e2_err = np.zeros((32, 16))
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc="all CCDs"):
+        print("\n")
         d = fitsio.read(fname)
 
         ccd_msk = (d["n"] > 0)
@@ -105,6 +106,7 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
     loc = np.zeros(shape)
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc=desc):
+        print("\n")
         d = fitsio.read(fname)
 
         msk = (d["n"] > 0)
@@ -135,7 +137,7 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
     fitsio.write(oname, e1_err, extname="e1_err")
     fitsio.write(oname, e2, extname="e2")
     fitsio.write(oname, e2_err, extname="e2_err")
-    fitsio.write(oname, col, extname=loc_col)
+    fitsio.write(oname, loc, extname=loc_col)
 
 
 def main():
