@@ -187,7 +187,7 @@ def main():
         last_io = time.time()
         loc = 0
         io_loc = 0
-        delta_io_loc = len(jobs) // 20
+        delta_io_loc = len(jobs) // 100
         with BNLCondorParallel(verbose=0, n_jobs=10000) as exc:
             for pr in PBar(exc(jobs), total=len(jobs), desc="running jobs"):
                 try:
