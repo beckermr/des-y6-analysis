@@ -41,6 +41,8 @@ def _query_gold(tilename, band):
         d = fitsio.read("gold_ids.fits")
         if band == "r":
             fitsio.write(gf, d, clobber=True)
+
+        subprocess.run("rm -f gold_ids.fits", shell=True)
     else:
         d = fitsio.read(gf)
 
