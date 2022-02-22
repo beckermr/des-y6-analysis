@@ -53,7 +53,7 @@ def _online_update_one(e, e_err, n, n2, _e, _n, ind):
     e_old = e[ind].copy()
     e[ind] = e_old + (_n / n[ind]) * (_e - e_old)
     e_err[ind] = e_err[ind] + _n * (_e - e_old) * (_e - e[ind])
-    return e, e_err, n, n2
+    return e, e_err
 
 
 def _reduce_rows_cols(fnames, shape, col, desc, loc_col):
@@ -80,17 +80,17 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col):
             n2[b] += _n**2
 
             _e = np.mean(d["e1"][msk])
-            e1, e1_err, n, n2 = _online_update_one(e1, e1_err, n, n2, _e, _n, b)
+            e1, e1_err = _online_update_one(e1, e1_err, n, n2, _e, _n, b)
 
             _e = np.mean(d["e2"][msk])
-            e1, e1_err, n, n2 = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
+            e2, e2_err = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
 
             loc[b] += np.sum(d[loc_col][msk])
 
             ns[b] = np.sum(msk)
 
-    e1_err = np.sqrt(e1_err / (n - 1)) / np.sqrt(n)
-    e2_err = np.sqrt(e2_err / (n - 1)) / np.sqrt(n)
+    e1_err = np.sqrt(e1_err / (n - 1))
+    e2_err = np.sqrt(e2_err / (n - 1))
 
     return e1, e1_err, e2, e2_err, loc/n
 
