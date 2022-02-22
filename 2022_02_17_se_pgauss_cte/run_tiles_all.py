@@ -15,7 +15,7 @@ import joblib
 from ngmix.prepsfmom import PGaussMom
 
 
-TESTING = True
+TESTING = False
 
 
 def get_ccdnum(fname):
@@ -201,7 +201,7 @@ def main():
                 if loc % delta_io_loc == 0 or time.time() - last_io > 300:
                     all_data = [np.concatenate(all_data, axis=0)]
                     fitsio.write(
-                        "cte_data_all_%d.fits" % io_loc,
+                        "cte_data_all_%03d.fits" % io_loc,
                         all_data[0],
                         clobber=True,
                     )
@@ -212,7 +212,7 @@ def main():
                         all_data = []
 
         fitsio.write(
-            "cte_data_all_%d.fits" % io_loc,
+            "cte_data_all_%03d.fits" % io_loc,
             np.concatenate(all_data, axis=0),
             clobber=True,
         )
