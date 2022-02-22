@@ -121,6 +121,7 @@ def _run_tile(tilename, band, seed, cwd):
         ii = m.get_image_info()
 
         for i in PBar(range(m.size)):
+            print(m["id"][i])
             if m["id"][i] not in gids:
                 continue
             for j in range(m["ncutout"][i]):
