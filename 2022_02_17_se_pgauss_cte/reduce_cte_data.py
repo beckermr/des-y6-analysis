@@ -23,7 +23,7 @@ def _reduce_per_ccd(fnames, ccd):
     e2_err = np.zeros((32, 16))
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc="ccd %d" % ccd):
-        print("\n")
+        print("\n", end="", flush=True)
         d = fitsio.read(fname)
 
         ccd_msk = (d["n"] > 0) & (d["ccdnum"] == ccd)
@@ -31,15 +31,16 @@ def _reduce_per_ccd(fnames, ccd):
         for row in range(32):
             for col in range(16):
                 msk = (d["row_bin"] == row) & (d["col_bin"] == col)
-                _n = np.sum(d["n"][msk])
-                n[row, col] += _n
-                n2[row, col] += _n**2
+                if np.any(msk):
+                    _n = np.sum(d["n"][msk])
+                    n[row, col] += _n
+                    n2[row, col] += _n**2
 
-                _e = np.mean(d["e1"][msk])
-                e1, e1_err = _online_update(e1, e1_err, n, n2, _e, _n, row, col)
+                    _e = np.mean(d["e1"][msk])
+                    e1, e1_err = _online_update(e1, e1_err, n, n2, _e, _n, row, col)
 
-                _e = np.mean(d["e2"][msk])
-                e2, e2_err = _online_update(e2, e2_err, n, n2, _e, _n, row, col)
+                    _e = np.mean(d["e2"][msk])
+                    e2, e2_err = _online_update(e2, e2_err, n, n2, _e, _n, row, col)
 
     e1_err = np.sqrt(e1_err / (n - 1))
     e2_err = np.sqrt(e2_err / (n - 1))
@@ -60,7 +61,7 @@ def _reduce_per_ccd_all(fnames):
     e2_err = np.zeros((32, 16))
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc="all CCDs"):
-        print("\n")
+        print("\n", end="", flush=True)
         d = fitsio.read(fname)
 
         ccd_msk = (d["n"] > 0)
@@ -68,15 +69,16 @@ def _reduce_per_ccd_all(fnames):
         for row in range(32):
             for col in range(16):
                 msk = (d["row_bin"] == row) & (d["col_bin"] == col)
-                _n = np.sum(d["n"][msk])
-                n[row, col] += _n
-                n2[row, col] += _n**2
+                if np.any(msk):
+                    _n = np.sum(d["n"][msk])
+                    n[row, col] += _n
+                    n2[row, col] += _n**2
 
-                _e = np.mean(d["e1"][msk])
-                e1, e1_err = _online_update(e1, e1_err, n, n2, _e, _n, row, col)
+                    _e = np.mean(d["e1"][msk])
+                    e1, e1_err = _online_update(e1, e1_err, n, n2, _e, _n, row, col)
 
-                _e = np.mean(d["e2"][msk])
-                e2, e2_err = _online_update(e2, e2_err, n, n2, _e, _n, row, col)
+                    _e = np.mean(d["e2"][msk])
+                    e2, e2_err = _online_update(e2, e2_err, n, n2, _e, _n, row, col)
 
     e1_err = np.sqrt(e1_err / (n - 1))
     e2_err = np.sqrt(e2_err / (n - 1))
@@ -106,27 +108,27 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
     loc = np.zeros(shape)
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc=desc):
-        print("\n")
+        print("\n", end="", flush=True)
         d = fitsio.read(fname)
 
         msk = (d["n"] > 0)
         d = d[msk]
         for b in range(shape):
             msk = (d[col] == b)
+            if np.any(msk):
+                _n = np.sum(d["n"][msk])
+                n[b] += _n
+                n2[b] += _n**2
 
-            _n = np.sum(d["n"][msk])
-            n[b] += _n
-            n2[b] += _n**2
+                _e = np.mean(d["e1"][msk])
+                e1, e1_err = _online_update_one(e1, e1_err, n, n2, _e, _n, b)
 
-            _e = np.mean(d["e1"][msk])
-            e1, e1_err = _online_update_one(e1, e1_err, n, n2, _e, _n, b)
+                _e = np.mean(d["e2"][msk])
+                e2, e2_err = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
 
-            _e = np.mean(d["e2"][msk])
-            e2, e2_err = _online_update_one(e2, e2_err, n, n2, _e, _n, b)
+                loc[b] += np.sum(d[loc_col][msk])
 
-            loc[b] += np.sum(d[loc_col][msk])
-
-            ns[b] = np.sum(msk)
+                ns[b] = np.sum(msk)
 
     e1_err = np.sqrt(e1_err / (n - 1))
     e2_err = np.sqrt(e2_err / (n - 1))
