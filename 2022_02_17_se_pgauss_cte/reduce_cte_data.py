@@ -23,12 +23,12 @@ def _reduce_per_ccd(fnames, ccd):
     e2 = np.zeros((32, 16))
     e2_err = np.zeros((32, 16))
 
-    for fname in tqdm.tqdm(fnames, ncols=79):
+    for fname in tqdm.tqdm(fnames, ncols=79, desc="ccd %d" % ccd):
         d = fitsio.read(fname)
 
         ccd_msk = (d["n"] > 0) & (d["ccdnum"] == ccd)
         d = d[ccd_msk]
-        for row in tqdm.trange(32, ncols=79):
+        for row in range(32):
             for col in range(16):
                 msk = (d["row_bin"] == row) & (d["col_bin"] == col)
                 _n = np.sum(d["n"][msk])
@@ -59,12 +59,12 @@ def _reduce_per_ccd_all(fnames):
     e2 = np.zeros((32, 16))
     e2_err = np.zeros((32, 16))
 
-    for fname in tqdm.tqdm(fnames, ncols=79):
+    for fname in tqdm.tqdm(fnames, ncols=79, desc="all CCDs"):
         d = fitsio.read(fname)
 
         ccd_msk = (d["n"] > 0)
         d = d[ccd_msk]
-        for row in tqdm.trange(32, ncols=79):
+        for row in range(32):
             for col in range(16):
                 msk = (d["row_bin"] == row) & (d["col_bin"] == col)
                 _n = np.sum(d["n"][msk])
@@ -152,8 +152,8 @@ def main():
             "cte_data_all_col.fits"
         ),
         joblib.delayed(_reduce_rows_cols)(
-            fnames, 16, "col_bin", "reducing cols", "col",
-            "cte_data_all_col.fits"
+            fnames, 32, "row_bin", "reducing rows", "row",
+            "cte_data_all_row.fits"
         ),
         joblib.delayed(_reduce_per_ccd_all)(fnames),
     ]
