@@ -102,7 +102,7 @@ def main():
     fnames = [
         f
         for f in fnames
-        if f.split(".")[0].split("_")[-1].idigit()
+        if f.split(".")[0].split("_")[-1].isdigit()
     ]
 
     e1, e1_err, e2, e2_err, row = _reduce_rows_cols(
