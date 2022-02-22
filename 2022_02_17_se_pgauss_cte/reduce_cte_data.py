@@ -27,7 +27,7 @@ def _reduce_per_ccd(fnames):
             e2_err=np.zeros((32, 16)),
         )
 
-    for fname in tqdm.tqdm(fnames, ncols=79, desc="per ccd" % ccd):
+    for fname in tqdm.tqdm(fnames, ncols=79, desc="per ccd"):
         print("\n", end="", flush=True)
         d = fitsio.read(fname)
 
