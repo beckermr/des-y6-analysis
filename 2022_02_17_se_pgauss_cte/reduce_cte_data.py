@@ -4,6 +4,18 @@ import tqdm
 import glob
 import joblib
 import subprocess
+import time
+
+
+def _read_file(fname):
+    for i in range(10):
+        try:
+            return fitsio.read(fname)
+        except Exception as _e:
+            time.sleep(0.1 * 2**i)
+            e = _e
+
+    raise e
 
 
 # see here https://en.wikipedia.org/wiki/
@@ -32,7 +44,7 @@ def _reduce_per_ccd(fnames, ccds):
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc="per ccd %d" % np.min(ccds)):
         print("\n", end="", flush=True)
-        d = fitsio.read(fname)
+        d = _read_file(fname)
         d = d[d["n"] > 0]
 
         for ccd in ccds:
@@ -97,7 +109,7 @@ def _reduce_per_ccd_all(fnames):
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc="all CCDs"):
         print("\n", end="", flush=True)
-        d = fitsio.read(fname)
+        d = _read_file(fname)
 
         ccd_msk = (d["n"] > 0)
         d = d[ccd_msk]
@@ -144,7 +156,7 @@ def _reduce_rows_cols(fnames, shape, col, desc, loc_col, oname):
 
     for fname in tqdm.tqdm(fnames, ncols=79, desc=desc):
         print("\n", end="", flush=True)
-        d = fitsio.read(fname)
+        d = _read_file(fname)
 
         msk = (d["n"] > 0)
         d = d[msk]
