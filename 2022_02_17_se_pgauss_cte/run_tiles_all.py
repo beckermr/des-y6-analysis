@@ -151,7 +151,7 @@ def _run_tile(tilename, band, seed, cwd):
                         if (
                             res is not None
                             and res["flags"] == 0
-                            and res["s2n"] > 20
+                            and res["s2n"] > 10
                             and res["s2n"] < 100
                             and res["T"] > 0.5
                             and res["T"] < 1
