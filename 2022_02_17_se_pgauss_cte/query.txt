@@ -1,0 +1,10 @@
+SELECT
+    coadd_object_id
+FROM
+    y6_gold_2_0
+WHERE
+    flags_footprint > 0
+    AND flags_gold = 0
+    AND flags_foreground = 0
+    AND ext_mash = 4
+    AND tilename = 'DES0156-1915'; > gold_ids.fits
