@@ -5,9 +5,10 @@ import subprocess
 import numpy as np
 import glob
 import time
-from concurrent.futures import as_completed
 from esutil.pbar import PBar
-from mattspy import BNLCondorExecutor
+from mattspy import BNLCondorParallel
+import joblib
+import random
 
 
 def _download_tile(tilename, cwd):
@@ -53,7 +54,7 @@ def _run_tile(tilename, seed, opth, tmpdir, cwd):
             mfiles = _download_tile(tilename, cwd)
             break
         except Exception:
-            time.sleep(600)
+            time.sleep(600 + random.randint(-100, 100))
             mfiles = None
             pass
 
@@ -128,27 +129,21 @@ else:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    with BNLCondorExecutor(conda_env, debug=True, mem=4) as exec:
-        futs = []
-        nsub = 0
+    with BNLCondorParallel(verbose=0, mem=4) as exec:
+        jobs = []
         for tilename, seed in PBar(
-            zip(tnames, seeds), total=len(tnames), desc="submitting"
+            zip(tnames, seeds), total=len(tnames), desc="making jobs"
         ):
             if (
                 np.sum(all_tnames == tilename) == 4
                 and len(glob.glob("%s/%s*.fits.fz" % (opth, tilename))) == 0
             ):
-                nsub += 1
-                futs.append(
-                    exec.submit(_run_tile, tilename, seed, opth, tmpdir, cwd)
+                jobs.append(
+                    joblib.delayed(_run_tile)(tilename, seed, opth, tmpdir, cwd)
                 )
-            if nsub % 32 == 0 and nsub > 0:
-                print("sleeping for jobs to finish downloads", flush=True)
-                time.sleep(300)
-                nsub = 0
 
-        for fut in PBar(as_completed(futs), total=len(futs), desc="running mdet"):
+        for res in PBar(exec(jobs), total=len(jobs), desc="running mdet"):
             try:
-                fut.result()
+                res.result()
             except Exception as e:
-                print(repr(e), flush=True)
+                print("ERROR: " + repr(e), flush=True)
