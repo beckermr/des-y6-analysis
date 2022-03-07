@@ -27,7 +27,7 @@ def _download_tile(tilename, cwd):
 
     d = d[msk]
     mfiles = []
-    for band in ["r", "i", "z"]:
+    for band in ["i"]:
         msk = d["band"] == band
         if np.any(msk):
             _d = d[msk]
@@ -74,8 +74,8 @@ run-metadetect-on-slices \
   --tmpdir=%s \
   --log-level=INFO \
   --n-jobs=1 \
-  --band-names=riz %s %s %s""" % (
-        cwd, seed, tmpdir, mfiles[0], mfiles[1], mfiles[2]
+  --band-names=i %s""" % (
+        cwd, seed, tmpdir, mfiles[0],
     )
     subprocess.run(cmd, shell=True, check=True)
 
