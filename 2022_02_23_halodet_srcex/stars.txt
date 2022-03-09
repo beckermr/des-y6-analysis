@@ -2,7 +2,7 @@ SELECT
     coadd_object_id,
     alphawin_j2000 AS ra, deltawin_j2000 AS dec,
     psf_mag_g_corrected, psf_mag_r_corrected, psf_mag_i_corrected, psf_mag_z_corrected, psf_mag_y_corrected,
-    psf_mag_err_g, psf_mag_err_r,  psf_mag_err_i,  psf_mag_err_z,  psf_mag_err_y,
+    psf_mag_err_g, psf_mag_err_r,  psf_mag_err_i,  psf_mag_err_z,  psf_mag_err_y
 FROM
     y6_gold_2_0
 WHERE
