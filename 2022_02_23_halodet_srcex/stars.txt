@@ -7,5 +7,6 @@ FROM
     y6_gold_2_0
 WHERE
     flags_footprint > 0
+    AND psf_mag_g_corrected < 22
     AND flags_gold = 0
     AND ext_mash = 0; > y6_gold_2_0_stars.fits
