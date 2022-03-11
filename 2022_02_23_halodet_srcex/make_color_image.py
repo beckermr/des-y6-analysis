@@ -1,8 +1,6 @@
 import subprocess
 import glob
-import concurrent.futures
 import os
-import tqdm
 import sys
 import fitsio
 import numpy as np
@@ -87,29 +85,23 @@ def main():
 
     subprocess.run("mkdir -p images", check=True, shell=True)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-        futs = []
-
-        mfiles = glob.glob(
-            "data/"
-            "%s_r*_*_pizza-cutter-slices.fits.fz" % (
-                tilename,
-            )
+    mfiles = glob.glob(
+        "data/"
+        "%s_r*_*_pizza-cutter-slices.fits.fz" % (
+            tilename,
         )
-        mfiles = sorted(mfiles)
-        mfiles = [
-            mfiles[0],
-            mfiles[2],
-            mfiles[1],
-        ]
-        print(mfiles)
+    )
+    mfiles = sorted(mfiles)
+    mfiles = [
+        mfiles[0],
+        mfiles[2],
+        mfiles[1],
+    ]
+    print("meds files:\n    ", "\n    ".join(mfiles), flush=True)
 
-        futs.append(executor.submit(_make_image, mfiles, tilename))
+    _make_image(mfiles, tilename)
 
-        for fut in tqdm.tqdm(
-            concurrent.futures.as_completed(futs), total=len(futs)
-        ):
-            print("done %s" % fut.result())
+    print("done", flush=True)
 
 
 if __name__ == "__main__":
