@@ -140,6 +140,9 @@ dmypy.json
 condor-exec/
 *.pq
 *.oe
+*.fit
+*.fits.gz
+*.oe
 
 2022_01_22_run_mdet_final_v1/data_final
 2022_01_22_run_mdet_final_v1/mdet_data
@@ -149,5 +152,7 @@ condor-exec/
 2022_02_04_run_mdet_final_v1_nog/data_final_nogcut/
 2022_01_22_run_mdet_final_v1/data_final_nogcut/
 2022_02_04_imsims_tests_desy6/sim_outputs/
-2022_02_17_se_pgauss_cte/condor-yield/*
-2022_01_22_run_mdet_final_v1/data/*
+2022_02_17_se_pgauss_cte/condor-yield/
+2022_01_22_run_mdet_final_v1/data/
+2022_03_07_run_mdet_final_v1_ionly/condor-yield/
+2022_03_07_run_mdet_final_v1_ionly/data_final_nogcut/
