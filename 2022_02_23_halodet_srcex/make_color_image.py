@@ -92,9 +92,8 @@ def main():
 
         mfiles = glob.glob(
             "data/"
-            "OPS/multiepoch/Y6A2_PIZZACUTTER/*/%s/*/pizza-cutter/"
             "%s_r*_*_pizza-cutter-slices.fits.fz" % (
-                tilename, tilename,
+                tilename,
             )
         )
         mfiles = sorted(mfiles)
@@ -103,6 +102,7 @@ def main():
             mfiles[2],
             mfiles[1],
         ]
+        print(mfiles)
 
         futs.append(executor.submit(_make_image, mfiles, tilename))
 
