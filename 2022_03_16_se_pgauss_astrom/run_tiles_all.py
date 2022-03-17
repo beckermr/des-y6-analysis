@@ -235,8 +235,7 @@ def _download_file(fname, ntry=10):
     return "./data/%s" % os.path.basename(fname)
 
 
-@lru_cache(maxsize=1024)
-def _get_piff_path(se_filename):
+def _get_piff_path_base(se_filename):
     os.makedirs(WORKDIR + "/piff_paths", exist_ok=True)
     gf = WORKDIR + "/piff_paths/%s.txt" % se_filename
     if not os.path.exists(gf):
@@ -295,8 +294,7 @@ def _get_piff_path(se_filename):
     return piff_file
 
 
-@lru_cache(maxsize=200)
-def _read_piff(fname):
+def _read_piff_base(fname):
     return piff.read(fname)
 
 
@@ -392,6 +390,14 @@ def _draw_piff(x, y, pmod, color, use_piff_rend=False):
 
 
 def _run_tile(tilename, band, seed, cwd, desdm_path, base_color):
+    @lru_cache(maxsize=1024)
+    def _read_piff(fn):
+        return _read_piff_base(fn)
+
+    @lru_cache(maxsize=1024)
+    def _get_piff_path(fn):
+        return _get_piff_path_base(fn)
+
     gold_ids, gmi_gold = _query_gold(tilename, band)
     meds_pth = _download_file(desdm_path)
     with NGMixMEDS(meds_pth) as mfile:
