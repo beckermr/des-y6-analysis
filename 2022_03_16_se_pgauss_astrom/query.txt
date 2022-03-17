@@ -1,0 +1,12 @@
+    SELECT
+        coadd_object_id,
+        mag_auto_g - mag_auto_i as mag_auto_gmi
+    FROM
+        y6_gold_2_0
+    WHERE
+        flags_footprint > 0
+        AND flags_gold = 0
+        AND flags_foreground = 0
+        AND ext_mash = 4
+        AND tilename = 'DES0053-3540'; > gold_ids.fits
+    

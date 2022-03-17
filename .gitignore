@@ -156,3 +156,6 @@ condor-exec/
 2022_01_22_run_mdet_final_v1/data/
 2022_03_07_run_mdet_final_v1_ionly/condor-yield/
 2022_03_07_run_mdet_final_v1_ionly/data_final_nogcut/
+**/gold_ids/*
+**/data/*
+**/piff_paths/*
