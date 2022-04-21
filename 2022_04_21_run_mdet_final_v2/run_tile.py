@@ -7,7 +7,7 @@ import glob
 import time
 from concurrent.futures import as_completed
 from esutil.pbar import PBar
-from mattspy import BNLCondorExecutor
+from mattspy import BNLCondorParallel
 
 
 def _download_tile(tilename, cwd):
@@ -94,7 +94,6 @@ run-metadetect-on-slices \
 
 
 cwd = os.path.abspath(os.path.realpath(os.getcwd()))
-conda_env = "des-y6-final-v1"
 seed = 100
 os.system("mkdir -p ./mdet_data")
 opth = os.path.abspath("./mdet_data")
@@ -147,7 +146,7 @@ else:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    with BNLCondorExecutor(conda_env, debug=True, mem=4) as exec:
+    with BNLCondorParallel(verbose=0, mem=4) as exec:
         futs = []
         nsub = 0
         for tilename, seed in PBar(
