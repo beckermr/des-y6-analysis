@@ -6,6 +6,7 @@ import numpy as np
 import glob
 import time
 import random
+import joblib
 from esutil.pbar import PBar
 from mattspy import BNLCondorParallel
 
@@ -121,7 +122,6 @@ else:
             d["filename"][i].split("_")[0]
             for i in range(d.shape[0])
         ])))
-        import joblib
 
         jobs = []
         for tilename in tnames:
