@@ -1,11 +1,12 @@
-select
-    fai.path,
-    concat(fai.filename, fai.compression) as filename,
-    m.band,
-    m.tilename
-from proctag t, miscfile m, file_archive_info fai
-where
-    t.tag='Y6A2_COADD'
-    and t.pfw_attempt_id=m.pfw_attempt_id
-    and m.filetype='coadd_meds'
-    and m.filename=fai.filename; > meds_files.fits
+    SELECT
+        coadd_object_id,
+        mag_auto_g - mag_auto_i as mag_auto_gmi
+    FROM
+        y6_gold_2_0
+    WHERE
+        flags_footprint > 0
+        AND flags_gold = 0
+        AND flags_foreground = 0
+        AND ext_mash = 4
+        AND tilename = 'DES0448-4123'; > gold_ids.fits
+    

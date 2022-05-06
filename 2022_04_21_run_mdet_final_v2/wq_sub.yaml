@@ -1,0 +1,7 @@
+N: 1
+mode: by_node
+command: |
+  source ~/.bashrc
+  conda activate des-y6-final-v1
+  echo `which python`
+  python cut_and_blind_cats.py
