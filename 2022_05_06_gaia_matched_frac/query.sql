@@ -10,7 +10,7 @@ select
   g.ra,
   g.dec,
   d.ra as ra_des,
-  d.dec ad dec_des,
+  d.dec as dec_des
 from
   GAIA_DR2_X_Y6_GOLD_2_0 m,
   GAIA_DR2 g,
