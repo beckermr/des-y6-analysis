@@ -7,8 +7,10 @@ select
   d.MAG_AUTO_Z,
   d.COADD_OBJECT_ID,
   g.SOURCE_ID,
-  d.ra,
-  d.dec
+  g.ra,
+  g.dec,
+  d.ra as ra_des,
+  d.dec ad dec_des,
 from
   GAIA_DR2_X_Y6_GOLD_2_0 m,
   GAIA_DR2 g,
