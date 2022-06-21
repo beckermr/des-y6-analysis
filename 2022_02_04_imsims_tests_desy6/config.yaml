@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara, single_band_swarp, swarp, src_extractor]
+    steps: [galsim_montara, single_band_swarp, swarp, src_extractor, meds]
 
 galsim_montara: {}
 
@@ -18,14 +18,14 @@ galsim_montara: {}
 # delete_meds:
 #     save_tilenames: [DES0003-3832]
 #
-# meds:
-#     cutout_types: ['image','weight','seg','bmask']
-#     meds_dir: meds
-#     meds_run: y3v02
-#     sub_bkg: False
-#     add_psf_data: True
-#     use_joblib: True
-#
+meds:
+    cutout_types: ['image','weight','seg','bmask']
+    meds_dir: meds
+    meds_run: y6a2
+    sub_bkg: False
+    add_psf_data: True
+    use_joblib: True
+    use_rejectlist: False
 
 single_band_swarp: {}
 swarp:
