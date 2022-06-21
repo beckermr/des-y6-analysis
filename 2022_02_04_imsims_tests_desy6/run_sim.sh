@@ -4,8 +4,7 @@ export IMSIM_DATA=${MEDS_DIR}
 
 mkdir -p ./sim_outputs
 run-eastlake-sim \
-  -v 1 \
-  -v 1 \
+  -v 2 \
   --skip_completed_steps \
   --resume_from=./sim_outputs/job_record.pkl \
   config.yaml \
