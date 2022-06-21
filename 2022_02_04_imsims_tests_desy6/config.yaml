@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara, single_band_swarp, swarp, src_extractor, coadd_nwgint, meds]
+    steps: [galsim_montara, single_band_swarp, swarp, src_extractor, coadd_nwgint, meds, pizza_cutter]
 
 galsim_montara: {}
 
@@ -32,6 +32,7 @@ swarp:
     coadd_bands: ['r', 'i', 'z']
 src_extractor: {}
 coadd_nwgint: {}
+pizza_cutter: {}
 
 image:
     type: WideScattered
