@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara, single_band_swarp, swarp, src_extractor, coadd_nwgint, meds, pizza_cutter]
+    steps: [galsim_montara, coadd_nwgint, single_band_swarp, swarp, src_extractor, meds, pizza_cutter]
 
 galsim_montara: {}
 
