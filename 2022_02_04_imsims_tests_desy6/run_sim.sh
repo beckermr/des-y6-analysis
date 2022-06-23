@@ -4,7 +4,7 @@ export IMSIM_DATA=${MEDS_DIR}
 
 mkdir -p ./sim_outputs
 run-eastlake-sim \
-  -v 2 \
+  -v 1 \
   --step_names galsim_montara pizza_cutter \
   --resume_from=./sim_outputs/job_record.pkl \
   config.yaml \
