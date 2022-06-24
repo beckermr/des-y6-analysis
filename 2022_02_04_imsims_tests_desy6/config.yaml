@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara, coadd_nwgint, single_band_swarp, swarp, src_extractor, meds, pizza_cutter]
+    steps: [galsim_montara, coadd_nwgint, single_band_swarp, swarp, src_extractor, meds, pizza_cutter, metadetect]
 
 galsim_montara: {}
 
@@ -20,9 +20,6 @@ galsim_montara: {}
 #
 meds:
     cutout_types: ['image','weight','seg','bmask']
-    meds_dir: meds
-    meds_run: y6a2
-    sub_bkg: False
     add_psf_data: True
     use_joblib: True
     use_rejectlist: False
@@ -33,6 +30,8 @@ swarp:
 src_extractor: {}
 coadd_nwgint: {}
 pizza_cutter: {}
+metadetect:
+  bands: ["r", "i", "z"]
 
 image:
     type: WideScattered
