@@ -98,6 +98,7 @@ output:
     imsim_data: "$os.environ['IMSIM_DATA']"
     noise_mode: from_weight
     add_bkg: False
+    n_se_test: 3
 
     #Save weight and badpix extensions too
     badpixfromfits:
