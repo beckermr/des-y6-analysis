@@ -36,7 +36,6 @@ metadetect:
 image:
     type: WideScattered
     border: 15
-    random_seed: 1234
 
     # The number of objects across the full focal plane.
     nobjects: 100
