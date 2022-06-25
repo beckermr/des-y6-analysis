@@ -7,6 +7,7 @@ run-eastlake-sim \
   -v 1 \
   --step_names pizza_cutter metadetect \
   --resume_from=./sim_outputs/job_record.pkl \
+  --seed 234324 \
   config.yaml \
   ./sim_outputs
 
