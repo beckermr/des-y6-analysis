@@ -10,7 +10,7 @@ pipeline:
 stash_prep:
   desrun: "des-pizza-slices-y6-v12"
   imsim_data: "$os.environ['IMSIM_DATA']"
-  bands: ["g", "r", "i", "z"]
+  bands: ["r", "i", "z"]
   tilename: DES2359-6539
 
 coadd_nwgint:
