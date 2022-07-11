@@ -32,6 +32,9 @@ coadd_nwgint: {}
 pizza_cutter: {}
 metadetect:
   bands: ["r", "i", "z"]
+true_detection:
+  box_size: 48
+
 
 image:
     type: WideScattered
