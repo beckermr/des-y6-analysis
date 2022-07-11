@@ -90,9 +90,9 @@ output:
     type: DESTile
     nproc: 16
     # The number of exposures to build
-    tilename: DES2359-6539
+    tilename: DES0433-2332
     bands: ['r', 'i', 'z']
-    desrun: "des-pizza-slices-y6-v12"
+    desrun: "des-pizza-slices-y6-v14"
     imsim_data: "$os.environ['IMSIM_DATA']"
     noise_mode: from_weight
     add_bkg: False
