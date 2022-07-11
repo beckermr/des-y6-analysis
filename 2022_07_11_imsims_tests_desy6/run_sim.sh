@@ -6,8 +6,6 @@ mkdir -p ./sim_outputs
 run-eastlake-sim \
   -v 1 \
   --seed 234324 \
-  --resume_from=./sim_outputs/job_record.pkl \
-  --skip_completed_steps \
   config.yaml \
   ./sim_outputs
 
