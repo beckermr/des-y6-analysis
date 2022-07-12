@@ -2,25 +2,23 @@ import os
 import fitsio
 import subprocess
 import tqdm
-import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def _download(fname):
-    with tempfile.TemporaryDirectory() as tmpdir:
-        fpth = os.path.join(tmpdir, "fname_%s.txt" % os.path.basename(fname))
-        with open(fpth) as fp:
-            fp.write(fname + "\n")
+    # with tempfile.TemporaryDirectory() as tmpdir:
+    #     fpth = os.path.join(tmpdir, "fname_%s.txt" % os.path.basename(fname))
+    #     with open(fpth) as fp:
+    #         fp.write(fname + "\n")
 
-        cmd = """\
-        rsync \
-                -av \
-                --password-file $DES_RSYNC_PASSFILE \
-                --files-from=%s \
-                ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/ \
-                ./mdet_data
-        """ % fpth
-        subprocess.run(cmd, shell=True)
+    cmd = """\
+    rsync \
+            -av \
+            --password-file $DES_RSYNC_PASSFILE \
+            ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
+            ./mdet_data/%s
+    """ % (fname, fname)
+    subprocess.run(cmd, shell=True)
 
 
 if __name__ == "__main__":
