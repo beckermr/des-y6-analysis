@@ -106,7 +106,7 @@ if __name__ == "__main__":
     with open(os.path.expanduser("~/.test_des_blinding_v4"), "r") as fp:
         passphrase = fp.read().strip()
 
-    fnames = glob.glob("mdet_data/*.fit*", recursive=True)
+    fnames = glob.glob("mdet_data/**/*.fit*", recursive=True)
     print("found %d tiles to process" % len(fnames), flush=True)
     with ProcessPoolExecutor(max_workers=10) as exec:
         futs = [
