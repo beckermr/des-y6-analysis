@@ -1,27 +1,46 @@
 import os
 import fitsio
 import subprocess
+import tqdm
+import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-d = fitsio.read("fnames.fits", lower=True)
+def _download(fname):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fpth = os.path.join(tmpdir, "fname_%s.txt" % os.path.basename(fname))
+        with open(fpth) as fp:
+            fp.write(fname + "\n")
 
-fnames = [
-    os.path.join(d["path"][i], d["filename"][i])
-    for i in range(len(d))
-]
-print(fnames)
-with open("fnames.txt", "w") as fp:
-    for fname in fnames:
-        fp.write("%s\n" % fname)
+        cmd = """\
+        rsync \
+                -av \
+                --password-file $DES_RSYNC_PASSFILE \
+                --files-from=%s \
+                ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/ \
+                ./mdet_data
+        """ % fpth
+        subprocess.run(cmd, shell=True)
 
-subprocess.run("mkdir -p mdet_data", shell=True)
 
-cmd = """\
-rsync \
-        -av \
-        --password-file $DES_RSYNC_PASSFILE \
-        --files-from=fnames.txt \
-        ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/ \
-        ./mdet_data
-"""
-subprocess.run(cmd, shell=True)
+if __name__ == "__main__":
+    d = fitsio.read("fnames.fits", lower=True)
+
+    fnames = [
+        os.path.join(d["path"][i], d["filename"][i])
+        for i in range(len(d))
+    ]
+
+    subprocess.run("mkdir -p mdet_data", shell=True)
+
+    print("found %d tiles to download" % len(fnames), flush=True)
+    with ThreadPoolExecutor(max_workers=10) as exec:
+        futs = [
+            exec.submit(_download, fname)
+            for fname in tqdm.tqdm(fnames, desc="making jobs")
+        ]
+        for fut in tqdm.tqdm(as_completed(futs), total=len(futs)):
+            try:
+                fut.result()
+            except Exception as e:
+                print(e)
