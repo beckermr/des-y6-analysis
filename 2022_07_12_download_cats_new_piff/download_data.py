@@ -17,7 +17,7 @@ def _download(fname):
             --password-file $DES_RSYNC_PASSFILE \
             ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
             ./mdet_data/%s
-    """ % (fname, fname)
+    """ % (fname, os.path.bansename(fname))
     subprocess.run(cmd, shell=True)
 
 
