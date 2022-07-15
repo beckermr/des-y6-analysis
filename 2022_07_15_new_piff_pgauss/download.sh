@@ -22,7 +22,7 @@ for fname in \
 ; do
 
   rsync \
-    -av \
+    -avP \
     --password-file $DES_RSYNC_PASSFILE \
     ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/${fname} `basename ${fname}`
 done
