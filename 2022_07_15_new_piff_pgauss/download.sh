@@ -11,5 +11,5 @@ for fname in \
   rsync \
     -av \
     --password-file $DES_RSYNC_PASSFILE \
-    ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/${fname}
+    ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/${fname} `basename ${fname}`
 done
