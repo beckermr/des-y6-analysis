@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara, coadd_nwgint]
+    steps: [stash_prep, coadd_nwgint]
 
 galsim_montara: {}
 
@@ -23,16 +23,17 @@ meds:
     add_psf_data: True
     use_joblib: True
     use_rejectlist: False
-
+stash_prep:
+  bands: ["g", "r", "i", "z"]
 single_band_swarp: {}
 swarp:
-    coadd_bands: ['r', 'i', 'z']
+    coadd_bands: ['g', 'r', 'i', 'z']
 src_extractor: {}
 coadd_nwgint:
   run_on_inputs: True
 pizza_cutter: {}
 metadetect:
-  bands: ["r", "i", "z"]
+  bands: ["g", "r", "i", "z"]
 true_detection:
   box_size: 48
 
@@ -95,7 +96,7 @@ output:
     nproc: 16
     # The number of exposures to build
     tilename: DES0433-2332
-    bands: ['r', 'i', 'z']
+    bands: ['g', 'r', 'i', 'z']
     desrun: "des-pizza-slices-y6-v14"
     imsim_data: "$os.environ['IMSIM_DATA']"
     noise_mode: from_weight
