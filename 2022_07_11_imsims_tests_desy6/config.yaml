@@ -5,7 +5,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim_montara, true_detection, pizza_cutter, metadetect]
+    steps: [galsim_montara, coadd_nwgint]
 
 galsim_montara: {}
 
@@ -28,7 +28,8 @@ single_band_swarp: {}
 swarp:
     coadd_bands: ['r', 'i', 'z']
 src_extractor: {}
-coadd_nwgint: {}
+coadd_nwgint:
+  run_on_inputs: True
 pizza_cutter: {}
 metadetect:
   bands: ["r", "i", "z"]

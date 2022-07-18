@@ -1,7 +1,7 @@
 #!/bin/bash
 
 for tname in DES0433-2332; do
-  for band in r i z; do
+  for band in g r i z; do
     des-pizza-cutter-prep-tile \
       --config des-pizza-slices-y6-v14.yaml \
       --tilename ${tname} \
