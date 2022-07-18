@@ -25,6 +25,7 @@ meds:
     use_rejectlist: False
 stash_prep:
   bands: ["g", "r", "i", "z"]
+  tilename: DES0433-2332
 single_band_swarp: {}
 swarp:
     coadd_bands: ['g', 'r', 'i', 'z']
