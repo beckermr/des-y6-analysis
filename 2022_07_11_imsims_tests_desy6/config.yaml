@@ -26,6 +26,7 @@ meds:
 stash_prep:
   bands: ["g", "r", "i", "z"]
   tilename: DES0433-2332
+  desrun: des-pizza-slices-y6-v14
 single_band_swarp: {}
 swarp:
     coadd_bands: ['g', 'r', 'i', 'z']
