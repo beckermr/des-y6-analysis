@@ -103,7 +103,7 @@ if __name__ == "__main__":
     if not os.path.exists(OUTDIR):
         os.makedirs(OUTDIR, exist_ok=True)
 
-    with open(os.path.expanduser("~/.test_des_blinding_v5"), "r") as fp:
+    with open(os.path.expanduser("~/.test_des_blinding_v6"), "r") as fp:
         passphrase = fp.read().strip()
 
     fnames = glob.glob("mdet_data/**/*.fit*", recursive=True)
