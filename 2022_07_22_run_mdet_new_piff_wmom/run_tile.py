@@ -34,14 +34,15 @@ def _download_tile(tilename, cwd):
             _d = d[msk]
             for i in range(len(_d)):
                 fname = os.path.join(d["path"][msk][i], d["filename"][msk][i])
-                cmd = """\
-        rsync \
-                -av \
-                --password-file $DES_RSYNC_PASSFILE \
-                ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
-                ./data/%s
-        """ % (fname, os.path.basename(fname))
-                subprocess.run(cmd, shell=True, check=True)
+                if not os.path.exists("./data/%s" % os.path.basename(fname)):
+                    cmd = """\
+rsync \
+-av \
+--password-file $DES_RSYNC_PASSFILE \
+${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
+./data/%s
+""" % (fname, os.path.basename(fname))
+                    subprocess.run(cmd, shell=True, check=True)
             mfiles.append("./data/%s" % os.path.basename(fname))
 
     return mfiles
