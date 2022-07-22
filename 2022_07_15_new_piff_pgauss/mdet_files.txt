@@ -1,0 +1,3 @@
+DES0322-2249_r5922p04_metadetect.fits
+DES0325-2249_r5922p02_metadetect.fits
+DES0328-2249_r5922p02_metadetect.fits
