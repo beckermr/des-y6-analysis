@@ -68,7 +68,7 @@ def _run_tile(tilename, seed, opth, tmpdir, cwd):
 
     cmd = """\
 run-metadetect-on-slices \
-  --config=%s/metadetect-v5.yaml \
+  --config=%s/metadetect-v6.yaml \
   --output-path=./mdet_data \
   --seed=%d \
   --use-tmpdir \
