@@ -160,5 +160,6 @@ condor-exec/
 **/data/*
 **/piff_paths/*
 2022_04_21_run_mdet_final_v2/data_final_nogcut/*
-2022_07_22_run_mdet_new_piff_smooth_v1/metadetect/*
-2022_07_22_run_mdet_new_piff_smooth_v1/pizza-cutter-metadetect/*
+**/metadetect/*
+**/pizza-cutter-metadetect/*
+**/sim_outputs/*
