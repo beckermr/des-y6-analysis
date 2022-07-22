@@ -1,0 +1,9 @@
+N: 1
+mode: by_node
+command: |
+  source ~/.bashrc
+  conda activate des-y6-mdet-smooth-v1
+  echo `which python`
+  mkdir -p mdet_data
+  chmod go-r mdet_data
+  python run_tile.py DES0328-224
