@@ -54,7 +54,7 @@ def _run_tile(tilename, seed, opth, tmpdir, cwd):
             mfiles = _download_tile(tilename, cwd)
             break
         except Exception:
-            time.sleep(600 + random.randint(-100, 100))
+            # time.sleep(600 + random.randint(-100, 100))
             mfiles = None
             pass
 
