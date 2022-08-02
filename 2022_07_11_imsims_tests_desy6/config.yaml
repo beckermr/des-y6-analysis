@@ -5,39 +5,18 @@ modules:
     - numpy
 
 pipeline:
-    steps: [stash_prep, coadd_nwgint]
+    steps: steps: [galsim_montara, true_detection, pizza_cutter, metadetect]
 
 galsim_montara: {}
 
-# delete_images:
-#     delete_coadd: True
-#     delete_se: True
-#     save_tilenames:
-#     - DES0003-3832
-#
-# delete_meds:
-#     save_tilenames: [DES0003-3832]
-#
-meds:
-    cutout_types: ['image','weight','seg','bmask']
-    add_psf_data: True
-    use_joblib: True
-    use_rejectlist: False
-stash_prep:
-  bands: ["g", "r", "i", "z"]
-  tilename: DES0433-2332
-  desrun: des-pizza-slices-y6-v14
-single_band_swarp: {}
-swarp:
-    coadd_bands: ['g', 'r', 'i', 'z']
-src_extractor: {}
-coadd_nwgint:
-  run_on_inputs: True
-pizza_cutter: {}
-metadetect:
-  bands: ["g", "r", "i", "z"]
 true_detection:
-  box_size: 48
+    box_size: 48
+
+pizza_cutter:
+  config_file: ./des-pizza-slices-y6-v14.yaml
+
+metadetect:
+  bands: ["r"]
 
 
 image:
@@ -98,12 +77,13 @@ output:
     nproc: 16
     # The number of exposures to build
     tilename: DES0433-2332
-    bands: ['g', 'r', 'i', 'z']
+    bands: ['r']
     desrun: "des-pizza-slices-y6-v14"
     imsim_data: "$os.environ['IMSIM_DATA']"
     noise_mode: from_weight
     add_bkg: False
-    n_se_test: 3
+    n_se_test: 20
+    grid_objects: True
 
     #Save weight and badpix extensions too
     badpixfromfits:

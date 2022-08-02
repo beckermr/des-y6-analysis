@@ -38,7 +38,7 @@ single_epoch:
   # set this to either piff or psfex
   # if using piff in DES and a release earlier than Y6,
   # you need to set the piff_run above too
-  psf_type: piff
+  psf_type: psfex
   psf_kwargs:
     g:
       GI_COLOR: 1.1
@@ -58,7 +58,7 @@ single_epoch:
     max_abs_T_diff: 0.15
 
   # which SE WCS to use - one of piff, pixmappy or image
-  wcs_type: pixmappy
+  wcs_type: image
   wcs_color: 1.1
 
   ignored_ccds:
