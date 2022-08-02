@@ -52,7 +52,7 @@ psf:
 gal:
   type: Exponential
   half_light_radius: 0.5
-  flux: 64000.0
+  flux: "$10**(0.4*(mag_zp-18.0))"
 
 star:
   type: Gaussian
