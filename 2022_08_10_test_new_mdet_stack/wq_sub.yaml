@@ -1,0 +1,9 @@
+N: 1
+mode: by_node
+command: |
+  source ~/.bashrc
+  conda activate des-y6-mdet-all-meas
+  echo `which python`
+  mkdir -p mdet_data
+  chmod go-r mdet_data
+  python run_tile.py DES0328-2249
