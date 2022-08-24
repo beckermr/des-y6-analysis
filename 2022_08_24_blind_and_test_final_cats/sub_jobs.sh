@@ -11,9 +11,7 @@ command: |
   source ~/.bashrc
   conda activate desy6
   echo \`which python\`
-  mkdir -p mdet_data
-  chmod go-r mdet_data
-  python download_and_blind.py ${num} ${tot}
+  python download_and_blind.py ${num} ${tot} &> log${num}.oe
 " > wq_sub${num}.yaml
   # wq sub -b wq_sub${num}.yaml
 done

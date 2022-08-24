@@ -1,3 +1,4 @@
+from wurlitzer import sys_pipes
 import os
 import fitsio
 import subprocess
@@ -50,7 +51,8 @@ def _msk_shear(fname, passphrase):
         buff = io.StringIO()
         with contextlib.redirect_stderr(sys.stdout):
             with contextlib.redirect_stdout(buff):
-                _download(fname)
+                with sys_pipes():
+                    _download(fname)
     except Exception as e:
         err = repr(e)
         failed = True
