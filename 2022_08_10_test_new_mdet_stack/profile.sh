@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tag=ppsfperfv2
+tag=ppsfperfv2_mdetnocp
 
 python -m cProfile -o prof_${tag}.dat `which run-metadetect-on-slices` \
   --config=metadetect-v6-all-meas.yaml \
