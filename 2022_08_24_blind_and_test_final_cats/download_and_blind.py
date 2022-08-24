@@ -37,7 +37,9 @@ def _is_ok(fname):
 
 
 def _msk_shear(fname, passphrase):
-    if _is_ok(os.path.join(".", OUTDIR, os.path.basename(fname))):
+    indata = os.path.join(".", "mdet_data", os.path.basename(fname))
+    outdata = os.path.join(".", OUTDIR, os.path.basename(fname))
+    if _is_ok(outdata):
         return None
 
     fac = generate_shear_masking_factor(passphrase)
@@ -45,11 +47,12 @@ def _msk_shear(fname, passphrase):
     err = ""
 
     try:
-        buff = io.StringIO()
-        with contextlib.redirect_stderr(sys.stdout):
-            with contextlib.redirect_stdout(buff):
-                _download(fname)
-        d = fitsio.read(os.path.join(".", "mdet_data", os.path.basename(fname)))
+        if not _is_ok(indata):
+            buff = io.StringIO()
+            with contextlib.redirect_stderr(sys.stdout):
+                with contextlib.redirect_stdout(buff):
+                    _download(fname)
+        d = fitsio.read(indata)
     except Exception as e:
         err = repr(e)
         failed = True
@@ -102,9 +105,7 @@ def _msk_shear(fname, passphrase):
                             msk |= _msk
 
                     msk &= (d["mask_flags"] == 0)
-
-                    out = os.path.join(".", OUTDIR, os.path.basename(fname))
-                    fitsio.write(out, d[msk], clobber=True)
+                    fitsio.write(outdata, d[msk], clobber=True)
 
                 except Exception as e:
                     failed = True
