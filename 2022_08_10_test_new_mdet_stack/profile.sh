@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python -m cProfile -o profile_ppsfperfv1.dat `which run-metadetect-on-slices` \
+python -m cProfile -o prof_ppsfperfv2.dat `which run-metadetect-on-slices` \
   --config=metadetect-v6-all-meas.yaml \
   --output-path=./mdet_data \
   --seed=1342 \
