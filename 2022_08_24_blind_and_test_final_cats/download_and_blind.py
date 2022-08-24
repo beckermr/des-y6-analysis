@@ -47,11 +47,10 @@ def _msk_shear(fname, passphrase):
     err = ""
 
     try:
-        if not _is_ok(indata):
-            buff = io.StringIO()
-            with contextlib.redirect_stderr(sys.stdout):
-                with contextlib.redirect_stdout(buff):
-                    _download(fname)
+        buff = io.StringIO()
+        with contextlib.redirect_stderr(sys.stdout):
+            with contextlib.redirect_stdout(buff):
+                _download(fname)
     except Exception as e:
         err = repr(e)
         failed = True
