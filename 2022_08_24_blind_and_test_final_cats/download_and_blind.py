@@ -117,6 +117,13 @@ def _msk_shear(fname, passphrase):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        num = int(sys.argv[1])
+        tot = int(sys.argv[2])
+    else:
+        num = 0
+        tot = 1
+
     if not os.path.exists(OUTDIR):
         os.makedirs(OUTDIR, exist_ok=True)
     if not os.path.exists("./mdet_data"):
@@ -128,12 +135,17 @@ if __name__ == "__main__":
 
     d = fitsio.read("fnames.fits", lower=True)
 
-    fnames = sorted([
+    _fnames = sorted([
         os.path.join(d["path"][i], d["filename"][i])
         for i in range(len(d))
     ])
+    fnames = [
+        fname
+        for i, fname in enumerate(_fnames)
+        if i % tot == num
+    ]
 
-    print("found %d tiles to process" % len(fnames), flush=True)
+    print("found %d tiles to process for task %d" % (len(fnames), num), flush=True)
     with ProcessPoolExecutor(max_workers=10) as exec:
         futs = [
             exec.submit(_msk_shear, fname, passphrase)
@@ -147,4 +159,5 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e)
 
-    os.system(f"cd {OUTDIR} && ls -1 *.fits > mdet_files.txt")
+            if num == 0:
+                os.system(f"cd {OUTDIR} && ls -1 *.fits > mdet_files.txt")
