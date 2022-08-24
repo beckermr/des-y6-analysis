@@ -49,7 +49,7 @@ def _msk_shear(fname, passphrase):
         with contextlib.redirect_stderr(sys.stdout):
             with contextlib.redirect_stdout(buff):
                 _download(fname)
-        d = fitsio.read("./mdet_data/" + fname)
+        d = fitsio.read(os.path.join(".", "mdet_data", os.path.basename(fname)))
     except Exception as e:
         err = repr(e)
         failed = True
