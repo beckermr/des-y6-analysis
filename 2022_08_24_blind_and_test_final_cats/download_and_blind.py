@@ -132,7 +132,7 @@ if __name__ == "__main__":
     fnames = sorted([
         os.path.join(d["path"][i], d["filename"][i])
         for i in range(len(d))
-    ])[0:2]
+    ])
 
     print("found %d tiles to process" % len(fnames), flush=True)
     with ProcessPoolExecutor(max_workers=10) as exec:
