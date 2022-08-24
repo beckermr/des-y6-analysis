@@ -52,7 +52,6 @@ def _msk_shear(fname, passphrase):
             with contextlib.redirect_stderr(sys.stdout):
                 with contextlib.redirect_stdout(buff):
                     _download(fname)
-        d = fitsio.read(indata)
     except Exception as e:
         err = repr(e)
         failed = True
@@ -62,7 +61,7 @@ def _msk_shear(fname, passphrase):
         with contextlib.redirect_stderr(sys.stdout):
             with contextlib.redirect_stdout(buff):
                 try:
-                    d = fitsio.read(fname)
+                    d = fitsio.read(indata)
 
                     # make all non-zero flags nan in shear
                     for pre in COLS_TO_KEEP:
