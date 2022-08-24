@@ -45,7 +45,10 @@ def _msk_shear(fname, passphrase):
     err = ""
 
     try:
-        _download(fname)
+        buff = io.StringIO()
+        with contextlib.redirect_stderr(sys.stdout):
+            with contextlib.redirect_stdout(buff):
+                _download(fname)
         d = fitsio.read("./mdet_data/" + fname)
     except Exception as e:
         err = repr(e)
@@ -137,7 +140,9 @@ if __name__ == "__main__":
             exec.submit(_msk_shear, fname, passphrase)
             for fname in tqdm.tqdm(fnames, desc="making jobs")
         ]
-        for fut in tqdm.tqdm(as_completed(futs), total=len(futs)):
+        for fut in tqdm.tqdm(
+            as_completed(futs), total=len(futs), desc="making catalogs"
+        ):
             try:
                 fut.result()
             except Exception as e:
