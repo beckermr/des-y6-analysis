@@ -13,5 +13,5 @@ command: |
   echo \`which python\`
   python download_and_blind.py ${num} ${tot} &> log${num}.oe
 " > wq_sub${num}.yaml
-  # wq sub -b wq_sub${num}.yaml
+  wq sub -b wq_sub${num}.yaml
 done
