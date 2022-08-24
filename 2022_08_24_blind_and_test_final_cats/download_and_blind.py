@@ -119,6 +119,7 @@ if __name__ == "__main__":
         os.makedirs(OUTDIR, exist_ok=True)
     if not os.path.exists("./mdet_data"):
         os.makedirs("./mdet_data", exist_ok=True)
+        os.system("chmod go-r ./mdet_data")
 
     with open(os.path.expanduser("~/.test_des_blinding_v7"), "r") as fp:
         passphrase = fp.read().strip()
