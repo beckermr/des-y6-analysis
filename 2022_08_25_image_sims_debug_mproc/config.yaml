@@ -93,7 +93,7 @@ stamp:
 
 output:
   type: DESTile
-  nproc: 2
+  nproc: 6
   # The number of exposures to build
   tilename: DES0433-2332
   bands: ['r']
