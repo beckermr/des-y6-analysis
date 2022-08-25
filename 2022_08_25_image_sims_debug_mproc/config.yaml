@@ -38,7 +38,6 @@ metadetect:
   bands: ["r"]
 
 image:
-  nproc: -1
   type: WideScattered
   border: 15
 
@@ -94,6 +93,7 @@ stamp:
 
 output:
   type: DESTile
+  nproc: -1  
   # The number of exposures to build
   tilename: DES0433-2332
   bands: ['r']
