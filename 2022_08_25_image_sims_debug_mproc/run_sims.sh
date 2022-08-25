@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export IMSIM_DATA=${MEDS_DIR}
+export TMPDIR=/data/beckermr/tmp
 
 mkdir -p ./sim_outputs
 run-eastlake-sim \
