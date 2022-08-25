@@ -3,13 +3,13 @@
 export IMSIM_DATA=${MEDS_DIR}
 export TMPDIR=/data/beckermr/tmp
 
-mkdir -p ./sim_outputs
+mkdir -p ./sim_outputs_outpar
 run-eastlake-sim \
   -v 1 \
   --seed 234324 \
   config.yaml \
-  ./sim_outputs
-
+  ./sim_outputs_outpar \
+  output.nproc=-1
   # --step_names pizza_cutter metadetect \
   # --resume_from=./sim_outputs/job_record.pkl \
 
