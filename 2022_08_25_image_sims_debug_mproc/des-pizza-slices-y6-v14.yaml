@@ -1,12 +1,12 @@
 des_data:
   campaign: Y6A2_COADD
   source_type: finalcut
-  piff_campaign: Y6A2_PIFF
+  piff_campaign: Y6A2_PIFF_V3
 
 # optional but these are good defaults
 fpack_pars:
   # if you do not set FZTILE, the code sets it to the size of a slice for you
-  FZQVALUE: 4
+  FZQVALUE: 16
   FZALGOR: "RICE_1"
   # preserve zeros, don't dither them
   FZQMETHD: "SUBTRACTIVE_DITHER_2"
@@ -38,14 +38,14 @@ single_epoch:
   # set this to either piff or psfex
   # if using piff in DES and a release earlier than Y6,
   # you need to set the piff_run above too
-  psf_type: piff
+  psf_type: psfex
   psf_kwargs:
     g:
-      GI_COLOR: 0.61
+      GI_COLOR: 1.1
     r:
-      GI_COLOR: 0.61
+      GI_COLOR: 1.1
     i:
-      GI_COLOR: 0.61
+      GI_COLOR: 1.1
     z:
       IZ_COLOR: 0.34
   piff_cuts:
@@ -58,8 +58,8 @@ single_epoch:
     max_abs_T_diff: 0.15
 
   # which SE WCS to use - one of piff, pixmappy or image
-  wcs_type: pixmappy
-  wcs_color: 0.61
+  wcs_type: image
+  wcs_color: 1.1
 
   ignored_ccds:
     - 31
