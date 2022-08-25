@@ -165,3 +165,16 @@ condor-exec/
 **/sim_outputs/*
 **/data_final_nogcut/*
 **/condor-yield/*
+**/blinded_data/*
+*.wqlog
+*.dat
+**/ngmix/*
+**/metadetect/*
+2022_08_10_test_new_mdet_stack/metadetect
+2022_08_10_test_new_mdet_stack/ngmix
+2022_08_10_test_new_mdet_stack/pizza-cutter-metadetect
+2022_07_22_run_mdet_new_piff_smooth_v1/metadetect/
+2022_07_22_run_mdet_new_piff_smooth_v1/pizza-cutter-metadetect/
+2022_07_22_run_mdet_new_piff_wmom/Untitled.ipynb
+
+
