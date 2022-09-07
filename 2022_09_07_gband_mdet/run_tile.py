@@ -76,6 +76,7 @@ run-metadetect-on-slices \
   --tmpdir=%s \
   --log-level=INFO \
   --n-jobs=12 \
+  --range="0:200" \
   --band-names=g %s""" % (
         cwd, seed, tmpdir, mfiles[0],
     )
