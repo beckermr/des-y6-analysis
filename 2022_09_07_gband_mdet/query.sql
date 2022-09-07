@@ -8,7 +8,7 @@ from
     file_archive_info fai
 where
     d1.pfw_attempt_id = t.pfw_attempt_id
-    and t.tag = 'Y6A2_METADETECT_V3'
+    and t.tag = 'Y6A2_METADETECT_TEST_V3_3'
     and d1.filename = m.filename
     and d1.id = fai.desfile_id
     and fai.archive_name = 'desar2home'
