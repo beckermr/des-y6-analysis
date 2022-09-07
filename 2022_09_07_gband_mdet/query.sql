@@ -1,6 +1,7 @@
 select
     concat(fai.filename, fai.compression) as filename,
-    fai.path as path
+    fai.path as path,
+    m.band as band
 from
     desfile d1,
     proctag t,
