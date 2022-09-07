@@ -148,7 +148,7 @@ if __name__ == "__main__":
     ]
 
     print("found %d tiles to process for task %d" % (len(fnames), num), flush=True)
-    with ProcessPoolExecutor(max_workers=10) as exec:
+    with ProcessPoolExecutor(max_workers=5) as exec:
         futs = [
             exec.submit(_msk_shear, fname, passphrase)
             for fname in tqdm.tqdm(fnames, desc="making jobs")
