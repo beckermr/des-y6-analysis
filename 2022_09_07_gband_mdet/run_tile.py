@@ -130,21 +130,22 @@ else:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    with BNLCondorParallel(verbose=0, mem=8) as exc:
-        jobs = []
-        for tilename, seed in PBar(
-            zip(tnames, seeds), total=len(tnames), desc="making jobs"
-        ):
-            if (
-                np.sum(all_tnames == tilename) == 1
-                and len(glob.glob("%s/%s*.fits.fz" % (opth, tilename))) == 0
+    for mem in [6, 8]:
+        with BNLCondorParallel(verbose=0, mem=mem) as exc:
+            jobs = []
+            for tilename, seed in PBar(
+                zip(tnames, seeds), total=len(tnames), desc="making jobs"
             ):
-                jobs.append(
-                    joblib.delayed(_run_tile)(tilename, seed, opth, tmpdir, cwd)
-                )
+                if (
+                    np.sum(all_tnames == tilename) == 1
+                    and len(glob.glob("%s/%s*.fits.fz" % (opth, tilename))) == 0
+                ):
+                    jobs.append(
+                        joblib.delayed(_run_tile)(tilename, seed, opth, tmpdir, cwd)
+                    )
 
-        for res in PBar(exc(jobs), total=len(jobs), desc="running mdet"):
-            try:
-                res.result()
-            except Exception as e:
-                print("ERROR: " + repr(e), flush=True)
+            for res in PBar(exc(jobs), total=len(jobs), desc="running mdet"):
+                try:
+                    res.result()
+                except Exception as e:
+                    print("ERROR: " + repr(e), flush=True)
