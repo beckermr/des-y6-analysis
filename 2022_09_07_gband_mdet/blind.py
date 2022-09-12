@@ -86,6 +86,8 @@ def _msk_shear(fname, passphrase):
                     fitsio.write(outdata, d[msk], clobber=True)
 
                 except Exception as e:
+                    if not _is_ok(indata):
+                        os.system("rm -f %s" % indata)
                     failed = True
                     err = repr(e)
 
