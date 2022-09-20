@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p meds_dir
+export MEDS_DIR=./meds_dir
 
 desmeds-prep-tile \
   --no-temp \
