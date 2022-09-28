@@ -13,4 +13,4 @@ where
     and d1.filename = m.filename
     and d1.id = fai.desfile_id
     and fai.archive_name = 'desar2home'
-    and d1.filetype = 'coadd_pizzacutter'; > fnames.fits
+    and d1.filetype = 'coadd_pizza_cutter'; > fnames.fits
