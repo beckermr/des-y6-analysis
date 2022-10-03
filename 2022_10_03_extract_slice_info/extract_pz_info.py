@@ -8,7 +8,7 @@ import time
 import random
 import joblib
 from esutil.pbar import PBar
-from mattspy import BNLCondorParallel
+from mattspy import LokyParallel
 
 
 def _download_tile(tilename, cwd):
@@ -106,7 +106,7 @@ else:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    with BNLCondorParallel(verbose=0, mem=2) as exec:
+    with LokyParallel(verbose=0, n_jobs=20) as exec:
         jobs = []
         for tilename, seed in PBar(
             zip(tnames, seeds), total=len(tnames), desc="making jobs"
