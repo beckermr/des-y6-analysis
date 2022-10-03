@@ -106,7 +106,7 @@ else:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    with LokyParallel(verbose=0, n_jobs=40) as exec:
+    with LokyParallel(verbose=0, n_jobs=20) as exec:
         jobs = []
         for tilename, seed in PBar(
             zip(tnames, seeds), total=len(tnames), desc="making jobs"
