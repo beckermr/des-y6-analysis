@@ -7,9 +7,11 @@ tmpmeds=/data/beckermr/2022_09_20_color_dep_meds/DES0137-3749
 mkdir -p ${tmpmeds}
 rm -rf ${tmpmeds}/*
 
-desmeds-make-meds-desdm \
-  Y6A1_test_piff.yaml \
-  ${MEDS_DIR}/Y6A1_test_piff/DES0137-3749/lists-r/DES0137-3749_r_fileconf-Y6A1_test_piff.yaml \
-  --tmpdir=${tmpmeds} &> log.oe
+for band in r z; do
+  desmeds-make-meds-desdm \
+    Y6A1_test_piff.yaml \
+    ${MEDS_DIR}/Y6A1_test_piff/DES0137-3749/lists-${band}/DES0137-3749_${band}_fileconf-Y6A1_test_piff.yaml \
+    --tmpdir=${tmpmeds} &> log.oe
+done
 
 rm -rf ${tmpmeds}
