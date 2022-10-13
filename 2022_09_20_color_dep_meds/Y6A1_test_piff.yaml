@@ -11,6 +11,8 @@ psf:
     type: piff
     stamp_size: 25
     use_color: True
+    gi_color_range: [0.0, 3.0]
+    iz_color_range: [0.0, 0.7]
 
   coadd:
     type: psfex
