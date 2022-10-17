@@ -16,6 +16,7 @@ psf:
 
   coadd:
     type: psfex
+    use_color: False
 
 # extensions for single-epoch images
 # the ngwint files
@@ -25,6 +26,7 @@ se_bmask_ext:  "msk"
 
 se_astrom:
   type: 'piff'
+  use_color: True
 
 # separate bkg files
 se_bkg_ext:    "sci"
@@ -55,6 +57,8 @@ fpack_pars:
 source_type: "finalcut"
 
 use_astro_refine: False
+coadd_astrom:
+  use_color: False
 
 # allowed_box_sizes: [32, 48, 64, 96, 128, 192, 256]
 allowed_box_sizes: [40, 56, 72, 104, 136, 200, 264]
