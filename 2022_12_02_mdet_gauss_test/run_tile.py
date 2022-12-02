@@ -23,7 +23,7 @@ def _download_tile(tilename, cwd):
         for i in range(d.shape[0])
     ])
     msk = tnames == tilename
-    if np.sum(msk) != 1:
+    if np.sum(msk) != 4:
         return np.sum(msk)
 
     d = d[msk]
