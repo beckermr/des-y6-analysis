@@ -48,7 +48,7 @@ ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
     return mfiles
 
 
-def _run_tile(tilename, seed, opth, tmpdir, cwd):
+def _run_tile(tilename, seed, opth, tmpdir, cwd, cpus):
     os.system("mkdir -p ./data")
     for _ in range(10):
         try:
@@ -77,10 +77,9 @@ run-metadetect-on-slices \
   --use-tmpdir \
   --tmpdir=%s \
   --log-level=INFO \
-  --n-jobs=12 \
-  --range="0:1000" \
+  --n-jobs=%d \
   --band-names=griz %s %s %s %s""" % (
-        cwd, seed, tmpdir, mfiles[0], mfiles[1], mfiles[2], mfiles[3],
+        cwd, seed, tmpdir, cpus, mfiles[0], mfiles[1], mfiles[2], mfiles[3],
     )
     subprocess.run(cmd, shell=True, check=True)
 
@@ -116,14 +115,15 @@ if len(sys.argv) == 1:
     rng = np.random.RandomState(seed=seed)
     seeds = rng.randint(low=1, high=2**29, size=len(tnames))
     tmpdir = None
-
+    cpus = 8
 else:
     tnames = [sys.argv[1]]
     tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
     os.system("mkdir -p " + tmpdir)
+    cpus = 1
 
 if len(tnames) == 1:
-    _run_tile(tnames[0], seed, opth, tmpdir, cwd)
+    _run_tile(tnames[0], seed, opth, tmpdir, cwd, cpus)
 else:
     d = fitsio.read(
         os.path.join(cwd, "fnames.fits"),
@@ -134,7 +134,7 @@ else:
         for i in range(d.shape[0])
     ])
     for mem in [6, 8]:
-        with BNLCondorParallel(verbose=0, mem=mem) as exc:
+        with BNLCondorParallel(verbose=0, mem=mem, cpus=cpus) as exc:
             jobs = []
             for tilename, seed in PBar(
                 zip(tnames, seeds), total=len(tnames), desc="making jobs"
@@ -147,7 +147,7 @@ else:
                 ):
                     jobs.append(
                         joblib.delayed(_run_tile)(
-                            tilename, seed, opth, tmpdir, cwd
+                            tilename, seed, opth, tmpdir, cwd, cpus,
                         )
                     )
 
