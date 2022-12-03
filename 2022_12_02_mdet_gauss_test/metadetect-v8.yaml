@@ -10,7 +10,7 @@ fitters:
   - model: pgauss
     weight:
       fwhm: 2.0
-    symmetrize: False
+    symmetrize: True
   - model: gauss
     weight:
       fwhm: 2.0
