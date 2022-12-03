@@ -139,7 +139,7 @@ else:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    for mem in [6, 8]:
+    for mem in [8]:
         with BNLCondorParallel(verbose=0, mem=mem, cpus=cpus) as exc:
             jobs = []
             for tilename, seed in PBar(
