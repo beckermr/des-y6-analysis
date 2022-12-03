@@ -146,7 +146,7 @@ else:
                 zip(tnames, seeds), total=len(tnames), desc="making jobs"
             ):
                 if (
-                    np.sum(all_tnames == tilename) == 1
+                    np.sum(all_tnames == tilename) == 4
                     and len(
                         glob.glob("%s/%s*.fits.fz" % (opth, tilename))
                     ) == 0
