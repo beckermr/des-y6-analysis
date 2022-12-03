@@ -96,6 +96,12 @@ run-metadetect-on-slices \
                 check=True,
             )
 
+    for mfile in mfiles:
+        try:
+            os.remove(mfile)
+        except Exception:
+            pass
+
 
 cwd = os.path.abspath(os.path.realpath(os.getcwd()))
 seed = 100
