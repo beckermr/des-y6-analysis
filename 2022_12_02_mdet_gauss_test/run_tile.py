@@ -77,7 +77,6 @@ run-metadetect-on-slices \
   --use-tmpdir \
   --tmpdir=%s \
   --log-level=INFO \
-  --range="0:20" \
   --n-jobs=%d \
   --band-names=griz %s %s %s %s""" % (
         cwd, seed, tmpdir, cpus, mfiles[0], mfiles[1], mfiles[2], mfiles[3],
@@ -116,7 +115,7 @@ if len(sys.argv) == 1:
     rng = np.random.RandomState(seed=seed)
     seeds = rng.randint(low=1, high=2**29, size=len(tnames))
     tmpdir = None
-    cpus = 8
+    cpus = 4
 else:
     tnames = [sys.argv[1]]
     tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
