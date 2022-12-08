@@ -6,12 +6,13 @@ import io
 import sys
 import contextlib
 import numpy as np
+from ngmix.shape import g1g2_to_eta1eta2, eta1eta2_to_g1g2
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from des_y6utils.shear_masking import generate_shear_masking_factor
 
 OUTDIR = "blinded_data"
-COLS_TO_KEEP = ["wmom", "pgauss", "pgauss_reg0.90"]
+COLS_TO_KEEP = ["pgauss", "gauss"]
 
 
 def _is_ok(fname):
@@ -63,8 +64,16 @@ def _msk_shear(fname, passphrase):
                             d[pre + "_g_1"][msk].copy(),
                             d[pre + "_g_2"][msk].copy(),
                         )
-                        e1 = e1o * fac
-                        e2 = e2o * fac
+                        if pre not in ["gauss"]:
+                            e1 = e1o * fac
+                            e2 = e2o * fac
+                        else:
+                            # use eta due to bounds
+                            eta1o, eta2o = g1g2_to_eta1eta2(e1o, e2o)
+                            eta1 = eta1o * fac
+                            eta2 = eta2o * fac
+                            e1, e2 = eta1eta2_to_g1g2(eta1, eta2)
+
                         d[pre + "_g_1"][msk] = e1
                         d[pre + "_g_2"][msk] = e2
 
