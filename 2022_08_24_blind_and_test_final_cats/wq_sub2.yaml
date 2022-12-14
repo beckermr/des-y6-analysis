@@ -1,0 +1,8 @@
+N: 1
+mode: by_node
+command: |
+  source ~/.bashrc
+  conda activate desy6
+  echo `which python`
+  python download_and_blind.py 2 4 &> log2.oe
+
