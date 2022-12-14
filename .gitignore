@@ -143,6 +143,7 @@ condor-exec/
 *.fit
 *.fits.gz
 *.oe
+*.svg
 
 2022_01_22_run_mdet_final_v1/data_final
 2022_01_22_run_mdet_final_v1/mdet_data
@@ -186,3 +187,4 @@ condor-exec/
 2022_09_20_color_dep_meds/meds_dir
 2022_09_20_color_dep_meds/meds
 2022_09_20_color_dep_meds/desmeds
+2022_09_20_color_dep_meds/meds_dir_v1
