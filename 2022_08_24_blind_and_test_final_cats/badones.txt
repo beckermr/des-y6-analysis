@@ -1,0 +1,13 @@
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0533-5540_r5995p01_metadetect.fits 'ascii' codec can't decode byte 0 xfe in position 2: ordinal not in range(128)
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0533-4414_r5995p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0534-1915_r5995p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0531-5457_r5995p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0151-4040_r5936p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0533-4123_r5995p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0533-6122_r5995p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0151-6456_r5936p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0533-4331_r5995p01_metadetect.fits 'ascii' codec can't decode byte 0 xd0 in position 3: ordinal not in range(128)
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0032-2706_r5935p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0037+0126_r5935p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0533-4040_r5995p01_metadetect.fits No extensions have data
+/gpfs02/astro/workarea/beckermr/des-y6-analysis/2022_08_24_blind_and_test_final_cats/blinded_data/DES0533-3415_r5995p01_metadetect.fits No extensions have data
