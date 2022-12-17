@@ -9,7 +9,7 @@ N: 1
 mode: by_node
 command: |
   source ~/.bashrc
-  conda activate desy6
+  conda activate des-y6-final-v2
   echo \`which python\`
   python download_and_blind.py ${num} ${tot} &> log${num}.oe
 " > wq_sub${num}.yaml
