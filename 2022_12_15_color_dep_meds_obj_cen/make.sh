@@ -6,7 +6,7 @@ export MEDS_DIR=./meds_dir
 band=$1
 tname="DES0253+0500"
 
-tmpmeds=/data/beckermr/2022_12_15_color_dep_meds_obj_cen/${tname}
+tmpmeds=/data/beckermr/2022_12_15_color_dep_meds_obj_cen/${tname}-${band}
 mkdir -p ${tmpmeds}
 rm -rf ${tmpmeds}/*
 
