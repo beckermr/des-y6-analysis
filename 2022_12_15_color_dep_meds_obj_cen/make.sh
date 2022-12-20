@@ -9,7 +9,7 @@ tmpmeds=/data/beckermr/2022_12_15_color_dep_meds_obj_cen/${tname}
 mkdir -p ${tmpmeds}
 rm -rf ${tmpmeds}/*
 
-for band in g r i z; do
+for band in i g r z; do
   desmeds-make-meds-desdm \
     Y6A1_test_piff.yaml \
     ${MEDS_DIR}/Y6A1_test_piff/${tname}/lists-${band}/${tname}_${band}_fileconf-Y6A1_test_piff.yaml \
