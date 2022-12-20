@@ -1,7 +1,0 @@
-N: 1
-mode: by_node
-command: |
-  source ~/.bashrc
-  conda activate desmeds-dev
-  echo `which python`
-  ./make.sh
