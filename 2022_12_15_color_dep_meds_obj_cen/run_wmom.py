@@ -38,7 +38,7 @@ m = meds.MEDS(mfiles[0])
 n = m.size
 m.close()
 
-job_inds = list(more_itertools.chunked(range(1000), n//99))
+job_inds = list(more_itertools.chunked(range(n), n//99))
 
 jobs = []
 for jinds in job_inds:
