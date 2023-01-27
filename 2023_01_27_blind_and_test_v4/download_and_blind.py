@@ -12,7 +12,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from des_y6utils.shear_masking import generate_shear_masking_factor
 
-OUTDIR = "blinded_data_test_v2"
+OUTDIR = "blinded_data"
 COLS_TO_KEEP = ["pgauss", "gauss"]
 
 
