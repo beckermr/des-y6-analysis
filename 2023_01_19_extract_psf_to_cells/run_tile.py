@@ -112,7 +112,7 @@ def main():
         for fn in fitsio.read("fnames.fits")["FILENAME"]
     ]))
 
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 2:
         tnames = tnames[:int(sys.argv[1])]
 
     for band in "griz":
