@@ -119,7 +119,7 @@ def main():
         os.makedirs("./epochs_info/" + band, exist_ok=True)
     os.system("mkdir -p data")
 
-    with BNLCondorParallel(verbose=0, mem=2, cpus=40) as exc:
+    with BNLCondorParallel(verbose=0, mem=2, cpus=1, n_jobs=40) as exc:
         jobs = []
         for tilename in PBar(tnames, total=len(tnames), desc="making jobs"):
             jobs.append(
