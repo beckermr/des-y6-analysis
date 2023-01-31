@@ -7,6 +7,7 @@ from esutil.pbar import PBar
 from mattspy import BNLCondorParallel
 import esutil
 import joblib
+import glob
 
 
 def _download_tile(tilename, cwd):
@@ -124,11 +125,19 @@ def main():
     with BNLCondorParallel(verbose=0, mem=2, cpus=1, n_jobs=40) as exc:
         jobs = []
         for tilename in PBar(tnames, total=len(tnames), desc="making jobs"):
-            jobs.append(
-                joblib.delayed(_process_tile)(
-                    tilename, cwd,
+            if len(
+                glob.glob(os.path.join(
+                    cwd,
+                    "epochs_info",
+                    "*",
+                    tilename + "*"
+                ))
+            ) < 4:
+                jobs.append(
+                    joblib.delayed(_process_tile)(
+                        tilename, cwd,
+                    )
                 )
-            )
 
         for res in PBar(exc(jobs), total=len(jobs), desc="processing tiles"):
             try:
