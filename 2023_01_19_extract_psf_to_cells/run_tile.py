@@ -87,7 +87,7 @@ def _process_file(fname, tname, band):
     return ei, ii
 
 
-def _process_tile(tname, uccds, cwd):
+def _process_tile(tname, cwd):
     fnames = _download_tile(tname, cwd)
     for fname in fnames:
         band = os.path.basename(fname).split("_")[2]
@@ -96,6 +96,7 @@ def _process_tile(tname, uccds, cwd):
         ei, _ = _process_file(fname, tname, band)
 
         ofname = os.path.join(
+            cwd,
             "epochs_info",
             band,
             os.path.basename(fname)[:-len("pizza-cutter-slices.fits.fz")]
@@ -103,8 +104,6 @@ def _process_tile(tname, uccds, cwd):
         )
 
         fitsio.write(ofname, ei, clobber=True)
-        for i in range(len(ei)):
-            uccds.add((ei["expnum"][i], ei["ccdnum"][i], ei["band"][i]))
 
 
 def main():
@@ -127,7 +126,7 @@ def main():
         for tilename in PBar(tnames, total=len(tnames), desc="making jobs"):
             jobs.append(
                 joblib.delayed(_process_tile)(
-                    tilename, set(), cwd,
+                    tilename, cwd,
                 )
             )
 
