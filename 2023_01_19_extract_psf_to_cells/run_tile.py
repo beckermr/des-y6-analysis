@@ -10,6 +10,7 @@ import joblib
 
 
 def _download_tile(tilename, cwd):
+    os.system("mkdir -p data")
     d = fitsio.read(
         os.path.join(cwd, "fnames.fits"),
         lower=True,
@@ -86,8 +87,8 @@ def _process_file(fname, tname, band):
     return ei, ii
 
 
-def _process_tile(tname, uccds):
-    fnames = _download_tile(tname, os.getcwd())
+def _process_tile(tname, uccds, cwd):
+    fnames = _download_tile(tname, cwd)
     for fname in fnames:
         band = os.path.basename(fname).split("_")[2]
         tname = os.path.basename(fname).split("_")[0]
@@ -107,6 +108,8 @@ def _process_tile(tname, uccds):
 
 
 def main():
+    cwd = os.path.abspath(os.path.realpath(os.getcwd()))
+
     tnames = np.unique(np.array([
         fn.split("_")[0]
         for fn in fitsio.read("fnames.fits")["FILENAME"]
@@ -124,7 +127,7 @@ def main():
         for tilename in PBar(tnames, total=len(tnames), desc="making jobs"):
             jobs.append(
                 joblib.delayed(_process_tile)(
-                    tilename, set(),
+                    tilename, set(), cwd,
                 )
             )
 
