@@ -91,8 +91,8 @@ def main():
                 fixed_text={"mdet_step": len("noshear")},
                 compression="SNAPPY",
                 append=False if first else True,
-                row_group_offsets=1_000_000,
-                file_scheme="drill",
+                row_group_offsets=10_000_000,
+                file_scheme="hive",
                 partition_on=["patch_num", "mdet_step"],
             )
             first = False
