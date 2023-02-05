@@ -6,6 +6,7 @@ from esutil.pbar import PBar
 import fastparquet
 import pandas as pd
 import numpy as np
+import gc
 
 
 def _read_and_mask(fname):
@@ -41,7 +42,7 @@ def main():
             if _d is not None:
                 cats.append(_d)
 
-            if len(cats) == 10:
+            if len(cats) == 20:
                 num_done += len(cats)
                 _d = np.concatenate(cats, axis=0)
                 cats = []
@@ -57,6 +58,7 @@ def main():
                     row_group_offsets=1_000_000,
                 )
                 first = False
+                gc.collect()
                 # print(num_done, num_obj/1e6)
 
     if len(cats) > 0:
@@ -74,6 +76,7 @@ def main():
             append=False if first else True,
             row_group_offsets=1_000_000,
         )
+        gc.collect()
 
 
 if __name__ == "__main__":
