@@ -75,7 +75,6 @@ def main():
         _d = np.concatenate([_read_and_mask(fname)], axis=0)
         num_obj += len(_d)
         _d = pd.DataFrame(_d)
-        print(_d["patch_num"][0], flush=True)
         fastparquet.write(
             pq_fname, _d,
             has_nulls=False,
