@@ -26,7 +26,7 @@ def main():
     num_obj = 0
     cats = []
 
-    exc = get_reusable_executor(max_workers=10)
+    exc = get_reusable_executor(max_workers=1)
     futs = [
         exc.submit(_read_and_mask, fname)
         for fname in PBar(fnames, desc="making jobs")
