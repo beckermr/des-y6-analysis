@@ -7,6 +7,7 @@ import pandas as pd
 import gc
 from numpy.lib.recfunctions import repack_fields
 import numpy as np
+import os
 
 
 COLS = (
@@ -62,11 +63,13 @@ def main():
     fnames = glob.glob(
         "/gpfs02/astro/desdata/esheldon/lensing/"
         "des-lensing/y6patches/patches/*.fits"
-    )[0:3]
+    )
 
     pq_fname = "metadetect_desdmv4_cutsv3_jk"
     first = True
     num_obj = 0
+
+    os.system(f"rm -rf {pq_fname}")
 
     for fname in PBar(fnames):
         _d = np.concatenate([_read_and_mask(fname)], axis=0)
