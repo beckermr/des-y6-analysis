@@ -5,16 +5,18 @@ from des_y6utils.mdet import make_mdet_cuts
 from esutil.pbar import PBar
 import fastparquet
 import pandas as pd
+import numpy as np
+
+
+def _read_and_mask(fname):
+    d = fitsio.read(fname)
+    msk = make_mdet_cuts(d, "3")
+    d = d[msk]
+    return d
 
 
 def main():
     fnames = glob.glob("blinded_data/*.fits")
-
-    def _read_and_mask(fname):
-        d = fitsio.read(fname)
-        msk = make_mdet_cuts(d, "3")
-        d = d[msk]
-        return d
 
     pq_fname = "mdet_desdmv4_cutsv3.parq"
     first = True
@@ -46,9 +48,9 @@ def main():
                 num_obj += len(_d)
                 _d = pd.DataFrame(_d)
                 fastparquet.write(
-                    pq_fname, _d, 
-                    has_nulls=False, 
-                    write_index=False, 
+                    pq_fname, _d,
+                    has_nulls=False,
+                    write_index=False,
                     fixed_text={"mdet_step": len("noshear")},
                     compression="SNAPPY",
                     append=False if first else True,
@@ -64,9 +66,9 @@ def main():
         num_obj += len(_d)
         _d = pd.DataFrame(_d)
         fastparquet.write(
-            pq_fname, _d, 
-            has_nulls=False, 
-            write_index=False, 
+            pq_fname, _d,
+            has_nulls=False,
+            write_index=False,
             fixed_text={"mdet_step": len("noshear")},
             compression="SNAPPY",
             append=False if first else True,
