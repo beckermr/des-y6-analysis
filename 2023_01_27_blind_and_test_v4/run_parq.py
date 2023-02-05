@@ -1,13 +1,12 @@
 import fitsio
-from concurrent.futures import as_completed
 import glob
 from des_y6utils.mdet import make_mdet_cuts
 from esutil.pbar import PBar
 import fastparquet
 import pandas as pd
 import numpy as np
+import joblib
 import gc
-from loky import get_reusable_executor
 
 
 def _read_and_mask(fname):
@@ -20,33 +19,23 @@ def _read_and_mask(fname):
 def main():
     fnames = glob.glob("blinded_data/*.fits")
 
-    pq_fname = "mdet_desdmv4_cutsv3.parq"
+    pq_fname = "metadetect_desdmv4_cutsv3.parq"
     first = True
     num_done = 0
     num_obj = 0
-    cats = []
 
-    exc = get_reusable_executor(max_workers=1)
-    futs = [
-        exc.submit(_read_and_mask, fname)
-        for fname in PBar(fnames, desc="making jobs")
-    ]
-    for fut in PBar(
-        as_completed(futs), total=len(futs), desc="appending catalogs"
-    ):
-        try:
-            _d = fut.result()
-        except Exception as e:
-            print(e)
-            _d = None
+    loc = 0
+    chunk_size = 10
+    chunks = len(fnames) // chunk_size
+    chunks += 1
 
-        if _d is not None:
-            cats.append(_d)
-
-        if len(cats) == 20:
-            num_done += len(cats)
-            _d = np.concatenate(cats, axis=0)
-            cats = []
+    with joblib.Parallel(n_jobs=chunk_size, verbose=0) as par:
+        for chunk in PBar(range(chunks)):
+            max_loc = min(loc + chunk_size, len(fnames))
+            _fnames = fnames[loc:max_loc]
+            jobs = [joblib.delayed(_read_and_mask)(fn) for fn in _fnames]
+            _d = np.concatenate(par(jobs), axis=0)
+            num_done += (max_loc-loc)
             num_obj += len(_d)
             _d = pd.DataFrame(_d)
             fastparquet.write(
@@ -59,25 +48,8 @@ def main():
                 row_group_offsets=1_000_000,
             )
             first = False
+            del _d
             gc.collect()
-            # print(num_done, num_obj/1e6)
-
-    if len(cats) > 0:
-        num_done += len(cats)
-        _d = np.concatenate(cats, axis=0)
-        cats = []
-        num_obj += len(_d)
-        _d = pd.DataFrame(_d)
-        fastparquet.write(
-            pq_fname, _d,
-            has_nulls=False,
-            write_index=False,
-            fixed_text={"mdet_step": len("noshear")},
-            compression="SNAPPY",
-            append=False if first else True,
-            row_group_offsets=1_000_000,
-        )
-        gc.collect()
 
 
 if __name__ == "__main__":
