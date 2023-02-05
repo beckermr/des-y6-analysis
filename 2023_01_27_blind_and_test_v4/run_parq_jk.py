@@ -6,6 +6,7 @@ import fastparquet
 import pandas as pd
 import gc
 from numpy.lib.recfunctions import repack_fields
+import joblib
 
 
 COLS = (
@@ -68,8 +69,8 @@ def main():
     num_obj = 0
 
     for fname in PBar(fnames):
-
-        _d = _read_and_mask(fname)
+        with joblib.Parallel(n_jobs=1, verbose=0) as par:
+            _d = par([joblib.delayed(_read_and_mask)(fname)])[0]
         num_obj += len(_d)
         _d = pd.DataFrame(_d)
         print(_d["patch_num"][0], flush=True)
