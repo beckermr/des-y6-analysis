@@ -7,13 +7,56 @@ import pandas as pd
 import numpy as np
 import joblib
 import gc
+from numpy.lib.recfunctions import repack_fields
+
+
+COLS = (
+    'uid',
+    'patch_num',
+    'tilename',
+    'slice_id',
+    'mdet_step',
+    'ra',
+    'dec',
+    'x',
+    'y',
+    'mfrac',
+    'mfrac_img',
+    'nepoch_g',
+    'nepoch_r',
+    'nepoch_i',
+    'nepoch_z',
+    'psfrec_g_1',
+    'psfrec_g_2',
+    'psfrec_T',
+    'gauss_s2n',
+    'gauss_g_1',
+    'gauss_g_2',
+    'gauss_g_cov_1_1',
+    'gauss_g_cov_1_2',
+    'gauss_g_cov_2_2',
+    'gauss_T_err',
+    'gauss_T_ratio',
+    'gauss_psf_T',
+    'pgauss_T_err',
+    'pgauss_T',
+    'pgauss_psf_T',
+    'pgauss_band_flux_g',
+    'pgauss_band_flux_r',
+    'pgauss_band_flux_i',
+    'pgauss_band_flux_z',
+    'pgauss_band_flux_err_g',
+    'pgauss_band_flux_err_r',
+    'pgauss_band_flux_err_i',
+    'pgauss_band_flux_err_z',
+)
 
 
 def _read_and_mask(fname):
     d = fitsio.read(fname)
     msk = make_mdet_cuts(d, "3")
     d = d[msk]
-    return d
+    return repack_fields(d[[col for col in COLS if col in d.dtype.names]])
 
 
 def main():
