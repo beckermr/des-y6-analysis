@@ -192,3 +192,7 @@ condor-exec/
 2022_12_15_color_dep_meds_obj_cen/desmeds
 
 **/blinded_data*/*
+
+2023_02_16_image_sims_astro_refine_nullwgt/montara
+2023_02_16_image_sims_astro_refine_nullwgt/eastlake
+**/sim_outputs_outpar/*

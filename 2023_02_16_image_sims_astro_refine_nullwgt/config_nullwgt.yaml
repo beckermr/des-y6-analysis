@@ -1,0 +1,47 @@
+modules:
+  - galsim.des
+  - galsim_extra
+  - montara
+  - numpy
+
+pipeline:
+  steps: [stash_prep, coadd_nwgint]
+
+galsim_montara: {}
+
+true_detection:
+  box_size: 48
+
+# delete_images:
+#     delete_coadd: True
+#     delete_se: True
+#     save_tilenames:
+#     - DES0003-3832
+#
+# delete_meds:
+#     save_tilenames: [DES0003-3832]
+#
+meds:
+  cutout_types: ['image','weight','seg','bmask']
+  add_psf_data: True
+  use_joblib: True
+  use_rejectlist: False
+
+single_band_swarp: {}
+swarp:
+  coadd_bands: ['r', 'i', 'z']
+src_extractor: {}
+coadd_nwgint: {}
+pizza_cutter:
+  n_jobs: 8
+metadetect:
+  bands: ["r"]
+
+coadd_nwgint:
+  run_on_inputs: true
+
+stash_prep:
+  tilename: DES0433-2332
+  bands: ['r']
+  desrun: "des-pizza-slices-y6-v14"
+  imsim_data: "$os.environ['IMSIM_DATA']"
