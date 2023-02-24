@@ -5,7 +5,7 @@ modules:
   - numpy
 
 pipeline:
-  steps: [galsim_montara, true_detection, coadd_nwgint, pizza_cutter, metadetect]
+  steps: [galsim_montara, true_detection, coadd_nwgint, delete_images, pizza_cutter, metadetect]
 
 galsim_montara: {}
 
