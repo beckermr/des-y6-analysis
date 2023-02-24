@@ -12,15 +12,9 @@ galsim_montara: {}
 true_detection:
   box_size: 48
 
-# delete_images:
-#     delete_coadd: True
-#     delete_se: True
-#     save_tilenames:
-#     - DES0003-3832
-#
-# delete_meds:
-#     save_tilenames: [DES0003-3832]
-#
+delete_images:
+  delete_se: True
+
 meds:
   cutout_types: ['image','weight','seg','bmask']
   add_psf_data: True
