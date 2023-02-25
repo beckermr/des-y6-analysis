@@ -12,7 +12,7 @@ from mattspy import SLACLSFParallel
 
 
 def _download_tile(tilename, cwd):
-    os.system("mkdir -p data")
+    os.system("mkdir -p ./data")
 
     d = fitsio.read(
         os.path.join(cwd, "fnames.fits"),
