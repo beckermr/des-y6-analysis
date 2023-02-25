@@ -127,7 +127,7 @@ else:
     tnames = [sys.argv[1]]
     tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
     os.system("mkdir -p " + tmpdir)
-    cpus = 1
+    cpus = 4
 
 if len(tnames) == 1:
     _run_tile(tnames[0], seed, opth, tmpdir, cwd, cpus)
