@@ -89,7 +89,6 @@ run-metadetect-on-slices \
 --config=%s/metadetect-v10.yaml \
 --output-path=./mdet_data \
 --seed=%d \
---use-tmpdir \
 --log-level=INFO \
 --n-jobs=%d \
 --band-names=griz %s %s %s %s""" % (
