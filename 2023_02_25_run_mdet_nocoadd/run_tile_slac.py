@@ -156,7 +156,7 @@ else:
         for i in range(d.shape[0])
     ])
     for mem in [8]:
-        with SLACLSFParallel(verbose=0, mem=mem, cpus=cpus) as exc:
+        with SLACLSFParallel(verbose=0, mem=mem) as exc:
             jobs = []
             for tilename, seed in PBar(
                 zip(tnames, seeds), total=len(tnames), desc="making jobs"
