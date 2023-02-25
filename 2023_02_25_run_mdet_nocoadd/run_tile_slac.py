@@ -121,7 +121,7 @@ if len(sys.argv) == 1:
     rng = np.random.RandomState(seed=seed)
     seeds = rng.randint(low=1, high=2**29, size=len(tnames))
     tmpdir = None
-    cpus = 2
+    cpus = 4
 else:
     tnames = [sys.argv[1]]
     tmpdir = None
