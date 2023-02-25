@@ -7,7 +7,6 @@ import glob
 import time
 import random
 import joblib
-import tempfile
 from esutil.pbar import PBar
 from mattspy import SLACLSFParallel
 
@@ -67,43 +66,57 @@ def _run_tile(tilename, seed, opth, tmpdir, cwd, cpus):
             mfiles, tilename
         ))
 
-    with tempfile.TemporaryDirectory() as _tmpdir:
-        if tmpdir is None:
-            tmpdir = str(_tmpdir)
+    if tmpdir is None and "LSB_JOB_TMPDIR" in os.environ:
+        tmpdir = os.environ["LSB_JOB_TMPDIR"]
 
+    if tmpdir is not None:
         cmd = """\
-    run-metadetect-on-slices \
-    --config=%s/metadetect-v10.yaml \
-    --output-path=./mdet_data \
-    --seed=%d \
-    --use-tmpdir \
-    --tmpdir=%s \
-    --log-level=INFO \
-    --n-jobs=%d \
-    --band-names=griz %s %s %s %s""" % (
+run-metadetect-on-slices \
+--config=%s/metadetect-v10.yaml \
+--output-path=./mdet_data \
+--seed=%d \
+--use-tmpdir \
+--tmpdir=%s \
+--log-level=INFO \
+--n-jobs=%d \
+--band-names=griz %s %s %s %s""" % (
             cwd, seed, tmpdir, cpus,
             mfiles[0], mfiles[1], mfiles[2], mfiles[3],
         )
-        subprocess.run(cmd, shell=True, check=True)
+    else:
+        cmd = """\
+run-metadetect-on-slices \
+--config=%s/metadetect-v10.yaml \
+--output-path=./mdet_data \
+--seed=%d \
+--use-tmpdir \
+--log-level=INFO \
+--n-jobs=%d \
+--band-names=griz %s %s %s %s""" % (
+            cwd, seed, cpus,
+            mfiles[0], mfiles[1], mfiles[2], mfiles[3],
+        )
 
-        fnames = glob.glob("./mdet_data/%s*" % tilename)
-        for fname in fnames:
-            pth1 = os.path.realpath(os.path.abspath(fname))
-            pth2 = os.path.realpath(os.path.abspath(
-                os.path.join(opth, os.path.basename(fname)))
+    subprocess.run(cmd, shell=True, check=True)
+
+    fnames = glob.glob("./mdet_data/%s*" % tilename)
+    for fname in fnames:
+        pth1 = os.path.realpath(os.path.abspath(fname))
+        pth2 = os.path.realpath(os.path.abspath(
+            os.path.join(opth, os.path.basename(fname)))
+        )
+        if pth1 != pth2:
+            subprocess.run(
+                "mv %s %s" % (pth1, pth2),
+                shell=True,
+                check=True,
             )
-            if pth1 != pth2:
-                subprocess.run(
-                    "mv %s %s" % (pth1, pth2),
-                    shell=True,
-                    check=True,
-                )
 
-        for mfile in mfiles:
-            try:
-                os.remove(mfile)
-            except Exception:
-                pass
+    for mfile in mfiles:
+        try:
+            os.remove(mfile)
+        except Exception:
+            pass
 
 
 cwd = os.path.abspath(os.path.realpath(os.getcwd()))
