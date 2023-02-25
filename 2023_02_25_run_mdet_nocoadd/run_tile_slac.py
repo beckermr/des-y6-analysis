@@ -79,7 +79,6 @@ run-metadetect-on-slices \
 --tmpdir=%s \
 --log-level=INFO \
 --n-jobs=%d \
---range=0:10 \
 --band-names=griz %s %s %s %s""" % (
             cwd, seed, tmpdir, cpus,
             mfiles[0], mfiles[1], mfiles[2], mfiles[3],
@@ -92,7 +91,6 @@ run-metadetect-on-slices \
 --seed=%d \
 --log-level=INFO \
 --n-jobs=%d \
---range=0:10 \
 --band-names=griz %s %s %s %s""" % (
             cwd, seed, cpus,
             mfiles[0], mfiles[1], mfiles[2], mfiles[3],
@@ -134,7 +132,7 @@ if len(sys.argv) == 1:
     tnames = sorted(list(set([
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
-    ])))[0:10]
+    ])))
     rng = np.random.RandomState(seed=seed)
     seeds = rng.randint(low=1, high=2**29, size=len(tnames))
     tmpdir = None
