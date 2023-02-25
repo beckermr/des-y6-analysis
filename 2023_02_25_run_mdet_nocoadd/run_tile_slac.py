@@ -134,7 +134,7 @@ if len(sys.argv) == 1:
     tnames = sorted(list(set([
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
-    ])))
+    ])))[0:10]
     rng = np.random.RandomState(seed=seed)
     seeds = rng.randint(low=1, high=2**29, size=len(tnames))
     tmpdir = None
