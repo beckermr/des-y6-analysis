@@ -126,7 +126,7 @@ else:
     tnames = [sys.argv[1]]
     tmpdir = "/data/beckermr/tmp/" + tnames[0] + "_mdet"
     os.system("mkdir -p " + tmpdir)
-    cpus = 4
+    cpus = 2
 
 if len(tnames) == 1:
     _run_tile(tnames[0], seed, opth, tmpdir, cwd, cpus)
@@ -139,7 +139,7 @@ else:
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
     ])
-    for mem in [8]:
+    for mem in [4]:
         with BNLCondorParallel(verbose=0, mem=mem, cpus=cpus) as exc:
             jobs = []
             for tilename, seed in PBar(
