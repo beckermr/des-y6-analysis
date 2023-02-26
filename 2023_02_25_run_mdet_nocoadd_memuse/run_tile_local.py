@@ -8,14 +8,11 @@ import time
 import random
 import joblib
 from esutil.pbar import PBar
-from mattspy import SLACLSFParallel
+from mattspy import BNLCondorParallel
 
 
-def _download_tile(tilename, cwd, tmpdir):
-    if tmpdir is not None:
-        odir = tmpdir
-    else:
-        odir = "./data"
+def _download_tile(tilename, cwd):
+    os.system("mkdir -p data")
 
     d = fitsio.read(
         os.path.join(cwd, "fnames.fits"),
@@ -37,29 +34,25 @@ def _download_tile(tilename, cwd, tmpdir):
             _d = d[msk]
             for i in range(len(_d)):
                 fname = os.path.join(d["path"][msk][i], d["filename"][msk][i])
-                if not os.path.exists(
-                    "%s/%s" % (odir, os.path.basename(fname))
-                ):
+                if not os.path.exists("./data/%s" % os.path.basename(fname)):
                     cmd = """\
 rsync \
 -av \
 --password-file $DES_RSYNC_PASSFILE \
 ${DESREMOTE_RSYNC_USER}@${DESREMOTE_RSYNC}/%s \
-%s/%s
-""" % (fname, odir, os.path.basename(fname))
+./data/%s
+""" % (fname, os.path.basename(fname))
                     subprocess.run(cmd, shell=True, check=True)
-            mfiles.append("%s/%s" % (odir, os.path.basename(fname)))
+            mfiles.append("./data/%s" % os.path.basename(fname))
 
     return mfiles
 
 
 def _run_tile(tilename, seed, opth, tmpdir, cwd, cpus):
-    if tmpdir is None and "LSB_JOB_TMPDIR" in os.environ:
-        tmpdir = os.environ["LSB_JOB_TMPDIR"]
-
+    os.system("mkdir -p ./data")
     for _ in range(10):
         try:
-            mfiles = _download_tile(tilename, cwd, tmpdir)
+            mfiles = _download_tile(tilename, cwd)
             break
         except Exception:
             time.sleep(600 + random.randint(-100, 100))
@@ -73,18 +66,21 @@ def _run_tile(tilename, seed, opth, tmpdir, cwd, cpus):
             mfiles, tilename
         ))
 
+    if tmpdir is None:
+        tmpdir = os.environ["TMPDIR"]
+
     cmd = """\
 run-metadetect-on-slices \
---config=%s/metadetect-v10.yaml \
---output-path=./mdet_data \
---seed=%d \
---n-jobs=%d \
---range=0:10 \
---band-names=griz %s %s %s %s""" % (
-        cwd, seed, cpus,
-        mfiles[0], mfiles[1], mfiles[2], mfiles[3],
+  --config=%s/metadetect-v10.yaml \
+  --output-path=./mdet_data \
+  --seed=%d \
+  --use-tmpdir \
+  --tmpdir=%s \
+  --log-level=INFO \
+  --n-jobs=%d \
+  --band-names=griz %s %s %s %s""" % (
+        cwd, seed, tmpdir, cpus, mfiles[0], mfiles[1], mfiles[2], mfiles[3],
     )
-
     subprocess.run(cmd, shell=True, check=True)
 
     fnames = glob.glob("./mdet_data/%s*" % tilename)
@@ -109,7 +105,6 @@ run-metadetect-on-slices \
 
 cwd = os.path.abspath(os.path.realpath(os.getcwd()))
 seed = 100
-os.system("mkdir -p ./data")
 os.system("mkdir -p ./mdet_data")
 os.system("chmod go-rw ./mdet_data")
 opth = os.path.abspath("./mdet_data")
@@ -129,7 +124,8 @@ if len(sys.argv) == 1:
     cpus = 4
 else:
     tnames = [sys.argv[1]]
-    tmpdir = None
+    tmpdir = None  # "/data/beckermr/tmp/" + tnames[0] + "_mdet"
+    # os.system("mkdir -p " + tmpdir)
     cpus = 4
 
 if len(tnames) == 1:
@@ -144,7 +140,7 @@ else:
         for i in range(d.shape[0])
     ])
     for mem in [8]:
-        with SLACLSFParallel(verbose=0, mem=mem) as exc:
+        with BNLCondorParallel(verbose=0, mem=mem, cpus=cpus) as exc:
             jobs = []
             for tilename, seed in PBar(
                 zip(tnames, seeds), total=len(tnames), desc="making jobs"
