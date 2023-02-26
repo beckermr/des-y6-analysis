@@ -7,16 +7,12 @@ import glob
 import time
 import random
 import joblib
+import tempfile
 from esutil.pbar import PBar
 from mattspy import SLACLSFParallel
 
 
-def _download_tile(tilename, cwd, tmpdir):
-    if tmpdir is not None:
-        odir = tmpdir
-    else:
-        odir = "./data"
-
+def _download_tile(tilename, cwd, odir):
     d = fitsio.read(
         os.path.join(cwd, "fnames.fits"),
         lower=True,
@@ -57,23 +53,27 @@ def _run_tile(tilename, seed, opth, tmpdir, cwd, cpus):
     if tmpdir is None and "LSB_JOB_TMPDIR" in os.environ:
         tmpdir = os.environ["LSB_JOB_TMPDIR"]
 
-    for _ in range(10):
-        try:
-            mfiles = _download_tile(tilename, cwd, tmpdir)
-            break
-        except Exception:
-            time.sleep(600 + random.randint(-100, 100))
-            mfiles = None
-            pass
+    with tempfile.TemporaryDirectory(dir=tmpdir) as tmp:
 
-    if mfiles is None:
-        raise RuntimeError("Could not download files for tile %s" % tilename)
-    elif not isinstance(mfiles, list):
-        raise RuntimeError("Only found %d files for tile %s" % (
-            mfiles, tilename
-        ))
+        for _ in range(10):
+            try:
+                mfiles = _download_tile(tilename, cwd, tmp)
+                break
+            except Exception:
+                time.sleep(600 + random.randint(-100, 100))
+                mfiles = None
+                pass
 
-    cmd = """\
+        if mfiles is None:
+            raise RuntimeError(
+                "Could not download files for tile %s" % tilename
+            )
+        elif not isinstance(mfiles, list):
+            raise RuntimeError("Only found %d files for tile %s" % (
+                mfiles, tilename
+            ))
+
+        cmd = """\
 run-metadetect-on-slices \
 --config=%s/metadetect-v10.yaml \
 --output-path=./mdet_data \
@@ -81,30 +81,30 @@ run-metadetect-on-slices \
 --n-jobs=%d \
 --range=0:10 \
 --band-names=griz %s %s %s %s""" % (
-        cwd, seed, cpus,
-        mfiles[0], mfiles[1], mfiles[2], mfiles[3],
-    )
-
-    subprocess.run(cmd, shell=True, check=True)
-
-    fnames = glob.glob("./mdet_data/%s*" % tilename)
-    for fname in fnames:
-        pth1 = os.path.realpath(os.path.abspath(fname))
-        pth2 = os.path.realpath(os.path.abspath(
-            os.path.join(opth, os.path.basename(fname)))
+            cwd, seed, cpus,
+            mfiles[0], mfiles[1], mfiles[2], mfiles[3],
         )
-        if pth1 != pth2:
-            subprocess.run(
-                "mv %s %s" % (pth1, pth2),
-                shell=True,
-                check=True,
-            )
 
-    for mfile in mfiles:
-        try:
-            os.remove(mfile)
-        except Exception:
-            pass
+        subprocess.run(cmd, shell=True, check=True)
+
+        fnames = glob.glob("./mdet_data/%s*" % tilename)
+        for fname in fnames:
+            pth1 = os.path.realpath(os.path.abspath(fname))
+            pth2 = os.path.realpath(os.path.abspath(
+                os.path.join(opth, os.path.basename(fname)))
+            )
+            if pth1 != pth2:
+                subprocess.run(
+                    "mv %s %s" % (pth1, pth2),
+                    shell=True,
+                    check=True,
+                )
+
+        for mfile in mfiles:
+            try:
+                os.remove(mfile)
+            except Exception:
+                pass
 
 
 cwd = os.path.abspath(os.path.realpath(os.getcwd()))
@@ -122,7 +122,7 @@ if len(sys.argv) == 1:
     tnames = sorted(list(set([
         d["filename"][i].split("_")[0]
         for i in range(d.shape[0])
-    ])))
+    ])))[0:10]
     rng = np.random.RandomState(seed=seed)
     seeds = rng.randint(low=1, high=2**29, size=len(tnames))
     tmpdir = None
