@@ -81,4 +81,4 @@ fnames = glob.glob(
     "/gpfs02/astro/desdata/esheldon/lensing/"
     "des-lensing/y6patches/patches-v5a/*.fits"
 )
-_reformat(fnames, "cutsv5")
+_reformat(fnames[0:2], "cutsv5")
