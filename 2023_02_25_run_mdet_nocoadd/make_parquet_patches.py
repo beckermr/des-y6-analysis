@@ -68,6 +68,7 @@ def _reformat_one(fname, odir):
 
 
 def _reformat(fnames, odir, n_jobs=2):
+    os.system("rm -rf %s/*" % odir)
     os.makedirs(odir, exist_ok=True)
     jobs = [
         joblib.delayed(_reformat_one)(fname, odir)
@@ -81,4 +82,4 @@ fnames = glob.glob(
     "/gpfs02/astro/desdata/esheldon/lensing/"
     "des-lensing/y6patches/patches-v5a/*.fits"
 )
-_reformat(fnames[0:2], "cutsv5")
+_reformat(fnames, "cutsv5")
