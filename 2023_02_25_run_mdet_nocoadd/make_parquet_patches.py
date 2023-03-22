@@ -67,7 +67,7 @@ def _reformat_one(fname, odir):
     )
 
 
-def _reformat(fnames, odir, n_jobs=2):
+def _reformat(fnames, odir, n_jobs=4):
     os.system("rm -rf %s/*" % odir)
     os.makedirs(odir, exist_ok=True)
     jobs = [

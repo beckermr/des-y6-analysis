@@ -63,6 +63,7 @@ def _get_col_one(fname, cols, mdet_step):
 
 
 def _get_col(fnames, cols, mdet_step, n_jobs=8):
+    print(" ", flush=True)
     jobs = [
         joblib.delayed(_get_col_one)(fname, cols, mdet_step)
         for fname in fnames
