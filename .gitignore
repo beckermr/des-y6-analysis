@@ -200,3 +200,9 @@ condor-exec/
 **/nocuts/*
 **/cutsv3/*
 **/wq_sub*.yaml
+
+2023_02_25_run_mdet_nocoadd_memuse/metadetect/*
+2023_02_25_run_mdet_nocoadd_memuse/pizza-cutter-metadetect/*
+
+*.h5
+**/*.h5
