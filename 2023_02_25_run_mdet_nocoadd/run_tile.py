@@ -1,5 +1,6 @@
 import sys
 import os
+import hashlib
 import fitsio
 import subprocess
 import numpy as np
@@ -129,6 +130,7 @@ else:
     cpus = 4
 
 if len(tnames) == 1:
+    seed = int(hashlib.sha1(tnames[0].encode("utf-8")).hexdigest(), 16) % 2**31 + 1
     _run_tile(tnames[0], seed, opth, tmpdir, cwd, cpus)
 else:
     d = fitsio.read(

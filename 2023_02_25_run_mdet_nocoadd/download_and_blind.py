@@ -135,11 +135,16 @@ if __name__ == "__main__":
         passphrase = fp.read().strip()
 
     _fnames = glob.glob("./mdet_data/*.fits")
+    _done_fnames = glob.glob("./%s/*.fits" % OUTDIR)
+    _done_fnames = [
+        os.path.basename(fname)
+        for fname in _done_fnames
+    ]
 
     fnames = [
         fname
         for i, fname in enumerate(_fnames)
-        if i % tot == num
+        if i % tot == num and os.path.basename(fname) not in _done_fnames
     ]
 
     print(

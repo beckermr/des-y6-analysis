@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tot=4
+tot=3
 
 for i in `seq 1 ${tot}`; do
   num=$((i-1))
