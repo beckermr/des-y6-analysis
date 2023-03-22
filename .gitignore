@@ -196,3 +196,7 @@ condor-exec/
 2023_02_16_image_sims_astro_refine_nullwgt/montara
 2023_02_16_image_sims_astro_refine_nullwgt/eastlake
 **/sim_outputs_outpar/*
+
+**/nocuts/*
+**/cutsv3/*
+**/wq_sub*.yaml
