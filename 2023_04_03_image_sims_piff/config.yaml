@@ -3,34 +3,16 @@ modules:
   - galsim_extra
   - montara
   - numpy
+  - eastlake
 
 pipeline:
-  steps: [galsim_montara, true_detection, coadd_nwgint, delete_images, pizza_cutter, metadetect]
+  steps: [galsim_montara]
 
 galsim_montara: {}
 
-true_detection:
-  box_size: 48
-
-delete_images:
-  delete_se: True
-
-meds:
-  cutout_types: ['image','weight','seg','bmask']
-  add_psf_data: True
-  use_joblib: True
-  use_rejectlist: False
-
-single_band_swarp: {}
-swarp:
-  coadd_bands: ['r', 'i', 'z']
-src_extractor: {}
-coadd_nwgint: {}
-pizza_cutter:
-  n_jobs: 8
-  use_nwgint: true
-metadetect:
-  bands: ["r"]
+input:
+  des_piff:
+    file_name: "$piff_path"
 
 image:
   type: WideScattered
@@ -57,10 +39,11 @@ image:
         x_min: "$numpy.radians(dec_min_deg)"
         x_max: "$numpy.radians(dec_max_deg)"
 
-
 psf:
-  type: Gaussian
-  fwhm: 0.9
+  type: DES_Piff
+  depixelize: false
+  gi_color: null
+  iz_color: null
 
 gal:
   type: Exponential
@@ -88,7 +71,7 @@ stamp:
 
 output:
   type: DESTile
-  n_se_test: 24
+  n_se_test: 4
   # The number of exposures to build
   tilename: DES0433-2332
   bands: ['r']
@@ -96,10 +79,9 @@ output:
   imsim_data: "$os.environ['IMSIM_DATA']"
   noise_mode: from_weight
   add_bkg: False
-  # n_se_test: 3
   grid_objects: True
 
-  #Save weight and badpix extensions too
+  # Save weight and badpix extensions too
   badpixfromfits:
     hdu: 1
     mask_hdu: 2
