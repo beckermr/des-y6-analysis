@@ -60,7 +60,7 @@ stamp:
   objects:
     star: 0
     gal: 1
-  draw_method: auto
+  draw_method: no_pixel
   # shear_scene: False
   shear:
     type: G1G2
