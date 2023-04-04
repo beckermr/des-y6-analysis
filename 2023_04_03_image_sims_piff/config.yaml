@@ -6,9 +6,15 @@ modules:
   - eastlake
 
 pipeline:
-  steps: [galsim_montara]
+  steps: [galsim_montara, true_detection, meds]
 
 galsim_montara: {}
+
+meds:
+  cutout_types: ['image', 'weight', 'seg', 'bmask']
+  add_psf_data: True
+  use_joblib: True
+  stage_output: True
 
 input:
   des_piff:
@@ -39,11 +45,15 @@ image:
         x_min: "$numpy.radians(dec_min_deg)"
         x_max: "$numpy.radians(dec_max_deg)"
 
+# psf:
+#   type: DES_Piff
+#   depixelize: false
+#   gi_color: null
+#   iz_color: null
+
 psf:
-  type: DES_Piff
-  depixelize: false
-  gi_color: null
-  iz_color: null
+  type: Gaussian
+  fwhm: 0.9
 
 gal:
   type: Exponential
