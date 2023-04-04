@@ -10,6 +10,9 @@ pipeline:
 
 galsim_montara: {}
 
+true_detection:
+  box_size: 48
+
 meds:
   cutout_types: ['image', 'weight', 'seg', 'bmask']
   add_psf_data: True
