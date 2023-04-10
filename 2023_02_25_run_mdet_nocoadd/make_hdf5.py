@@ -72,8 +72,8 @@ def _get_col(fnames, cols, mdet_step, n_jobs=8):
         return np.concatenate(par(jobs), axis=0)
 
 
-ofile_hdf5 = "metadetect_desdmv5a_cutsv5.h5"
-pf_fnames = glob.glob("cutsv5/patch-*.parq")
+ofile_hdf5 = "metadetect_desdmv5a_cutsv5_patchesv5b.h5"
+pf_fnames = glob.glob("desdmv5a_cutsv5_patchesv5b/patch-*.parq")
 
 os.system("rm -f %s" % ofile_hdf5)
 

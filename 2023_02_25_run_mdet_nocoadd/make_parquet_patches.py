@@ -80,6 +80,6 @@ def _reformat(fnames, odir, n_jobs=4):
 
 fnames = glob.glob(
     "/gpfs02/astro/desdata/esheldon/lensing/"
-    "des-lensing/y6patches/patches-v5a/*.fits"
+    "des-lensing/y6patches/patches-v5b/*.fits"
 )
-_reformat(fnames, "cutsv5")
+_reformat(fnames, "desdmv5a_cutsv5_patchesv5b")
