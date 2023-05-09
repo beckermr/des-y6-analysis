@@ -2,7 +2,7 @@ N: 1
 mode: by_node
 command: |
   source ~/.bashrc
-  conda activate des-y6-final-v2
+  conda activate des-y6-imsims
   echo `which python`
-  python download_and_blind.py 0 4 &> log0.oe
+  ./run_sims.sh &> log.oe
 
