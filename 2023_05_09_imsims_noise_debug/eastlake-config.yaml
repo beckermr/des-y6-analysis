@@ -75,7 +75,7 @@ output:
   type: DESTile
   n_se_test: 3
   tilename: DES0433-2332
-  bands: ["i"]
+  bands: ["r"]
   desrun: "des-pizza-slices-y6-v15"
   imsim_data: "$os.environ['IMSIM_DATA']"
   noise_mode: median_inverse_weight
