@@ -8,14 +8,14 @@ run-eastlake-sim \
   -v 1 \
   --seed 234324 \
   eastlake-config.yaml \
-  ./sim_outputs stamp.shear.g1=0.02 stamp.shear.g2=0.0
+  ./sim_outputs_plus stamp.shear.g1=0.02 stamp.shear.g2=0.0
 
 mkdir -p ./sim_outputs_minus
 run-eastlake-sim \
   -v 1 \
   --seed 234324 \
   eastlake-config.yaml \
-  ./sim_outputs stamp.shear.g1=-0.02 stamp.shear.g2=0.0
+  ./sim_outputs_minus stamp.shear.g1=-0.02 stamp.shear.g2=0.0
 
   # --step_names pizza_cutter metadetect \
   # --resume_from=./sim_outputs/job_record.pkl \
