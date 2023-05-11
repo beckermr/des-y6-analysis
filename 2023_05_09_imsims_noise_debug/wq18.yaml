@@ -4,5 +4,5 @@ command: |
   source ~/.bashrc
   conda activate des-y6-imsims
   echo `which python`
-  ./run_sims.sh 18 &> log.oe
+  ./run_sims.sh 18 &> log18.oe
 
