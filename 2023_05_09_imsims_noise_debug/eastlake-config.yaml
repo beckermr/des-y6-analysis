@@ -50,7 +50,10 @@ psf:
 gal:
   type: Exponential
   half_light_radius: 0.5
-  flux: "$10**(0.4*(mag_zp-18.0))"
+  flux:
+    type: Eval
+    str: "10**(0.4*(mag_zp-gmag))"
+    fgmag: 18.0
 
 star:
   type: Gaussian
@@ -73,7 +76,6 @@ stamp:
 
 output:
   type: DESTile
-  n_se_test: 24
   tilename: DES0433-2332
   bands: ["r"]
   desrun: "des-pizza-slices-y6-v15-nostars"
