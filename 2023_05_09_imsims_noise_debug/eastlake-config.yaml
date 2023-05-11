@@ -73,7 +73,7 @@ stamp:
 
 output:
   type: DESTile
-  n_se_test: 3
+  n_se_test: 24
   tilename: DES0433-2332
   bands: ["r"]
   desrun: "des-pizza-slices-y6-v15-nostars"
