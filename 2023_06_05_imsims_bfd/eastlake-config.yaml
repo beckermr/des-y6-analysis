@@ -1,0 +1,112 @@
+modules:
+  - galsim.des
+  - galsim_extra
+  - montara
+  - numpy
+
+pipeline:
+  steps: [galsim_montara, true_detection, desdm_meds]
+
+galsim_montara: {}
+
+delete_sources: {}
+
+true_detection:
+  box_size: 48
+
+desdm_meds: {}
+
+pizza_cutter:
+  n_jobs: 4
+  config_file: des-pizza-slices-y6-v15-nostars.yaml
+metadetect:
+  n_jobs: 12
+  config_file: metadetect-v10-nostars.yaml
+
+image:
+  type: WideScattered
+  border: 50
+
+  # The number of objects across the full focal plane.
+  nobjects: 42849
+
+  xsize: 2048
+  ysize: 4096
+
+  world_pos:
+    type: RADec
+    type: RADec
+    ra:
+      type: Degrees
+      theta: { type: Random, min: "$ra_min_deg", max: "$ra_max_deg" }
+    dec:
+      type: Radians
+      theta:
+        type: RandomDistribution
+        function: "math.cos(x)"  # Uniform on the sky means P(delta) ~ cos(delta)
+        x_min: "$numpy.radians(dec_min_deg)"
+        x_max: "$numpy.radians(dec_max_deg)"
+
+psf:
+  type: Gaussian
+  fwhm: 0.9
+
+gal:
+  type: Exponential
+  half_light_radius: 0.5
+  flux:
+    type: Eval
+    str: "10**(0.4*(mag_zp-gmag))"
+    fgmag: 18.0
+
+star:
+  type: Gaussian
+  sigma: 1.e-6
+  flux: 0
+
+stamp:
+  type: MixedScene
+  objects:
+    star: 0
+    gal: 1
+  draw_method: auto
+  # shear_scene: False
+  shear:
+    type: G1G2
+    g1: 0.00
+    g2: -0.02
+  gsparams:
+    maximum_fft_size: 16384
+
+output:
+  type: DESTile
+  tilename: DES0433-2332
+  bands: ["r", "i"]
+  desrun: "des-pizza-slices-y6-v15-nostars"
+  imsim_data: "$os.environ['IMSIM_DATA']"
+  noise_mode: from_weight
+  add_bkg: False
+  grid_objects: True
+  nproc: 12
+  n_se_test: 6
+
+  # uses the bit mask from the real image
+  # badpixfromfits:
+  #   hdu: 1
+  #   mask_hdu: 2
+  #   mask_file: "$orig_image_path"
+
+  badpix:  # all zero bit mask
+    hdu: 1
+  weight:
+    hdu: 2
+
+  truth:
+    columns:
+      num: obj_num
+      g1: "$(@stamp.shear).g1"
+      g2: "$(@stamp.shear).g2"
+      band: "band"
+      mag_zp: "$mag_zp"
+
+
