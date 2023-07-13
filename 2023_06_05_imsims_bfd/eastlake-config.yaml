@@ -23,6 +23,10 @@ metadetect:
   n_jobs: 12
   config_file: metadetect-v10-nostars.yaml
 
+input:
+ des_piff:
+    file_name: "$piff_path"
+
 image:
   type: WideScattered
   border: 50
@@ -48,8 +52,10 @@ image:
         x_max: "$numpy.radians(dec_max_deg)"
 
 psf:
-  type: Gaussian
-  fwhm: 0.9
+  type: DES_Piff
+  depixelize: false
+  gi_color: null
+  iz_color: null
 
 gal:
   type: Exponential
@@ -69,7 +75,7 @@ stamp:
   objects:
     star: 0
     gal: 1
-  draw_method: auto
+  draw_method: no_pixel
   # shear_scene: False
   shear:
     type: G1G2
