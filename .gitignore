@@ -206,9 +206,14 @@ condor-exec/
 
 *.h5
 **/*.h5
+**/*.parq
 
 2022_12_15_color_dep_meds_obj_cen/meds_dir
 **/montara
 **/eastlake
 **/sim_outputs*
 **/.vscode/*
+**/desmeds
+
+2023_05_16_imsims_noise_debug/run001
+2023_02_25_run_mdet_nocoadd/desdmv5a_cutsv5_patchesv5b/
