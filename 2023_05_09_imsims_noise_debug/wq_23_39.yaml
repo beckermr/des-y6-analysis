@@ -1,0 +1,7 @@
+N: 1
+mode: by_node
+command: |
+  source ~/.bashrc
+  conda activate des-y6-imsims
+  echo `which python`
+  ./run_sims.sh 23 39 &> log23_39.oe

@@ -103,3 +103,5 @@ output:
       g2: "$(@stamp.shear).g2"
       band: "band"
       mag_zp: "$mag_zp"
+
+

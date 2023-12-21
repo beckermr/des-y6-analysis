@@ -3,19 +3,19 @@
 export IMSIM_DATA=${MEDS_DIR}
 export TMPDIR=/data/beckermr/tmp
 
-mkdir -p ./sim_outputs_plus_$1
+mkdir -p ./sim_outputs_plus_$1_$2
 run-eastlake-sim \
   -v 1 \
-  --seed 234324 \
+  --seed $2 \
   eastlake-config.yaml \
-  ./sim_outputs_plus_$1 stamp.shear.g1=0.02 stamp.shear.g2=0.0 gal.flux.fgmag=$1
+  ./sim_outputs_plus_$1_$2 stamp.shear.g1=0.02 stamp.shear.g2=0.0 gal.flux.fgmag=$1
 
-mkdir -p ./sim_outputs_minus_$1
+mkdir -p ./sim_outputs_minus_$1_$2
 run-eastlake-sim \
   -v 1 \
-  --seed 234324 \
+  --seed $2 \
   eastlake-config.yaml \
-  ./sim_outputs_minus_$1 stamp.shear.g1=-0.02 stamp.shear.g2=0.0 gal.flux.fgmag=$1
+  ./sim_outputs_minus_$1_$2 stamp.shear.g1=-0.02 stamp.shear.g2=0.0 gal.flux.fgmag=$1
 
   # --step_names pizza_cutter metadetect \
   # --resume_from=./sim_outputs/job_record.pkl \

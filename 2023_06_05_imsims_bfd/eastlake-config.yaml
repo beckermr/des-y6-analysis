@@ -5,7 +5,7 @@ modules:
   - numpy
 
 pipeline:
-  steps: [galsim_montara, true_detection, desdm_meds]
+  steps: [galsim_montara, coadd_nwgint, swarp, src_extractor, desdm_meds]
 
 galsim_montara: {}
 
@@ -15,6 +15,9 @@ true_detection:
   box_size: 48
 
 desdm_meds: {}
+
+swarp:
+  coadd_bands: ["r", "i"]
 
 pizza_cutter:
   n_jobs: 4
