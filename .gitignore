@@ -217,3 +217,8 @@ condor-exec/
 
 2023_05_16_imsims_noise_debug/run001
 2023_02_25_run_mdet_nocoadd/desdmv5a_cutsv5_patchesv5b/
+
+
+**/.DS_Store
+**/*.hsp
+**/*.csv
