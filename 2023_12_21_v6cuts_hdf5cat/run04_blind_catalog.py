@@ -11,7 +11,7 @@ import numpy as np
 
 COLS_TO_KEEP = ["pgauss", "gauss"]
 
-ofile_hdf5 = "metadetect_cutsv6.h5"
+ofile_hdf5 = "metadetect_cutsv6_all.h5"
 bofile_hdf5 = ofile_hdf5.rsplit(".", maxsplit=1)[0] + "_blinded.h5"
 print(f"blinding {ofile_hdf5} to {bofile_hdf5}...", flush=True)
 
