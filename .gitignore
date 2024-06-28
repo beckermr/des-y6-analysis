@@ -222,3 +222,4 @@ condor-exec/
 **/.DS_Store
 **/*.hsp
 **/*.csv
+**/montara/*
