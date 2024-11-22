@@ -4,7 +4,7 @@ jax.config.update("jax_enable_x64", True)
 
 import jax.numpy as jnp  # noqa: E402
 import numpy as np  # noqa: E402
-import scipy.optimize  # noqa: E402
+import proplot as pplt  # noqa: E402
 
 # fmt: off
 ZVALS = np.array([
@@ -34,94 +34,11 @@ ZBIN_LOW = np.array([0.0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7])
 ZBIN_HIGH = np.array([0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 6.0])
 
 
-def mstudt_trunc(z, scale=0.01):
-    return jax.nn.sigmoid((z - scale / 2) / (scale / 100))
-
-
-@jax.jit
-def mstudt(z, mu, sigma):
-    nu = 3
-    znrm = (z - mu) / sigma
-    vals = jnp.power(1 + znrm * znrm / nu, -(nu + 1) / 2)
-    vals = vals * mstudt_trunc(z)
-    return vals
-
-
-def _safe_div(numer, denom):
-    denom = jnp.where(
-        (denom == 0),
-        1.0,
-        denom,
-    )
-    return jnp.where(
-        (numer == 0) & (denom == 0),
-        0.0,
-        numer / denom,
-    )
-
-
-_mstudt_d1 = jax.grad(mstudt)
-_mstudt_d2 = jax.grad(_mstudt_d1)
-_mstudt_d3 = jax.grad(_mstudt_d2)
-_mstudt_d4 = jax.grad(_mstudt_d3)
-
-
-def _fmodel_mstudt4(z, a0, a1, a2, a3, a4, mu, sigma):
-    val = mstudt(z, mu, sigma)
-    val_d1 = _mstudt_d1(z, mu, sigma)
-    val_d2 = _mstudt_d2(z, mu, sigma)
-    val_d3 = _mstudt_d3(z, mu, sigma)
-    val_d4 = _mstudt_d4(z, mu, sigma)
-
-    return (
-        a0
-        - a1 * _safe_div(val_d1, val)
-        + a2 * _safe_div(val_d2, val) / 2.0
-        - a3 * _safe_div(val_d3, val) / 6.0
-        + a4 * _safe_div(val_d4, val) / 24.0
-    )
-
-
-fmodel_mstudt4 = jax.jit(
-    jax.vmap(_fmodel_mstudt4, in_axes=[0, None, None, None, None, None, None, None]),
-)
-
-
-@jax.jit
-def mstudt_nrm(z, mu, sigma):
-    vals = mstudt(z, mu, sigma)
-    return vals / sompz_integral_nojit(vals, z, 0, 6)
-
-
-def gmodel_template_cosmos():
-    return GMODEL_COSMOS
-
-
-def fit_nz_data_for_template_params(nzs):
-    """Fit the modified Student's t model to the n(z) data.
-
-    Parameters
-    ----------
-    nzs : dict mapping bin index to n(z).
-        The input n(z) data.
-
-    Returns
-    -------
-    params : dict mapping bin index to parameter tuples
-        The fitted parameters for each bin.
-    """
-    params = {}
-    popt = None
-    for i in range(len(nzs)):
-        popt, pcov = scipy.optimize.curve_fit(
-            mstudt_nrm,
-            ZVALS,
-            nzs[i] / sompz_integral(nzs[i], ZVALS, 0, 6),
-            p0=(1, 0.1) if popt is None else popt,
-        )
-        params[i] = tuple(v for v in popt)
-
-    return params
+def gmodel_template_cosmos(z=None):
+    if z is None:
+        return GMODEL_COSMOS
+    else:
+        return jnp.interp(z, ZVALS, GMODEL_COSMOS, left=0.0, right=0.0)
 
 
 def sompz_integral_nojit(y, x, low, high):
@@ -194,3 +111,212 @@ def sompz_integral_nojit(y, x, low, high):
 
 
 sompz_integral = jax.jit(sompz_integral_nojit)
+
+
+def plot_results(*, model_module, model_data, samples=None, map_params=None):
+    mn_pars = tuple(tuple(mnp.tolist()) for mnp in model_data["mn_pars"])
+    z = model_data["z"]
+    nzs = model_data["nz"]
+    mn = model_data["mn"]
+    cov = model_data["cov"]
+    zbins = model_data["zbins"]
+
+    array = [
+        [
+            1,
+            3,
+        ],
+        [
+            1,
+            3,
+        ],
+        [
+            1,
+            3,
+        ],
+        [
+            1,
+            3,
+        ],
+        [
+            2,
+            4,
+        ],
+        [
+            5,
+            7,
+        ],
+        [
+            5,
+            7,
+        ],
+        [
+            5,
+            7,
+        ],
+        [
+            5,
+            7,
+        ],
+        [
+            6,
+            8,
+        ],
+    ]
+
+    fig, axs = pplt.subplots(
+        array,
+        figsize=(8, 6),
+        sharex=4,
+        sharey=0,
+        wspace=None,
+        hspace=[0] * 4 + [None] + [0] * 4,
+    )
+
+    for bi in range(4):
+        # first extract the stats from fit
+        if samples is not None:
+            ngammas = []
+            for i in range(1000):
+                _params = {}
+                for k, v in samples.items():
+                    _params[k] = v[i]
+                ngamma = model_module.model_mean_smooth_tomobin(
+                    **model_data, tbind=bi, params=_params
+                )
+                ngammas.append(ngamma)
+
+            ngammas = np.array(ngammas)
+            ngamma_mn = np.mean(ngammas, axis=0)
+        elif map_params is not None:
+            ngammas = np.array(
+                [
+                    model_module.model_mean_smooth_tomobin(
+                        **model_data, tbind=bi, params=map_params
+                    )
+                ]
+            )
+            ngamma_mn = ngammas[0]
+        else:
+            raise ValueError("Either samples or map_params must be provided.")
+
+        ngamma_ints = []
+        for ngamma in ngammas:
+            ngamma_int = []
+            for j in range(10):
+                nind = mn_pars.index((j, bi))
+                bin_zmin, bin_zmax = zbins[j + 1]
+                bin_dz = bin_zmax - bin_zmin
+                ngamma_int.append(
+                    sompz_integral(ngamma, z, bin_zmin, bin_zmax) / bin_dz
+                )
+            ngamma_ints.append(ngamma_int)
+        ngamma_ints = np.array(ngamma_ints)
+
+        # get the axes
+        bihist = bi * 2
+        axhist = axs[bihist]
+        bidiff = bi * 2 + 1
+        axdiff = axs[bidiff]
+
+        # plot the stuff
+        axhist.axhline(0.0, color="black", linestyle="dotted")
+        axhist.grid(False)
+        axhist.set_yscale("symlog", linthresh=0.2)
+        axhist.format(
+            xlim=(0, 4.1),
+            ylim=(-0.02, 10.0),
+            title=f"bin {bi}",
+            titleloc="ul",
+            xlabel="redshift",
+            ylabel=r"redshift density" if bi % 2 == 0 else None,
+            yticklabels=[] if bi % 2 == 1 else None,
+        )
+
+        axdiff.grid(False)
+        axdiff.axhline(0.0, color="black", linestyle="dotted")
+        axdiff.format(
+            ylim=(-3, 3),
+            ylabel=r"(model - data)/error" if bi % 2 == 0 else None,
+            yticklabels=[] if bi % 2 == 1 else None,
+        )
+
+        axhist.plot(
+            z,
+            nzs[bi],
+            drawstyle="steps-mid",
+            label=r"$n_{\rm phot}(z)$",
+            color="purple",
+            linestyle="dashed",
+        )
+        axhist.plot(
+            z, ngamma_mn, drawstyle="steps-mid", color="black", label=r"$n_\gamma(z)$"
+        )
+        for i in range(10):
+            nind = mn_pars.index((i, bi))
+            bin_zmin, bin_zmax = zbins[i + 1]
+            bin_dz = bin_zmax - bin_zmin
+
+            nmcal_val = sompz_integral(nzs[bi], z, bin_zmin, bin_zmax) / bin_dz
+            axhist.hlines(
+                nmcal_val,
+                bin_zmin,
+                bin_zmax,
+                color="purple",
+                linestyle="dashed",
+            )
+
+            nga_val = mn[nind] / bin_dz
+            nga_err = np.sqrt(cov[nind, nind]) / bin_dz
+            axhist.fill_between(
+                [bin_zmin, bin_zmax],
+                np.ones(2) * nga_val - nga_err,
+                np.ones(2) * nga_val + nga_err,
+                color="blue",
+                alpha=0.5,
+            )
+            axhist.hlines(
+                nga_val,
+                bin_zmin,
+                bin_zmax,
+                color="blue",
+                label=r"$N_{\gamma}^{\alpha}$" if i == 0 else None,
+            )
+
+            ng_val = np.mean(ngamma_ints, axis=0)[i]
+            axhist.hlines(ng_val, bin_zmin, bin_zmax, color="black")
+            if ngamma_ints.shape[0] > 1:
+                ng_err = np.std(ngamma_ints, axis=0)[i]
+                axhist.fill_between(
+                    [bin_zmin, bin_zmax],
+                    np.ones(2) * ng_val - ng_err,
+                    np.ones(2) * ng_val + ng_err,
+                    color="black",
+                    alpha=0.5,
+                )
+            axhist.legend(loc="ur", frameon=False, ncols=1)
+
+            axdiff.fill_between(
+                [bin_zmin, bin_zmax],
+                (np.ones(2) * nga_val - ng_val - nga_err) / nga_err,
+                (np.ones(2) * nga_val - ng_val + nga_err) / nga_err,
+                color="blue",
+                alpha=0.5,
+            )
+            # axdiff.hlines(
+            #     (nga_val - ng_val) / nga_err,
+            #     bin_zmin,
+            #     bin_zmax,
+            #     color="blue",
+            # )
+            # if ngamma_ints.shape[0] > 1:
+            #     ng_err = np.std(ngamma_ints, axis=0)[i]
+            #     axdiff.fill_between(
+            #         [bin_zmin, bin_zmax],
+            #         (np.ones(2) * nga_val - ng_val - ng_err) / ng_err,
+            #         (np.ones(2) * nga_val - ng_val + ng_err) / ng_err,
+            #         color="black",
+            #         alpha=0.5,
+            #     )
+
+    return fig
