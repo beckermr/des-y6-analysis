@@ -292,3 +292,44 @@ def plot_results(*, model_module, model_data, samples=None, map_params=None):
             #     )
 
     return fig
+
+
+def measure_m_dz(*, model_module, model_data, samples=None, return_dict=False):
+    z = model_data["z"]
+    nzs = model_data["nz"]
+    n_samples = 1000
+    data = np.zeros((8, n_samples))
+    for bi in range(4):
+        z_nz = sompz_integral(nzs[bi] * z, z, 0.0, 6.0)
+        assert np.allclose(sompz_integral(nzs[bi], z, 0.0, 6.0), 1.0)
+        for i in range(n_samples):
+            _params = {}
+            for k, v in samples.items():
+                _params[k] = v[i]
+            ngamma = model_module.model_mean_smooth_tomobin(
+                **model_data, tbind=bi, params=_params
+            )
+            m = sompz_integral(ngamma, z, 0.0, 6.0) - 1.0
+            nrm = sompz_integral(ngamma, z, 0.0, 6.0)
+            z_ngamma = sompz_integral(ngamma * z, z, 0.0, 6.0) / nrm
+
+            dz = z_ngamma - z_nz
+            data[bi * 2, i] = m
+            data[bi * 2 + 1, i] = dz
+
+    if return_dict:
+        data = dict(
+            m_b0=data[0],
+            dz_b0=data[1],
+            m_b1=data[2],
+            dz_b1=data[3],
+            m_b2=data[4],
+            dz_b2=data[5],
+            m_b3=data[6],
+            dz_b3=data[7],
+        )
+    else:
+        data = data.T
+
+    return data
+
