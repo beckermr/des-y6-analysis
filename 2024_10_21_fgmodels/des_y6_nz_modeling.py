@@ -121,48 +121,20 @@ def plot_results(*, model_module, model_data, samples=None, map_params=None):
     cov = model_data["cov"]
     zbins = model_data["zbins"]
 
+    # fmt: off
     array = [
-        [
-            1,
-            3,
-        ],
-        [
-            1,
-            3,
-        ],
-        [
-            1,
-            3,
-        ],
-        [
-            1,
-            3,
-        ],
-        [
-            2,
-            4,
-        ],
-        [
-            5,
-            7,
-        ],
-        [
-            5,
-            7,
-        ],
-        [
-            5,
-            7,
-        ],
-        [
-            5,
-            7,
-        ],
-        [
-            6,
-            8,
-        ],
+        [1, 3,],
+        [1, 3,],
+        [1, 3,],
+        [1, 3,],
+        [2, 4,],
+        [5, 7,],
+        [5, 7,],
+        [5, 7,],
+        [5, 7,],
+        [6, 8,],
     ]
+    # fmt: on
 
     fig, axs = pplt.subplots(
         array,
