@@ -1,15 +1,5 @@
 # F/G Modeling for DES Y6 Metadetection
 
-## Files and Scripts
-
-- `des_y6_nz_modeling.py`: collection of utilities to make the models
-- `test_des_y6_nz_modeling.py`: tests for the utilities
-- `N_gamma_alpha_v0.hdf5`: the simulation data - see below for the format
-- `des-y6-nz-fits-gmodel-tests.ipynb`: notebook to make the COSMOS template for the G model
-- `des-y6-nz-fits-full-model-tomo.ipynb`: notebook to fit the full model to the data
-
-**Ignore all other files.**
-
 ## Testing
 
 You can run the tests via `pytest test_des_y6_nz_modeling.py`.
@@ -58,3 +48,27 @@ with h5py.File("N_gamma_alpha_v0.hdf5") as d:
         nzs[_bin] = np.concatenate([[0.0], nzs[_bin]])
         nzs[_bin] = nzs[_bin] / np.asarray(sompz_integral(nzs[_bin], z, 0, 6.0))
 ```
+
+## Files and Scripts for v1
+
+These are in the `v1` directory.
+
+- `des_y6_nz_modeling.py`: collection of utilities to make the models
+- `test_des_y6_nz_modeling.py`: tests for the utilities
+- `N_gamma_alpha_v0.hdf5`: the simulation data - see below for the format
+- `des-y6-nz-fits-gmodel-tests.ipynb`: notebook to make the COSMOS template for the G model
+- `des-y6-nz-fits-full-model-tomo.ipynb`: notebook to fit the full model to the data
+
+**Ignore all other files.**
+
+## Files and Scripts for v0
+
+These are in the `v0` directory.
+
+- `des_y6_nz_modeling.py`: collection of utilities to make the models
+- `test_des_y6_nz_modeling.py`: tests for the utilities
+- `N_gamma_alpha_v0.hdf5`: the simulation data - see below for the format
+- `des-y6-nz-fits-gmodel-tests.ipynb`: notebook to make the COSMOS template for the G model
+- `des-y6-nz-fits-full-model-tomo.ipynb`: notebook to fit the full model to the data
+
+**Ignore all other files.**

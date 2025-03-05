@@ -4,7 +4,7 @@ jax.config.update("jax_enable_x64", True)
 
 import jax.numpy as jnp  # noqa: E402
 import numpy as np  # noqa: E402
-import proplot as pplt  # noqa: E402
+import ultraplot as uplt  # noqa: E402
 
 # fmt: off
 ZVALS = np.array([
@@ -41,9 +41,88 @@ def gmodel_template_cosmos(z=None):
         return jnp.interp(z, ZVALS, GMODEL_COSMOS, left=0.0, right=0.0)
 
 
-def sompz_integral_nojit(y, x, low, high):
+def nz_binned_to_interp(nz, dz, z0):
+    """Convert the binned n(z) to the linearly interpolated n(z).
+
+    The total integral value of the n(z) (i.e., `np.sum(nz)`)
+    is preserved.
+
+    Parameters
+    ----------
+    nz : array
+        The binned n(z) values (i.e., each value is the integral
+        of the underlying n(z) over the bin from -dz/2 to +dz/2
+        about the center of the bin).
+    dz : float
+        The bin width.
+    z0 : float
+        The center of the first bin.
+
+    Returns
+    -------
+    z : array, shape (nz.size + 2,)
+        The redshift values for the linearly interpolated dndz.
+        The two extra values are at the ends of the interpolation
+        for the first and last bins.
+    dndz : array, shape (nz.size + 2,)
+        The linearly interpolated dn(z)/dz values. The first and
+        last values will be zero.
+    """
+    # the first bin's interpolation kernel is truncated to end at zero
+    # if it goes below zero
+    # an untruncated kernel goes from -dz to dz about each bin's center
+    first_zval = jnp.maximum(z0 - dz, 0.0)
+    fbin_dist_left_to_peak = (
+        z0 - first_zval
+        # ^ this factor is the location of the first bin's left most influence
+        # if it is less than zero, we truncate
+    )
+    dndz = jnp.concatenate(
+        [
+            jnp.zeros(1),
+            jnp.array([nz[0] / ((fbin_dist_left_to_peak + dz) / 2)]),
+            nz[1:] / dz,
+            jnp.zeros(1),
+        ]
+    )
+    z = jnp.concatenate(
+        [
+            jnp.ones(1) * first_zval,
+            jnp.arange(nz.shape[0] + 1) * dz + z0,
+        ]
+    )
+    return z, dndz
+
+
+def sompz_integral_nojit(nz, low, high, dz, z0):
+    """Integrate a binned n(z) over a range transforming it to
+    a linearly interpolated n(z) in the process.
+
+    Parameters
+    ----------
+    nz : array
+        The binned n(z) values (i.e., each value is the integral
+        of the underlying n(z) over the bin from -dz/2 to +dz/2
+        about the center of the bin).
+    low : float
+        The lower bound of the integration range.
+    high : float
+        The upper bound of the integration range.
+    dz : float
+        The bin width.
+    z0 : float
+        The center of the first bin.
+    """
+    z, dndz = nz_binned_to_interp(nz, dz, z0)
+    return lin_interp_integral(dndz, z, low, high)
+
+
+sompz_integral = jax.jit(sompz_integral_nojit)
+
+
+def lin_interp_integral_nojit(y, x, low, high):
     """Integrate a linearly interpolated set of values
-    on a grid in a range (low, high).
+    in a range (low, high).
 
     Parameters
     ----------
@@ -70,28 +149,41 @@ def sompz_integral_nojit(y, x, low, high):
     low_ind = jnp.minimum(low_ind, x.shape[0] - 1)
     high_ind = jnp.digitize(high, x, right=True)
     dx = x[1:] - x[:-1]
+    m = (y[1:] - y[:-1]) / dx
 
     # high point not in same bin as low point
     not_in_single_bin = high_ind > low_ind
 
-    # fractional bit on the left
     ileft = jax.lax.select(
         not_in_single_bin,
-        (y[low_ind - 1] + y[low_ind])
+        # if not in single bin, this is the fractional bit on the left
+        ((y[low_ind - 1] + m[low_ind - 1] * (low - x[low_ind - 1])) + y[low_ind])
         / 2.0
-        * (1.0 - (low - x[low_ind - 1]) / dx[low_ind - 1])
-        * dx[low_ind - 1],
-        (y[low_ind - 1] + y[low_ind]) / 2.0 * (high - low),
+        * (x[low_ind] - low),
+        # otherwise this is the whole value
+        (
+            (y[low_ind - 1] + m[low_ind - 1] * (low - x[low_ind - 1]))
+            + (y[low_ind - 1] + m[low_ind - 1] * (high - x[low_ind - 1]))
+        )
+        / 2.0
+        * (high - low),
     )
 
     # fractional bit on the right
     iright = jax.lax.select(
         not_in_single_bin,
-        (y[high_ind - 1] + y[high_ind]) / 2.0 * (high - x[high_ind - 1]),
+        # if not in single bin, this is the fractional bit on the right
+        (
+            y[high_ind - 1]
+            + (y[high_ind - 1] + m[high_ind - 1] * (high - x[high_ind - 1]))
+        )
+        / 2.0
+        * (high - x[high_ind - 1]),
+        # optherwise return 0
         0.0,
     )
 
-    # central bits
+    # central bits, if any
     yint = (y[1:] + y[:-1]) / 2.0 * dx
     yind = jnp.arange(yint.shape[0])
     msk = (yind >= low_ind) & (yind < high_ind - 1)
@@ -110,7 +202,7 @@ def sompz_integral_nojit(y, x, low, high):
     return ileft + icen + iright
 
 
-sompz_integral = jax.jit(sompz_integral_nojit)
+lin_interp_integral = jax.jit(lin_interp_integral_nojit)
 
 
 def plot_results(*, model_module, model_data, samples=None, map_params=None):
@@ -136,7 +228,7 @@ def plot_results(*, model_module, model_data, samples=None, map_params=None):
     ]
     # fmt: on
 
-    fig, axs = pplt.subplots(
+    fig, axs = uplt.subplots(
         array,
         figsize=(8, 6),
         sharex=4,
@@ -332,4 +424,3 @@ def measure_m_dz(*, model_module, model_data, samples=None, return_dict=False):
         data = data.T
 
     return data
-
