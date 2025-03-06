@@ -1,3 +1,5 @@
+from functools import partial
+
 import jax
 
 jax.config.update("jax_enable_x64", True)
@@ -6,39 +8,34 @@ import jax.numpy as jnp  # noqa: E402
 import numpy as np  # noqa: E402
 import ultraplot as uplt  # noqa: E402
 
+# made in notebook des-y6-nz-fits-gmodel-tests.ipynb
 # fmt: off
-ZVALS = np.array([
-    0.   , 0.035, 0.085, 0.135, 0.185, 0.235, 0.285, 0.335, 0.385,
-    0.435, 0.485, 0.535, 0.585, 0.635, 0.685, 0.735, 0.785, 0.835,
-    0.885, 0.935, 0.985, 1.035, 1.085, 1.135, 1.185, 1.235, 1.285,
-    1.335, 1.385, 1.435, 1.485, 1.535, 1.585, 1.635, 1.685, 1.735,
-    1.785, 1.835, 1.885, 1.935, 1.985, 2.035, 2.085, 2.135, 2.185,
-    2.235, 2.285, 2.335, 2.385, 2.435, 2.485, 2.535, 2.585, 2.635,
-    2.685, 2.735, 2.785, 2.835, 2.885, 2.935, 2.985], dtype=np.float64)
-GMODEL_COSMOS = np.array([
-    0.        , 0.08246582, 1.3601444 , 1.25066374, 2.12958718,
-    2.07238116, 1.12181115, 1.74694677, 1.41628421, 0.69532465,
-    0.685951  , 0.61997625, 0.51828428, 0.50239732, 0.80093222,
-    0.56618465, 0.35469994, 0.54471916, 0.40586034, 0.46442509,
-    0.37345465, 0.15910531, 0.1814102 , 0.21069403, 0.16936997,
-    0.18921011, 0.12080918, 0.09110721, 0.09599979, 0.1051503 ,
-    0.08837551, 0.05902462, 0.05996257, 0.06431205, 0.0379474 ,
-    0.04820887, 0.04965505, 0.0430462 , 0.03193403, 0.04069588,
-    0.04148511, 0.02938825, 0.02468001, 0.02701437, 0.02319899,
-    0.02105647, 0.02256154, 0.02151391, 0.01996838, 0.01486944,
-    0.02031702, 0.02035628, 0.01602842, 0.01748957, 0.01953005,
-    0.01923483, 0.02052126, 0.01762587, 0.01375706, 0.01627206,
-    0.01461884], dtype=np.float64)
+GMODEL_COSMOS_NZ = np.array(
+    [
+        0.07959297, 1.3127611 , 1.20709441, 2.05539883, 2.0001857 ,
+        1.08273066, 1.68608845, 1.36694518, 0.67110165, 0.66205455,
+        0.59837816, 0.50022884, 0.48489532, 0.77303018, 0.5464605 ,
+        0.34234327, 0.5257428 , 0.3917214 , 0.44824593, 0.36044462,
+        0.15356257, 0.17509042, 0.20335409, 0.16346964, 0.18261861,
+        0.11660055, 0.08793331, 0.09265545, 0.10148718, 0.08529677,
+        0.05696838, 0.05787366, 0.06207161, 0.03662543, 0.04652942,
+        0.04792522, 0.0415466 , 0.03082155, 0.03927816, 0.04003989,
+        0.02836445, 0.02382023, 0.02607327, 0.02239081, 0.02032293,
+        0.02177557, 0.02076443, 0.01927274, 0.01435144, 0.01960923,
+        0.01964712, 0.01547004, 0.01688029, 0.01884968, 0.01856474,
+        0.01980636, 0.01701184, 0.01327781, 0.01570519, 0.01410957,
+        0.01191486, 0.00897651, 0.01219978, 0.01082054, 0.00800058,
+        0.00952325, 0.00941157, 0.0093954 , 0.00969362, 0.00960027,
+        0.01553798, 0.00565781, 0.52428815, 0.003932  , 0.00323953,
+        0.00355996, 0.00335961, 0.0039129 , 0.00344086, 0.03027401
+    ],
+    dtype=np.float64,
+)
 # fmt: on
+DZ = 0.05
+Z0 = 0.035
 ZBIN_LOW = np.array([0.0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7])
 ZBIN_HIGH = np.array([0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 6.0])
-
-
-def gmodel_template_cosmos(z=None):
-    if z is None:
-        return GMODEL_COSMOS
-    else:
-        return jnp.interp(z, ZVALS, GMODEL_COSMOS, left=0.0, right=0.0)
 
 
 def nz_binned_to_interp(nz, dz, z0):
@@ -94,7 +91,64 @@ def nz_binned_to_interp(nz, dz, z0):
     return z, dndz
 
 
-def sompz_integral_nojit(nz, low, high, dz, z0):
+GMODEL_COSMOS_Z, GMODEL_COSMOS_DNDZ = nz_binned_to_interp(GMODEL_COSMOS_NZ, DZ, Z0)
+
+
+@jax.jit
+def gmodel_template_cosmos(z):
+    return jnp.interp(z, GMODEL_COSMOS_Z, GMODEL_COSMOS_DNDZ, left=0.0, right=0.0)
+
+
+@jax.jit
+def compute_lin_interp_mean(z, dndz):
+    """Compute the mean of a linearly interpolated function.
+
+    Parameters
+    ----------
+    z : array
+        The grid points of the linearly interpolated function.
+    dndz : array
+        The values of the linearly interpolated function at the grid points.
+
+    Returns
+    -------
+    float
+        The mean of the function.
+    """
+    x1 = z[1:]
+    x0 = z[:-1]
+    y1 = dndz[1:]
+    y0 = dndz[:-1]
+    numer = jnp.sum(1 / 6 * (x1 - x0) * (x0 * (2 * y0 + y1) + x1 * (y0 + 2 * y1)))
+    denom = jnp.sum((y0 + y1) * (x1 - x0) / 2)
+    return numer / denom
+
+
+@partial(jax.jit, static_argnames=("dz", "z0"))
+def compute_nz_binned_mean(nz, dz=DZ, z0=Z0):
+    """Compute the mean redshift of a binned n(z).
+
+    Parameters
+    ----------
+    nz : array
+        The binned n(z) values (i.e., each value is the integral
+        of the underlying n(z) over the bin from -dz/2 to +dz/2
+        about the center of the bin).
+    dz : float, optional
+        The bin width.
+    z0 : float, optional
+        The center of the first bin.
+
+    Returns
+    -------
+    float
+        The mean redshift of the binned n(z).
+    """
+    z, dndz = nz_binned_to_interp(nz, dz, z0)
+    return compute_lin_interp_mean(z, dndz)
+
+
+def sompz_integral_nojit(nz, low, high, dz=DZ, z0=Z0):
     """Integrate a binned n(z) over a range transforming it to
     a linearly interpolated n(z) in the process.
 
@@ -117,7 +171,7 @@ def sompz_integral_nojit(nz, low, high, dz, z0):
     return lin_interp_integral(dndz, z, low, high)
 
 
-sompz_integral = jax.jit(sompz_integral_nojit)
+sompz_integral = jax.jit(sompz_integral_nojit, static_argnames=("dz", "z0"))
 
 
 def lin_interp_integral_nojit(y, x, low, high):
@@ -141,6 +195,15 @@ def lin_interp_integral_nojit(y, x, low, high):
     float
         The integral of the values in the range (low, high).
     """
+    # ensure integration bounds are ordered
+    low, high, sign = jax.lax.cond(
+        low < high,
+        lambda low, high: (low, high, 1.0),
+        lambda low, high: (high, low, -1.0),
+        jnp.array(low).astype(jnp.float64),
+        jnp.array(high).astype(jnp.float64),
+    )
+
     low = jnp.minimum(x[-1], jnp.maximum(low, x[0]))
     high = jnp.minimum(x[-1], jnp.maximum(high, x[0]))
     low_ind = jnp.digitize(low, x)
@@ -199,7 +262,7 @@ def lin_interp_integral_nojit(y, x, low, high):
         0.0,
     )
 
-    return ileft + icen + iright
+    return sign * (ileft + icen + iright)
 
 
 lin_interp_integral = jax.jit(lin_interp_integral_nojit)
@@ -272,7 +335,7 @@ def plot_results(*, model_module, model_data, samples=None, map_params=None):
                 bin_zmin, bin_zmax = zbins[j + 1]
                 bin_dz = bin_zmax - bin_zmin
                 ngamma_int.append(
-                    sompz_integral(ngamma, z, bin_zmin, bin_zmax) / bin_dz
+                    sompz_integral(ngamma, bin_zmin, bin_zmax) / bin_dz
                 )
             ngamma_ints.append(ngamma_int)
         ngamma_ints = np.array(ngamma_ints)
@@ -307,21 +370,21 @@ def plot_results(*, model_module, model_data, samples=None, map_params=None):
 
         axhist.plot(
             z,
-            nzs[bi],
+            nzs[bi] / DZ,
             drawstyle="steps-mid",
             label=r"$n_{\rm phot}(z)$",
             color="purple",
             linestyle="dashed",
         )
         axhist.plot(
-            z, ngamma_mn, drawstyle="steps-mid", color="black", label=r"$n_\gamma(z)$"
+            z, ngamma_mn / DZ, drawstyle="steps-mid", color="black", label=r"$n_\gamma(z)$"
         )
         for i in range(10):
             nind = mn_pars.index((i, bi))
             bin_zmin, bin_zmax = zbins[i + 1]
             bin_dz = bin_zmax - bin_zmin
 
-            nmcal_val = sompz_integral(nzs[bi], z, bin_zmin, bin_zmax) / bin_dz
+            nmcal_val = sompz_integral(nzs[bi], bin_zmin, bin_zmax) / bin_dz
             axhist.hlines(
                 nmcal_val,
                 bin_zmin,
@@ -387,13 +450,12 @@ def plot_results(*, model_module, model_data, samples=None, map_params=None):
 
 
 def measure_m_dz(*, model_module, model_data, samples=None, return_dict=False):
-    z = model_data["z"]
     nzs = model_data["nz"]
     n_samples = 1000
     data = np.zeros((8, n_samples))
     for bi in range(4):
-        z_nz = sompz_integral(nzs[bi] * z, z, 0.0, 6.0)
-        assert np.allclose(sompz_integral(nzs[bi], z, 0.0, 6.0), 1.0)
+        z_nz = compute_nz_binned_mean(nzs[bi])
+        assert np.allclose(sompz_integral(nzs[bi], 0.0, 6.0), 1.0)
         for i in range(n_samples):
             _params = {}
             for k, v in samples.items():
@@ -401,9 +463,8 @@ def measure_m_dz(*, model_module, model_data, samples=None, return_dict=False):
             ngamma = model_module.model_mean_smooth_tomobin(
                 **model_data, tbind=bi, params=_params
             )
-            m = sompz_integral(ngamma, z, 0.0, 6.0) - 1.0
-            nrm = sompz_integral(ngamma, z, 0.0, 6.0)
-            z_ngamma = sompz_integral(ngamma * z, z, 0.0, 6.0) / nrm
+            m = sompz_integral(ngamma, 0.0, 6.0) - 1.0
+            z_ngamma = compute_nz_binned_mean(ngamma)
 
             dz = z_ngamma - z_nz
             data[bi * 2, i] = m

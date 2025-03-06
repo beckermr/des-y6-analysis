@@ -12,8 +12,8 @@ from scipy.integrate import tanhsinh  # noqa: E402
 import pytest  # noqa: E402
 
 from des_y6_nz_modeling import (  # noqa: E402
+    compute_lin_interp_mean,
     gmodel_template_cosmos,
-    ZVALS,
     lin_interp_integral,
     lin_interp_integral_nojit,
     nz_binned_to_interp,
@@ -24,10 +24,11 @@ from mstudt4 import fmodel_mstudt4  # noqa: E402
 
 
 def test_gmodel_template_cosmos():
-    assert gmodel_template_cosmos()[0] == 0.0
+    assert gmodel_template_cosmos(0.0) == 0.0
 
 
 def test_fmodel_mstudt4():
+    zvals = np.arange(0, 4, 0.05)
     a0 = 0.0
     a1 = 0.0
     a2 = 0.0
@@ -35,8 +36,23 @@ def test_fmodel_mstudt4():
     a4 = 0.0
     mu = 0.5
     sigma = 0.3
-    assert np.all(fmodel_mstudt4(ZVALS, a0, a1, a2, a3, a4, mu, sigma) == 0.0)
-    assert np.all(fmodel_mstudt4(ZVALS, 0.3, a1, a2, a3, a4, mu, sigma) == 0.3)
+    assert np.all(fmodel_mstudt4(zvals, a0, a1, a2, a3, a4, mu, sigma) == 0.0)
+    assert np.all(fmodel_mstudt4(zvals, 0.3, a1, a2, a3, a4, mu, sigma) == 0.3)
+
+
+def test_compute_lin_interp_mean():
+    rng = np.random.default_rng(42)
+    x = np.sort(rng.uniform(0, 1, 100))
+    y = np.abs(np.sin(x * 10))
+
+    spl = InterpolatedUnivariateSpline(x, y, k=1, ext=1)
+
+    mn = compute_lin_interp_mean(x, y)
+
+    numer = tanhsinh(lambda z: z * spl(z), x[0], x[-1], atol=1e-12, rtol=0).integral
+    denom = tanhsinh(lambda z: spl(z), x[0], x[-1], atol=1e-12, rtol=0).integral
+
+    assert_allclose(numer / denom, mn, rtol=0, atol=1e-7)
 
 
 @pytest.mark.parametrize("dz", [0.01, 0.025, 0.04, 0.05])

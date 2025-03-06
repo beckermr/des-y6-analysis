@@ -9,12 +9,11 @@ import numpyro  # noqa: E402
 import numpyro.distributions as dist  # noqa: E402
 
 from des_y6_nz_modeling import (  # noqa: E402
+    compute_nz_binned_mean,
     sompz_integral,
     sompz_integral_nojit,
-    gmodel_template_cosmos,
+    GMODEL_COSMOS_NZ,
 )
-
-POLY_ORDER = -1
 
 
 def mstudt_trunc(z, scale=0.01):
@@ -73,7 +72,7 @@ fmodel_mstudt4 = jax.jit(
 @jax.jit
 def mstudt_nrm(z, mu, sigma):
     vals = mstudt(z, mu, sigma)
-    return vals / sompz_integral_nojit(vals, z, 0, 6)
+    return vals / sompz_integral_nojit(vals, 0, 6)
 
 
 def fit_nz_data_for_template_params(z, nzs):
@@ -97,7 +96,7 @@ def fit_nz_data_for_template_params(z, nzs):
         popt, pcov = scipy.optimize.curve_fit(
             mstudt_nrm,
             z,
-            nzs[i] / sompz_integral(nzs[i], z, 0, 6),
+            nzs[i] / sompz_integral(nzs[i], 0, 6),
             p0=(1, 0.1) if popt is None else popt,
         )
         params[i] = tuple(v for v in popt)
@@ -117,24 +116,13 @@ def model_mean_smooth(*, mu, sigma, z, nz, mn_pars, zbins, params, mn=None, cov=
         dmu_i = params[f"dmu_b{i}"]
         sigma_i = params[f"sigma_b{i}"]
 
-        _nrm = sompz_integral(nz[i], z, 0, 6)
-        _mn = sompz_integral(z * nz[i], z, 0, 6) / _nrm
+        _mn = compute_nz_binned_mean(nz[i])
 
         mu_i = _mn + dmu_i
-        # sigma_i = 0.8
-
-        # g_z0 = params.get("g_z0", 0.0)
-        # g_alpha = params.get("g_alpha", 0.0)
-        # g = g_z0 * jnp.power(1.0 + _mn, g_alpha)
 
         fmod = fmodel_mstudt4(z, a0, a1, a2, a3, a4, mu_i, sigma_i)
-        gmod = g * gmodel_template_cosmos(z)
+        gmod = g * GMODEL_COSMOS_NZ[:nz[i].shape[0]]
         ngamma = (1.0 + fmod) * nz[i] + gmod
-
-        zs = z - 1
-        for j in range(POLY_ORDER + 1):
-            c_j = params.get(f"c{j}_b{i}", 0.0)
-            ngamma = ngamma + c_j * jnp.power(zs, j)
 
         ngammas.append(ngamma)
 
@@ -155,7 +143,7 @@ def model_mean(*, mu, sigma, z, nz, mn_pars, zbins, params, mn=None, cov=None):
     def _scan_func(mn_pars, ind):
         si, bi = mn_pars[ind]
         zlow, zhigh = zbins[si + 1]
-        val = sompz_integral(ngammas[bi], z, zlow, zhigh)
+        val = sompz_integral(ngammas[bi], zlow, zhigh)
         return mn_pars, val
 
     inds = jnp.arange(len(mn_pars))
@@ -184,18 +172,7 @@ def model(
     assert zbins is not None
     assert z is not None
 
-    # gwidth = numpyro.sample("g_sigma_coeff", dist.LogUniform(0.001, 10.0))
-    # gprior = dist.Normal(0.0, gwidth)
-    # gprior = dist.Uniform(-10, 10)
-    # cwidth = numpyro.sample("c_sigma_coeff", dist.LogUniform(0.001, 10.0))
-    # cprior = dist.Normal(0.0, cwidth)
-    # pwidth = numpyro.sample("a_sigma_coeff", dist.LogUniform(0.001, 10.0))
-    # aprior = dist.Normal(0.0, pwidth)
-    # aprior = dist.Uniform(-10, 10)
-    # dmu_width = numpyro.sample("a_sigma_coeff", dist.LogUniform(0.001, 10.0))
     params = {}
-    # params["g_z0"] = numpyro.sample("g_z0", dist.Uniform(0, 1))
-    # params["g_alpha"] = numpyro.sample("g_alpha", dist.Uniform(-10, 10))
     for i in range(4):
         params[f"dmu_b{i}"] = numpyro.sample(f"dmu_b{i}", dist.Normal(0.0, 0.1))
         lns = 0.5
@@ -203,14 +180,9 @@ def model(
             f"sigma_b{i}", dist.LogNormal(np.log(0.8) - lns**2 / 2, lns)
         )
         for j in range(3):
-            params[f"a{j}_b{i}"] = numpyro.sample(f"a{j}_b{i}", dist.Normal(0.0, 1.0))
+            params[f"a{j}_b{i}"] = numpyro.sample(f"a{j}_b{i}", dist.Normal(0.0, 0.1))
 
-        params[f"g_b{i}"] = numpyro.sample(f"g_b{i}", dist.Normal(0.0, 1.0))
-        for j in range(POLY_ORDER + 1):
-            params[f"c{j}_b{i}"] = numpyro.sample(
-                f"c{j}_b{i}",
-                dist.Normal(0.0, 1.0),
-            )
+        params[f"g_b{i}"] = numpyro.sample(f"g_b{i}", dist.Normal(0.0, 0.1))
 
     model_mn = model_mean(
         mu=mu,

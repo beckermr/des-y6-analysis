@@ -12,11 +12,11 @@ The data is stored in an HDF5 file with the following structure:
 - `shear/cov_params`: the bin parameters for the covariance matrix - see the bin defs below
 - `shear/mean`: the mean of the Nga data
 - `shear/mean_params`: the bin parameters for the mean - see the bin defs below
-- `tomography/bin0`: the SOMPZ n(z) for the first tomographic bin
-- `tomography/bin1`: the SOMPZ n(z) for the second tomographic bin
-- `tomography/bin2`: the SOMPZ n(z) for the third tomographic bin
-- `tomography/bin3`: the SOMPZ n(z) for the fourth tomographic bin
-- `tomography/zbinsc`: the center redshift of the n(z)s
+- `redshift/bin0`: the SOMPZ n(z) for the first tomographic bin
+- `redshift/bin1`: the SOMPZ n(z) for the second tomographic bin
+- `redshift/bin2`: the SOMPZ n(z) for the third tomographic bin
+- `redshift/bin3`: the SOMPZ n(z) for the fourth tomographic bin
+- `redshift/zbinsc`: the center redshift of the n(z)s
 - `alpha/bin-1`: the redshift range of the applied shear for alpha bin -1 (2-element array of low, high)
 - `alpha/bin0`: the redshift range of the applied shear for alpha bin 0 (2-element array of low, high)
 - `alpha/bin1`: the redshift range of the applied shear for alpha bin 1 (2-element array of low, high)
