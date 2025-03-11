@@ -1,9 +1,11 @@
+from collections import namedtuple
 from functools import partial
 
 import jax
 
 jax.config.update("jax_enable_x64", True)
 
+import h5py # noqa: E402
 import jax.numpy as jnp  # noqa: E402
 import numpy as np  # noqa: E402
 import ultraplot as uplt  # noqa: E402
@@ -33,7 +35,60 @@ ZBIN_LOW = np.array([0.0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7])
 ZBIN_HIGH = np.array([0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 6.0])
 
 
-def nz_binned_to_interp(nz, dz, z0):
+ModelData = namedtuple(
+    "ModelData",
+    [
+        "z",
+        "nzs",
+        "mn_pars",
+        "zbins",
+        "mn",
+        "cov",
+    ],
+)
+
+
+def read_data(filename, redshift_type="true"):
+    """Read the data from the given filename.
+
+    Parameters
+    ----------
+    filename : str
+        The name of the file to read.
+    redshift_type : str
+        The type of redshift to read. Either "true" or "sompz".
+        Default is "true".
+
+    Returns
+    -------
+    ModelData
+        The data read from the file as a `ModelData` named tuple.
+    """
+    with h5py.File(filename) as d:
+        mn = d["shear/mean"][:].astype(np.float64)
+        cov = d["shear/cov"][:].astype(np.float64)
+        mn_pars = tuple(tuple(v) for v in d["shear/mean_params"][:].astype(np.int64).tolist())
+        zbins = []
+        for zbin in range(-1, 10):
+            zbins.append(d[f"alpha/bin{zbin}"][:].astype(np.float64))
+        zbins = np.array(zbins)
+
+        z = d[f"redshift/{redshift_type}/zbinsc"][:].astype(np.float64)
+        if np.allclose(z[0], 0.0):
+            cutind = 1
+        else:
+            cutind = 0
+        z = z[cutind:]
+
+        nzs = {}
+        for _bin in range(4):
+            nzs[_bin] = d[f"redshift/{redshift_type}/bin{_bin}"][:].astype(np.float64)
+            nzs[_bin] = nzs[_bin][cutind:] / np.sum(nzs[_bin][cutind:])
+
+    return ModelData(z=z, nzs=nzs, mn_pars=mn_pars, zbins=zbins, mn=mn, cov=cov)
+
+
+def nz_binned_to_interp(nz, dz=DZ, z0=Z0):
     """Convert the binned n(z) to the linearly interpolated n(z).
 
     The total integral value of the n(z) (i.e., `np.sum(nz)`)

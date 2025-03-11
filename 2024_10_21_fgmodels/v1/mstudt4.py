@@ -1,4 +1,6 @@
-import jax
+"""DO NOT USE"""
+assert False, "Do not use this code."
+import jax  # noqa: E402
 
 jax.config.update("jax_enable_x64", True)
 
@@ -121,7 +123,8 @@ def model_mean_smooth(*, mu, sigma, z, nz, mn_pars, zbins, params, mn=None, cov=
         mu_i = _mn + dmu_i
 
         fmod = fmodel_mstudt4(z, a0, a1, a2, a3, a4, mu_i, sigma_i)
-        gmod = g * GMODEL_COSMOS_NZ[:nz[i].shape[0]]
+        gtemp = GMODEL_COSMOS_NZ[:z.shape[0]]
+        gmod = g * gtemp / gtemp.sum()
         ngamma = (1.0 + fmod) * nz[i] + gmod
 
         ngammas.append(ngamma)
@@ -179,7 +182,7 @@ def model(
         params[f"sigma_b{i}"] = numpyro.sample(
             f"sigma_b{i}", dist.LogNormal(np.log(0.8) - lns**2 / 2, lns)
         )
-        for j in range(3):
+        for j in range(5):
             params[f"a{j}_b{i}"] = numpyro.sample(f"a{j}_b{i}", dist.Normal(0.0, 0.1))
 
         params[f"g_b{i}"] = numpyro.sample(f"g_b{i}", dist.Normal(0.0, 0.1))
