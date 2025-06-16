@@ -1,2 +1,4 @@
 *.npy
 *.txt
+**/cosmocov_comp/CosmoCov/*
+**/cosmocov_comp/y6-3x2pt/*
